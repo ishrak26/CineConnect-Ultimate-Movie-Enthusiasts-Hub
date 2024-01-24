@@ -1,0 +1,36 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.6",
+    "@tailwindcss/line-clamp": "^0.4.2",
+    "eslint": "8.56.0",
+    "eslint-config-next": "14.1.0",
+    "framer-motion": "^11.0.2",
+    "next": "14.1.0",
+    "next-auth": "^4.24.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-icons": "^4.7.1",
+    "react-player": "^2.11.2",
+    "react-toastify": "^9.1.1",
+    "swiper": "^9.0.5",
+    "tailwind-scrollbar": "^2.1.0",
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "typescript": "4.9.5"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1"
+  }
+}
