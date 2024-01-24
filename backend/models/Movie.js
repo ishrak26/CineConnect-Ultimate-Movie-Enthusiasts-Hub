@@ -57,7 +57,7 @@ async function fetchGenresByMovieId(movieId) {
 
 /*
     returns array of json objects
-    each json object has two fields: cast_id, cast_name, image_url, role_name
+    each json object has 4 fields: cast_id, cast_name, image_url, role_name
 */
 async function fetchCastsByMovieId(movieId) {
     const { data, error } = await supabase
@@ -80,6 +80,63 @@ async function fetchCastsByMovieId(movieId) {
 
     if (data) {
         // console.log(data);
+        return data;
+    }
+}
+
+/*
+    returns array of json objects
+    each json object has two fields: director_id, director_name
+*/
+async function fetchDirectorsByMovieId(movieId) {
+    const { data, error } = await supabase
+        .from('movie_has_director')
+        .select(
+            `
+        movie_person (
+            id, 
+            name
+        )`
+        )
+        .eq('movie_id', movieId);
+
+    if (error) {
+        console.error('Error fetching directors by movie id', error);
+        return null;
+    }
+
+    if (data) {
+        // console.log(data);
+        return data;
+    }
+}
+
+/*
+    returns array of json objects
+    each json object has two fields: cast_id, cast_name, image_url, role_name
+*/
+async function fetchTopCastsByMovieId(movieId, offset, limit) {
+    const { data, error } = await supabase
+        .from('movie_has_cast')
+        .select(
+            `
+        role_name,
+        movie_person (
+            id, 
+            name, 
+            image_url
+        )`
+        )
+        .eq('movie_id', movieId)
+        .range(offset, offset + limit);
+
+    if (error) {
+        console.error('Error fetching top casts by movie id', error);
+        return null;
+    }
+
+    if (data) {
+        console.log('Returning from fetchTopCastsByMovieId:', data);
         return data;
     }
 }
@@ -216,9 +273,14 @@ async function fetchMoviesById(id) {
                 movie.genres = genres;
             }
 
-            casts = await fetchCastsByMovieId(movie.id);
-            if (casts) {
-                movie.casts = casts;
+            // casts = await fetchCastsByMovieId(movie.id);
+            // if (casts) {
+            //     movie.casts = casts;
+            // }
+
+            const directors = await fetchDirectorsByMovieId(movie.id);
+            if (directors) {
+                movie.directors = directors;
             }
 
             const rating = await fetchMovieRatingById(movie.id);
@@ -229,6 +291,7 @@ async function fetchMoviesById(id) {
 
         console.log('Returning from fetchMoviesById:', data);
         // console.log(data[0].casts);
+        // console.log(data[0].directors);
         return data;
     }
 }
@@ -277,4 +340,5 @@ module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
     fetchMoviePersonsById,
+    fetchTopCastsByMovieId,
 };
