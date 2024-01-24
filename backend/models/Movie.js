@@ -1,18 +1,125 @@
 const supabase = require('../config/supabaseConfig');
 
 /*
-    returns array of json objects
-    each json object resembles a row from the movie table
-    key is the column name, value is the required value in db
+    returns only the numeric avg rating of a movie
 */
-async function getMovies() {
-    const { data, error } = await supabase.from('movie').select();
+async function fetchMovieRatingById(movieId) {
+    const { data, error } = await supabase
+        .from('movie_has_user_rating')
+        .select('rating', { avg: 'rating' })
+        .eq('movie_id', movieId);
 
     if (error) {
-        console.log(error);
+        console.error('Error fetching movie rating by id', error);
+        return null;
     }
     if (data) {
-        console.log(data);
+        // console.log(data);
+        return data[0].rating;
+    }
+}
+
+/*
+    returns array of json objects
+    each json object has two fields: genre_id, genre_name
+*/
+async function fetchGenresByMovieId(movieId) {
+    // First, get the genre IDs associated with the movie
+    const genreIdResponse = await supabase
+        .from('movie_has_genre')
+        .select('genre_id')
+        .eq('movie_id', movieId);
+
+    if (genreIdResponse.error) {
+        console.error(genreIdResponse.error);
+        return null;
+    }
+
+    // Extract genre IDs from the response
+    const genreIds = genreIdResponse.data.map((item) => item.genre_id);
+
+    // Now, get the genres using the retrieved IDs
+    const { data, error } = await supabase
+        .from('genre')
+        .select('id, name')
+        .in('id', genreIds);
+
+    if (error) {
+        console.error('Error fetching genres by movie id', error);
+        return null;
+    }
+
+    if (data) {
+        // console.log(data);
+        return data;
+    }
+}
+
+/*
+    returns array of json objects
+    each json object has two fields: cast_id, cast_name, image_url, role_name
+*/
+async function fetchCastsByMovieId(movieId) {
+    const { data, error } = await supabase
+        .from('movie_has_cast')
+        .select(
+            `
+        role_name,
+        movie_person (
+            id, 
+            name, 
+            image_url
+        )`
+        )
+        .eq('movie_id', movieId);
+
+    if (error) {
+        console.error('Error fetching casts by movie id', error);
+        return null;
+    }
+
+    if (data) {
+        // console.log(data);
+        return data;
+    }
+}
+
+/*
+    returns array of json objects
+    each json object resembles a movie
+    key is the column name, value is the required value in db
+
+    returns only those rows where movie.title matches the case-insensitive title
+*/
+async function fetchMoviesByTitle(title) {
+    title = '%' + title + '%';
+    const { data, error } = await supabase
+        .from('movie')
+        .select(
+            'id, title, release_date, poster_url, duration_in_mins, language'
+        )
+        .ilike('title', title);
+
+    if (error) {
+        console.error('Error fetching movies by title', error);
+        return null;
+    }
+    if (data) {
+        for (let movie of data) {
+            const genres = await fetchGenresByMovieId(movie.id);
+            if (genres) {
+                movie.genres = genres;
+                // console.log('movie.genres', movie.genres);
+            }
+
+            const rating = await fetchMovieRatingById(movie.id);
+            if (rating) {
+                movie.rating = rating;
+            }
+            // console.log('movie', movie);
+        }
+        console.log('Returning from fetchMoviesByTitle:', data);
+        // console.log(data[0].genres);
         return data;
     }
 }
@@ -22,43 +129,47 @@ async function getMovies() {
     each json object resembles a row from the movie table
     key is the column name, value is the required value in db
     returns only those rows where movie.id=id
+
+    should return an array of size 1
 */
-async function getMoviesById(id) {
+async function fetchMoviesById(id) {
     const { data, error } = await supabase.from('movie').select().eq('id', id);
 
     if (error) {
-        console.log(error);
+        console.error('Error fetching movies by id', error);
+        return null;
     }
-    if (data) {
-        console.log(data);
-        return data;
-    }
-}
 
-/*
-    returns array of json objects
-    each json object resembles a row from the movie table
-    key is the column name, value is the required value in db
-    returns only those rows where movie.title matches the case-insensitive title
-*/
-async function getMoviesByTitle(title) {
-    title = '%' + title + '%';
-    const { data, error } = await supabase
-        .from('movie')
-        .select()
-        .ilike('title', title);
-
-    if (error) {
-        console.log(error);
+    if (data.length > 1) {
+        console.error('Multiple movies for one id', data);
+        return null;
     }
+
     if (data) {
-        console.log(data);
+        for (let movie of data) {
+            const genres = await fetchGenresByMovieId(movie.id);
+            if (genres) {
+                movie.genres = genres;
+            }
+
+            casts = await fetchCastsByMovieId(movie.id);
+            if (casts) {
+                movie.casts = casts;
+            }
+
+            const rating = await fetchMovieRatingById(movie.id);
+            if (rating) {
+                movie.rating = rating;
+            }
+        }
+
+        console.log('Returning from fetchMoviesById:', data);
+        // console.log(data[0].casts);
         return data;
     }
 }
 
 module.exports = {
-    getMovies,
-    getMoviesById,
-    getMoviesByTitle,
+    fetchMoviesById,
+    fetchMoviesByTitle,
 };
