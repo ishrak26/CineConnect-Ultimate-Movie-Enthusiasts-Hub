@@ -15,7 +15,7 @@ export default function RootLayout({ children, session }) {
       <Head>
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="/LogoW.png" />
       </Head>
       <SessionProvider session={session}>{children}</SessionProvider>
     </>
