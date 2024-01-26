@@ -1,7 +1,6 @@
 // libraries
 const express = require('express');
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
@@ -15,23 +14,38 @@ const adminRouter = require('./backend/routes/adminIndexRoute');
 // app creation
 const app = express();
 
-// using libraries
-app.use(cors()); // Add CORS configuration here
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// CORS configuration
+app.use(cors({
+    // Configure with your specific CORS settings
+    origin: 'http://cineconnect.com', // PLACEHOLDER: Replace with your frontend domain
+}));
+
+// built-in body parser middleware
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+// cookie parser
 app.use(cookieParser());
 
+// logging
 app.use(morgan('tiny'));
 
-// // allow public directory
-// app.use(express.static('public'));
+// static files
+app.use(express.static('public'));
 
-// // use router
-// app.use('/admin', adminRouter);
-// app.use(auth);
-// app.use('/', router);
+// routers
+app.use('/admin', adminRouter);
+app.use(auth);
+app.use('/', router);
+
+// error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
 
 module.exports = app;
+
 
 /*
 

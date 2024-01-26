@@ -1,5 +1,32 @@
 // configuring .env variables
 require('dotenv').config();
+const { supabase } = require('/../config/supabaseConfig');
+const app = require('./app');
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+    console.log(`Server listening on http://localhost:${port}`);
+    // You can perform any additional startup logic here if needed
+});
+
+// Handling graceful shutdown
+process.once('SIGTERM', () => {
+    console.log('SIGTERM received. Shutting down gracefully.');
+    app.close(() => {
+        console.log('Server shut down.');
+    });
+}).once('SIGINT', () => {
+    console.log('SIGINT received. Shutting down gracefully.');
+    app.close(() => {
+        console.log('Server shut down.');
+    });
+});
+
+
+/*
+// configuring .env variables
+require('dotenv').config();
 
 const app = require('./app');
 const database = require('./database/database');
@@ -20,6 +47,8 @@ app.listen(port, async () => {
 });
 
 process.once('SIGTERM', database.shutdown).once('SIGINT', database.shutdown);
+
+*/
 
 /*
 
