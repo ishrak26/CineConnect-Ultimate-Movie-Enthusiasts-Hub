@@ -15,9 +15,20 @@ const authController = {
         try {
             const { username, email, password, full_name } = req.body;
 
-            // check if user exists
-            // TODO: check if email exists
-            // TODO: check if username exists
+            // check conflicts
+            // check if email exists
+            const emailExists = await userModel.checkIfEmailExists({ email });
+            if (emailExists) {
+                return res.status(409).json({ errors: 'Email already exists' });
+            }
+
+            // check if username exists
+            const userExists = await userModel.checkIfUserExists({ username });
+            if (userExists) {
+                return res
+                    .status(409)
+                    .json({ errors: 'Username already exists' });
+            }
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
