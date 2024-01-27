@@ -253,7 +253,12 @@ async function fetchMoviesByTitle(title, offset, limit) {
     should return an array of size 1
 */
 async function fetchMoviesById(id) {
-    const { data, error } = await supabase.from('movie').select().eq('id', id);
+    const { data, error } = await supabase
+        .from('movie')
+        .select(
+            'id, title, release_date, plot_summary, poster_url, trailer_url, duration_in_mins, language, country_of_first_release, certification'
+        )
+        .eq('id', id);
 
     if (error) {
         console.error('Error fetching movies by id', error);
@@ -308,7 +313,9 @@ async function fetchMoviesById(id) {
 async function fetchMoviePersonsById(moviePersonId) {
     const { data, error } = await supabase
         .from('movie_person')
-        .select()
+        .select(
+            'id, image_url, biography, date_of_birth, date_of_death, name, place_of_birth'
+        )
         .eq('id', moviePersonId);
 
     if (error) {
