@@ -1,0 +1,9 @@
+.card {
+  @apply bg-black-100 block bg-opacity-80 backdrop-blur-lg p-2 pb-0 rounded-xl relative transition;
+  @apply hover:bg-primary-700;
+  /* @apply w-48 h-72; */
+}
+
+.card-title {
+  @apply text-grey-50 font-bold py-4 px-2;
+}
