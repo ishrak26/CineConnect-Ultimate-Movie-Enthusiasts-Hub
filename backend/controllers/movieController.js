@@ -6,10 +6,11 @@ const moviesController = {
 
     getMovies: async (req, res) => {
         const limit = req.query.limit || 10; // Default limit to 10 if not specified
+        const offset = req.query.offset || 0; // Default offset to 0 if not specified
         try {
             console.log('title: ', req.query.title);
             const title = req.query.title || ''; // if title is not provided, use empty string
-            const movies = await db_movie.fetchMoviesByTitle(title, limit);
+            const movies = await db_movie.fetchMoviesByTitle(title, offset, limit);
             res.json(movies || []);
         } catch (error) {
             console.log('in catch: ', error.message);
@@ -29,6 +30,24 @@ const moviesController = {
             }
         } catch (error) {
             res.status(500).json({ message: error.message });
+        }
+    },
+
+    getMoviePersonById: async (req, res) => {
+        const moviePersonId = req.params.moviePersonId;
+        console.log(req.params)
+        try {
+            const moviePersonData = await db_movie.fetchMoviePersonsById(moviePersonId);
+
+            if (!moviePersonData) {
+                // No data found or an error occurred
+                return res.status(404).json({ message: 'Movie person not found' });
+            }
+
+            res.status(200).json(moviePersonData);
+        } catch (error) {
+            console.error('Error in getMoviePersonById:', error);
+            res.status(500).json({ message: 'Internal server error' });
         }
     },
 
@@ -218,33 +237,15 @@ const moviesController = {
 
         try {
             const castsData = await db_movie.fetchTopCastsByMovieId(movieId, offset, limit);
-            // const directorsData = await db_movie.fetchDirectorsByMovieId(movieId);
+            const directorsData = await db_movie.fetchDirectorsByMovieId(movieId);
             
-            if (castsData) {
-                res.status(200).json({ casts: castsData });
+            if (castsData && directorsData) {
+                res.status(200).json({ casts: castsData, directors: directorsData});
             } else {
                 res.status(404).json({ message: "No movie found for the provided movieId" });
             }
         } catch (error) {
             res.status(500).json({ message: error.message });
-        }
-    },
-
-    getMoviePersonById: async (req, res) => {
-        const moviePersonId = req.params.moviePersonId;
-
-        try {
-            const moviePersonData = await moviePersonModel.fetchMoviePersonsById(moviePersonId);
-
-            if (!moviePersonData) {
-                // No data found or an error occurred
-                return res.status(404).json({ message: 'Movie person not found' });
-            }
-
-            res.status(200).json(moviePersonData);
-        } catch (error) {
-            console.error('Error in getMoviePersonById:', error);
-            res.status(500).json({ message: 'Internal server error' });
         }
     },
 
