@@ -54,7 +54,9 @@ const authController = {
             const user = await userModel.findOne({ username });
 
             if (!user) {
-                return res.status(404).json({ errors: 'User not found' });
+                return res
+                    .status(401)
+                    .json({ errors: 'Username or password is incorrect' });
             }
 
             const isPasswordCorrect = await bcrypt.compare(
