@@ -106,7 +106,7 @@ async function fetchDirectorsByMovieId(movieId) {
     }
 
     if (data) {
-        // console.log(data);
+        console.log('Returning from fetchDirectorsByMovieId:', data);
         return data;
     }
 }
@@ -128,7 +128,7 @@ async function fetchTopCastsByMovieId(movieId, offset, limit) {
         )`
         )
         .eq('movie_id', movieId)
-        .range(offset, offset + limit);
+        .range(offset, offset + limit - 1);
 
     if (error) {
         console.error('Error fetching top casts by movie id', error);
@@ -212,13 +212,11 @@ async function fetchMoviesByMoviePersonId(moviePersonId) {
 
     returns only those rows where movie.title matches the case-insensitive title
 */
-async function fetchMoviesByTitle(title, limit, offset) {
+async function fetchMoviesByTitle(title, offset, limit) {
     title = '%' + title + '%';
     const { data, error } = await supabase
         .from('movie')
-        .select(
-            'id, title, release_date, poster_url, duration_in_mins, language'
-        )
+        .select('id, title, release_date, poster_url')
         .ilike('title', title)
         .range(offset, offset + limit - 1);
 
@@ -228,11 +226,11 @@ async function fetchMoviesByTitle(title, limit, offset) {
     }
     if (data) {
         for (let movie of data) {
-            const genres = await fetchGenresByMovieId(movie.id);
-            if (genres) {
-                movie.genres = genres;
-                // console.log('movie.genres', movie.genres);
-            }
+            // const genres = await fetchGenresByMovieId(movie.id);
+            // if (genres) {
+            //     movie.genres = genres;
+            //     // console.log('movie.genres', movie.genres);
+            // }
 
             const rating = await fetchMovieRatingById(movie.id);
             if (rating) {
@@ -342,4 +340,5 @@ module.exports = {
     fetchMoviesByTitle,
     fetchMoviePersonsById,
     fetchTopCastsByMovieId,
+    fetchDirectorsByMovieId,
 };
