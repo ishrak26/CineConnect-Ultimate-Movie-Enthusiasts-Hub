@@ -8,8 +8,9 @@ import Footer from '@components/footer'
 import Search from '@components/search'
 import Pagination from '@components/pagination'
 import BaseLayout from '@components/BaseLayout'
+import Row from '@components/Row'
 
-export default function Home({ data, query }) {
+export default function Home({ trending, netflixOriginals,actionMovies, query }) {
   const router = useRouter()
 
   return (
@@ -49,7 +50,29 @@ export default function Home({ data, query }) {
             </div>
           </div>
 
-          <Segmented
+          <section className="md:space-y-24 pt-5">
+            <div className="pb-14 my-6">
+            <Row
+              movies={trending.results}
+              title="Trending Now"
+              isMain={true}
+            />
+            </div>
+            <div className="pb-14 my-6">
+            <Row movies={netflixOriginals.results} title="Netflix Originals" isMain={true} />
+            </div>
+
+            <div className="pb-14 my-6">
+              <Row
+                movies={actionMovies.results}
+                title="Action Thrillers"
+                isMain={true}
+              />
+            </div>
+
+          </section>
+
+          {/* <Segmented
             className="my-6"
             name="home"
             defaultIndex={query.tab === 'tv' ? 2 : query.tab === 'movie' ? 1 : 0}
@@ -73,7 +96,7 @@ export default function Home({ data, query }) {
           />
 
           <div className="card-list">
-            {data.results.map((result) => (
+            {trending.results.map((result) => (
               <Card
                 key={result.id}
                 id={result.id}
@@ -87,10 +110,14 @@ export default function Home({ data, query }) {
 
           <Pagination
             currentPage={query.page}
-            totalPages={data.total_pages}
+            totalPages={trending.total_pages}
             className="mt-8"
-          />
+          /> */}
+         
+         <div className="pb-14 my-40">
           <Footer className="flex width-full" />
+          </div>
+
         </div>
       </BaseLayout>
 
@@ -99,33 +126,44 @@ export default function Home({ data, query }) {
 }
 
 export async function getServerSideProps({ query }) {
-  const response = await tmdb.get(`/trending/${query.tab || 'all'}/week`, {
-    params: {
-      page: query.page || 1,
-    },
-  })
-
-  if (response.status === 404) {
-    return {
-      notFound: true,
+   // Helper function to fetch data
+   async function fetchData(url, params) {
+    try {
+      const response = await tmdb.get(url, { params });
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return { notFound: true };
+      }
+      return { error: error.message };
     }
   }
+  // Fetch data for different categories
+  const trending = await fetchData(`/trending/${query.tab || 'all'}/week`, { page: query.page || 1 });
+  const netflixOriginals = await fetchData('/discover/movie', { with_networks: 213 });
+  const actionMovies = await fetchData('/discover/movie', { with_genres: 28 });
 
-  if (response.data.success === false) {
+  // Consolidate errors and data
+  if (trending.notFound || netflixOriginals.notFound || actionMovies.notFound) {
+    return { notFound: true };
+  }
+
+  if (trending.error || netflixOriginals.error || actionMovies.error) {
     return {
       props: {
         error: {
-          statusCode: response.status,
-          statusMessage: response.data.status_message,
+          message: trending.error || netflixOriginals.error || actionMovies.error,
         },
       },
-    }
+    };
   }
 
   return {
     props: {
-      data: response.data,
+      trending: trending,
+      netflixOriginals: netflixOriginals,
+      actionMovies: actionMovies,
       query,
     },
-  }
+  };
 }
