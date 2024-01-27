@@ -28,8 +28,8 @@ const authController = {
                 full_name,
             });
 
-            const token = jwt.sign({ id: user.id }, SECRET_KEY);
-            return res.status(201).json({ user: user, token: token });
+            // const token = jwt.sign({ id: user.id }, SECRET_KEY);
+            return res.status(201).json({ success: true });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ errors: err });
@@ -60,7 +60,10 @@ const authController = {
             const token = jwt.sign({ id: user.id }, SECRET_KEY, {
                 expiresIn: '1d',
             });
-            return res.status(200).json({ user: user, token: token });
+            return res.status(200).json({
+                user: { username: user.username, id: user.id },
+                token: token,
+            });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ errors: err });
