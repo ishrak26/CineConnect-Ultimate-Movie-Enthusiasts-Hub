@@ -1,0 +1,38 @@
+.navbar {
+  @apply bg-black-100 py-4 bg-opacity-80 sticky top-0 backdrop-blur-md z-40;
+}
+
+.nav-link {
+  @apply link inline-flex items-center px-4 py-3;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: grey;
+  border-radius: 50%;
+  padding: 0.5rem;
+  margin-right: 15px; /* Space between buttons */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  margin-left: auto; /* Pushes the icons to the right */
+}
+ 
+
+.icon-button:hover {
+  background-color: darkgrey; /* Change background color on hover */
+}
+
+.icon-button:last-child {
+  margin-right: 0; /* No right margin for the last button */
+}
+
+.icon {
+  width: 25px; /* Set your desired size */
+  height: 25px; /* Set your desired size */
+}
+.search-bar {
+  flex-grow: 1; /* Makes the search bar grow to use available space */
+  /* max-width: 600px; Optional: set a max-width for the search bar */
+  /* margin: 0 1rem; Adds space around the search bar */
+}

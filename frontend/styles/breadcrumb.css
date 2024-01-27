@@ -1,0 +1,8 @@
+.breadcrumb:not(:first-child)::before {
+  content: '›';
+  @apply inline-block mr-1 text-lg pointer-events-none;
+}
+
+.breadcrumb {
+  @apply flex-shrink-0;
+}

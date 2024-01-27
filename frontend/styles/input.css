@@ -1,0 +1,36 @@
+.input-group {
+  @apply relative;
+}
+
+.input {
+  @apply w-full text-white-100 border-2 border-grey-700 rounded-xl bg-black-10 pt-7 pb-3 px-4 h-16 transition;
+  @apply focus:outline-none focus:border-primary-500;
+  @apply placeholder:text-transparent focus:placeholder:text-grey-600;
+}
+
+.input.has-icon {
+  @apply pl-14;
+}
+
+.input-label {
+  @apply text-sm text-grey-600 top-1/2 -translate-y-1/2 absolute left-4 pointer-events-none transition;
+}
+
+.input.has-icon + .input-label {
+  @apply left-14;
+}
+
+.input:focus + .input-label,
+.input:not(:placeholder-shown) + .input-label {
+  @apply -translate-y-6 text-grey-400;
+}
+
+.input-icon {
+  @apply absolute top-1/2 left-7 -translate-y-1/2 -translate-x-1/2;
+}
+
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
