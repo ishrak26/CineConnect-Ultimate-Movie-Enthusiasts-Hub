@@ -176,9 +176,7 @@ async function fetchMoviesByMoviePersonId(moviePersonId) {
     // Now, get the genres using the retrieved IDs
     const { data, error } = await supabase
         .from('movie')
-        .select(
-            'id, title, release_date, poster_url, duration_in_mins, language'
-        )
+        .select('id, title, release_date, poster_url')
         .in('id', movieIds);
 
     if (error) {
@@ -189,11 +187,11 @@ async function fetchMoviesByMoviePersonId(moviePersonId) {
     if (data) {
         // console.log(data);
         for (let movie of data) {
-            const genres = await fetchGenresByMovieId(movie.id);
-            if (genres) {
-                movie.genres = genres;
-                // console.log('movie.genres', movie.genres);
-            }
+            // const genres = await fetchGenresByMovieId(movie.id);
+            // if (genres) {
+            //     movie.genres = genres;
+            //     // console.log('movie.genres', movie.genres);
+            // }
 
             const rating = await fetchMovieRatingById(movie.id);
             if (rating) {

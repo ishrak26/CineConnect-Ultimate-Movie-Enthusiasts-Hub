@@ -5,23 +5,24 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
 // middlewares
-//const auth = require('./middleware/auth').userAuth;
+const auth = require('./middleware/authMiddleware.js');
 
 // router
-const router = require('./routes/movieRoutes.js');
+const movieRouter = require('./routes/movieRoutes.js');
+const authRouter = require('./routes/authRoutes.js');
 // const adminRouter = require('.routes/adminIndexRoute');
 
 // app creation
 const app = express();
 
-console.log('app.js');
-
 // CORS configuration
-app.use(cors({
-    // Configure with your specific CORS settings
-    // origin: 'http://cineconnect.com', // PLACEHOLDER: Replace with your frontend domain
-    origin: 'http://localhost:3000', // PLACEHOLDER: Replace with your frontend domain
-}));
+app.use(
+    cors({
+        // Configure with your specific CORS settings
+        // origin: 'http://cineconnect.com', // PLACEHOLDER: Replace with your frontend domain
+        origin: 'http://localhost:4000', // PLACEHOLDER: Replace with your frontend domain
+    })
+);
 
 // built-in body parser middleware
 app.use(express.urlencoded({ extended: false }));
@@ -38,8 +39,9 @@ app.use(morgan('tiny'));
 
 // routers
 // app.use('/', adminRouter);
-// app.use(auth);
-app.use('/', router);
+app.use(auth);
+app.use('/v1/auth/', authRouter);
+app.use('/', movieRouter);
 
 // error handling middleware
 app.use((err, req, res, next) => {
@@ -48,7 +50,6 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
-
 
 /*
 
