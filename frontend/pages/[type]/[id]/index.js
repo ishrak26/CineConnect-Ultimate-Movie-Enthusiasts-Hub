@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { tmdb } from '@lib/service'
 import { format, formatDuration, intervalToDuration } from 'date-fns'
 import ArrowIcon from '@components/icons/arrow.svg'
@@ -16,18 +17,35 @@ import Card from '@components/card'
 import Link from 'next/link'
 import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
+import { FaPlus, FaCheck} from 'react-icons/fa'
+import SetRating from '@components/SetRating'
+
 
 export default function Home({
+
   data,
   type,
   // backdropData,
   // posterData,
   // profileData,
 }) {
+
+  const [isAdded, setIsAdded] = useState(false);
+
+  const handleClick = () => {
+    setIsAdded(!isAdded);
+    // Additional logic to handle adding/removing from watchlist
+  };
+  
+  const handleRating = (rate) => {
+    console.log(`Rated with: ${rate}`);
+    // Handle the rating logic (e.g., send to API)
+  };
+
   return (
     <div>
       <Head>
-        <title>{`${data.title || data.name} — Movielister`}</title>
+        <title>{`${data.title || data.name} — CineConnect`}</title>
         <meta
           name="description"
           content="Millions of movies, TV shows and people to discover. Explore now."
@@ -36,47 +54,7 @@ export default function Home({
           name="keywords"
           content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
         />
-        <meta
-          property="og:url"
-          content={`https://movielister.site/${type}/${data.id}`}
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={data.title || data.name} />
-        <meta
-          property="og:description"
-          content={type === 'person' ? data.biography : data.overview}
-        />
-        <meta
-          property="og:image"
-          content={
-            type === 'person'
-              ? `https://image.tmdb.org/t/p/h632${data.profile_path}`
-              : `https://image.tmdb.org/t/p/w500${data.poster_path}`
-          }
-        />
 
-        <meta
-          name="twitter:card"
-          content={type === 'person' ? 'summary' : 'summary_large_image'}
-        />
-        <meta property="twitter:domain" content="movielister.site" />
-        <meta
-          property="twitter:url"
-          content={`https://movielister.site/${type}/${data.id}`}
-        />
-        <meta name="twitter:title" content={data.title || data.name} />
-        <meta
-          name="twitter:description"
-          content={type === 'person' ? data.biography : data.overview}
-        />
-        <meta
-          name="twitter:image"
-          content={
-            type === 'person'
-              ? `https://image.tmdb.org/t/p/h632${data.profile_path}`
-              : `https://image.tmdb.org/t/p/w780${data.backdrop_path}`
-          }
-        />
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </Head>
 
@@ -95,10 +73,10 @@ export default function Home({
               alt={data.title || data.name}
               className="h-96 md:h-[480px] w-full object-cover object-center rounded-[40px]"
               loading="eager"
-              // blurDataURL={backdropData.base64}
-              // placeholder={backdropData.base64 ? 'blur' : 'empty'}
-              // width={1600}
-              // height={900}
+            // blurDataURL={backdropData.base64}
+            // placeholder={backdropData.base64 ? 'blur' : 'empty'}
+            // width={1600}
+            // height={900}
             />
           </div>
         )}
@@ -120,10 +98,10 @@ export default function Home({
                   type === 'movie'
                     ? 'Movies'
                     : type === 'tv'
-                    ? 'TV Shows'
-                    : type === 'person'
-                    ? 'Person'
-                    : 'Collection',
+                      ? 'TV Shows'
+                      : type === 'person'
+                        ? 'Person'
+                        : 'Collection',
               },
               {
                 href: '##',
@@ -150,10 +128,10 @@ export default function Home({
                     }
                     alt={data.title || data.name}
                     className="rounded-[40px] object-cover w-full h-full"
-                    // placeholder={posterData.base64 ? 'blur' : 'empty'}
-                    // blurDataURL={posterData.base64}
-                    // width={480}
-                    // height={710}
+                  // placeholder={posterData.base64 ? 'blur' : 'empty'}
+                  // blurDataURL={posterData.base64}
+                  // width={480}
+                  // height={710}
                   />
                 </div>
               </div>
@@ -161,12 +139,28 @@ export default function Home({
                 <h2 className="heading">{data.tagline || 'Overview'}</h2>
                 <p className="text-white-65">{data.overview}</p>
 
-                <Link
+                {/* <Link
                   href={`/${type}/${data.id}/watch`}
                   className="flex justify-center button button-primary"
                 >
                   Watch
-                </Link>
+                </Link> */}
+                <button
+                  onClick={handleClick}
+                  className="flex items-center justify-center button button-primary"
+                >
+                  {isAdded ? (
+                    <>
+                      <FaCheck className="mr-2" /> Added to Watchlist
+                    </>
+                  ) : (
+                    <>
+                      <FaPlus className="mr-2" /> Add to Watchlist
+                    </>
+                  )}
+                </button>
+
+                <SetRating onRating={handleRating} />
 
                 <Rating average={data.vote_average} />
 
@@ -404,10 +398,10 @@ export default function Home({
                     }
                     alt={data.name}
                     className="rounded-[40px] object-cover w-full h-full"
-                    // placeholder={profileData.base64 ? 'blur' : 'empty'}
-                    // blurDataURL={profileData.base64}
-                    // width={480}
-                    // height={710}
+                  // placeholder={profileData.base64 ? 'blur' : 'empty'}
+                  // blurDataURL={profileData.base64}
+                  // width={480}
+                  // height={710}
                   />
                 </div>
               </div>
