@@ -53,7 +53,18 @@ router.get('/v1/movie/:movieId/reviews', movieController.getMovieReviews);
 router.post('/v1/movie/:movieId/review/submit', movieController.submitMovieReview);
 
 // Route for getting a specific movie person
-// router.get('v1/moviePerson/:moviePersonId', movieController.getMoviePersonById); // **//
+router.get('v1/moviePerson/:moviePersonId', movieController.getMoviePersonById); // **//
 
+// Router to add a new movie to my watchlist
+router.post('/v1/movie/:movieId/watch', movieController.addToWatchlist);
+
+// Router to remove a movie from my watchlist
+router.delete('/v1/movie/:movieId/watch', movieController.removeFromWatchlist);
+
+// Router to mark a movie as watched
+router.post('/v1/movie/:movieId/watched', movieController.markAsWatched);
+
+// Router to unmark a movie as watched
+router.delete('/v1/movie/:movieId/watched', movieController.unmarkAsWatched);
 
 module.exports = router;

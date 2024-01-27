@@ -151,7 +151,9 @@ const moviesController = {
     },
 
     addToWatchlist: async (req, res) => {
+        console.log(req.headers.authorization);
         const movieId = req.params.movieId;
+        
         const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
 
         try {
@@ -166,28 +168,48 @@ const moviesController = {
         }
     },
 
-    removeFromWatchlist: async (req, res) => {
-        const movieId = req.params.movieId;
-        const userId = req.user.id; // Assuming you have a way to get userId from the request
+    // removeFromWatchlist: async (req, res) => {
+    //     const movieId = req.params.movieId;
+    //     const userId = req.user.id; // Assuming you have a way to get userId from the request
 
+    //     try {
+    //         const result = await db_movie.removeMovieFromWatchlist(movieId, userId);
+    //         if (result) {
+    //             res.status(200).json({ message: "Movie successfully removed from watchlist" });
+    //         } else {
+    //             res.status(404).json({ message: "No movie/previous addition to watchlist found for the provided movieId" });
+    //         }
+    //     } catch (error) {
+    //         res.status(500).json({ message: error.message });
+    //     }
+    // },
+    removeFromWatchlist: async (req, res) => {
         try {
-            const result = await db_movie.removeMovieFromWatchlist(movieId, userId);
-            if (result) {
-                res.status(200).json({ message: "Movie successfully removed from watchlist" });
-            } else {
-                res.status(404).json({ message: "No movie/previous addition to watchlist found for the provided movieId" });
-            }
+          // Extract the movieId from the request parameters
+          const movieId = req.params.movieId;
+    
+          const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
+
+          // Call the model function with the decoded user ID and movie ID
+          const result = await db_movie.removeMovieFromWatchlist(userId, movieId);
+    
+          if (result.error) {
+            return res.status(404).json({ message: result.error });
+          }
+          return res.status(200).json({ message: result.message });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+          // Log the error and send a 500 response if an error occurred during the process
+          console.error('Error in removeFromWatchlist controller:', error);
+          return res.status(500).json({ message: 'Internal server error occurred' });
         }
-    },
+      },
 
     markAsWatched: async (req, res) => {
         const movieId = req.params.movieId;
         const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
 
         try {
-            const result = await db_movie.markMovieAsWatched(movieId, userId);
+            const result = await db_movie.addMovieToWatchedlist(movieId, userId);
             if (result) {
                 res.status(201).json({ message: "Movie successfully added to watched-list" });
             } else {
@@ -204,7 +226,7 @@ const moviesController = {
         const userId = req.user.id; // Assuming you have a way to get userId from the request
 
         try {
-            const result = await db_movie.unmarkMovieAsWatched(movieId, userId);
+            const result = await db_movie.removeMovieFromWatchedlist(movieId, userId);
             if (result) {
                 res.status(200).json({ message: "Movie successfully removed from watched-list" });
             } else {
