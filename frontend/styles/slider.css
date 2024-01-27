@@ -1,0 +1,11 @@
+.slider .track-0 {
+  @apply bg-primary-400 w-full h-2 rounded-lg;
+}
+
+.slider .track-1 {
+  @apply bg-primary-600 h-2 rounded-lg;
+}
+
+.slider .thumb {
+  @apply bg-primary-400 w-5 h-5 grid place-items-center text-xs -top-1.5 rounded-full select-none;
+}

@@ -1,0 +1,17 @@
+.segments {
+  @apply bg-black-100 inline-flex items-center gap-1 rounded-xl backdrop-blur-md p-2 overflow-auto w-full snap-x;
+  @apply md:w-auto md:overflow-hidden;
+}
+
+.segment {
+  @apply snap-start;
+}
+
+.segment input {
+  @apply appearance-none hidden;
+}
+
+.segment label {
+  @apply inline-block px-4 py-2 font-semibold text-center text-primary-800 rounded-lg cursor-pointer transition whitespace-nowrap select-none;
+  @apply md:px-8;
+}
