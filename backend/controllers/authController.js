@@ -61,7 +61,7 @@ const authController = {
                 expiresIn: '1d',
             });
             return res.status(200).json({
-                user: { username: user.username, id: user.id },
+                user: { username: user.username, id: user.id, role: user.role },
                 token: token,
             });
         } catch (err) {

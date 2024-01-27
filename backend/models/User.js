@@ -24,7 +24,7 @@ async function createUser(user) {
 async function findOne({ username }) {
     const { data, error } = await supabase
         .from('user_info')
-        .select('id, password, username')
+        .select('id, password, username, role')
         .eq('username', username);
 
     if (error) {
