@@ -5,19 +5,22 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
 // middlewares
-const auth = require('./middlewares/auth').userAuth;
+//const auth = require('./middleware/auth').userAuth;
 
 // router
-const router = require('./backend/routes/indexRoute');
-const adminRouter = require('./backend/routes/adminIndexRoute');
+const router = require('./routes/movieRoutes.js');
+// const adminRouter = require('.routes/adminIndexRoute');
 
 // app creation
 const app = express();
 
+console.log('app.js');
+
 // CORS configuration
 app.use(cors({
     // Configure with your specific CORS settings
-    origin: 'http://cineconnect.com', // PLACEHOLDER: Replace with your frontend domain
+    // origin: 'http://cineconnect.com', // PLACEHOLDER: Replace with your frontend domain
+    origin: 'http://localhost:3000', // PLACEHOLDER: Replace with your frontend domain
 }));
 
 // built-in body parser middleware
@@ -30,12 +33,12 @@ app.use(cookieParser());
 // logging
 app.use(morgan('tiny'));
 
-// static files
-app.use(express.static('public'));
+// // static files
+// app.use(express.static('public'));
 
 // routers
-app.use('/admin', adminRouter);
-app.use(auth);
+// app.use('/', adminRouter);
+// app.use(auth);
 app.use('/', router);
 
 // error handling middleware

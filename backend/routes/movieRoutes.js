@@ -5,10 +5,10 @@ const router = express.Router();
 
 
 // Route for getting a list of movies with filters
-router.get('/v1/movies', movieController.getMovies);
+router.get('/v1/movies/', movieController.getMovies); // **//
 
 // Route for getting details of a specific movie
-router.get('/v1/movie/:movieId', movieController.getMovieById);
+router.get('/v1/movie/:movieId', movieController.getMovieById); // **//
 
 // Route for editing a specific movie
 router.put('/v1/movie/:movieId', movieController.updateMovie);
@@ -38,7 +38,7 @@ router.delete('/v1/movie/:movieId/watched', movieController.unmarkAsWatched);
 router.get('/v1/movie/:movieId/awards-nominations', movieController.getMovieAwards);
 
 // Route for getting all casts and crews of a specific movie
-router.get('/v1/movie/:movieId/casts', movieController.getMovieCasts);
+router.get('/v1/movie/:movieId/casts', movieController.getMovieCasts);  // **//
 
 // Route for getting a list of similar movies
 router.get('/v1/movie/:movieId/similar', movieController.getSimilarMovies);
@@ -51,6 +51,9 @@ router.get('/v1/movie/:movieId/reviews', movieController.getMovieReviews);
 
 // Route for submitting a review for a movie
 router.post('/v1/movie/:movieId/review/submit', movieController.submitMovieReview);
+
+// Route for getting a specific movie person
+// router.get('v1/moviePerson/:moviePersonId', movieController.getMoviePersonById); // **//
 
 
 module.exports = router;
