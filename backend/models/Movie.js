@@ -212,14 +212,15 @@ async function fetchMoviesByMoviePersonId(moviePersonId) {
 
     returns only those rows where movie.title matches the case-insensitive title
 */
-async function fetchMoviesByTitle(title) {
+async function fetchMoviesByTitle(title, limit, offset) {
     title = '%' + title + '%';
     const { data, error } = await supabase
         .from('movie')
         .select(
             'id, title, release_date, poster_url, duration_in_mins, language'
         )
-        .ilike('title', title);
+        .ilike('title', title)
+        .range(offset, offset + limit - 1);
 
     if (error) {
         console.error('Error fetching movies by title', error);
