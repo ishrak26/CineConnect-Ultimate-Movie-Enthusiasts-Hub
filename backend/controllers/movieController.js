@@ -86,69 +86,49 @@ const moviesController = {
         }
     },
 
-    submitMovieRating: async (req, res) => {    // need authentication that the user is logged in
-        const movieId = req.params.movieId;
-        const { rating } = req.body;
-
-        // Validate the rating
-        if (!rating || typeof rating !== 'number') {
-            return res.status(400).json({ message: "Invalid input provided" });
-        }
-
+    submitMovieRating: async (req, res) => {
         try {
-            const userId = req.user.id;
-            const result = await db_movie.addMovieRating(movieId, userId, rating);
-
-            if (result) {
-                res.status(201).json({ message: "Movie successfully rated" });
-            } else {
-                res.status(500).json({ message: "Internal server error occurred" });
-            }
+          const userId = req.user.id; // Assuming user ID is available from request object
+          const movieId = req.params.movieId; // Extract movieId from request parameters
+          const rating  = req.body.rating; // Extract movieId and rating from request body
+    
+          const result = await db_movie.submitRating(userId, movieId, rating);
+          res.status(201).json({ message: "Rating submitted successfully", data: result });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+          res.status(500).json({ message: "Internal server error", error: error.message });
         }
-    },
+      },
 
-    editMovieRating: async (req, res) => {  // need authentication that the user is logged in
-        const movieId = req.params.movieId;
-        const { rating } = req.body;
-
-        // Validate the rating
-        if (!rating || typeof rating !== 'number') {
-            return res.status(400).json({ message: "Invalid input provided" });
-        }
-
+      editMovieRating: async (req, res) => {
         try {
-            const userId = req.user.id;
-            const result = await db_movie.updateMovieRating(movieId, userId, rating);
-
-            if (result) {
-                res.status(200).json({ message: "Rating successfully updated" });
-            } else {
-                res.status(404).json({ message: "Movie not found" });
-            }
+          const userId = req.user.id; // Assuming user ID is available from request object
+          const movieId = req.params.movieId; // Extract movieId from request parameters
+          const rating = req.body.rating; // Extract movieId and rating from request body
+    
+          const result = await db_movie.editRating(userId, movieId, rating);
+          if(result.length === 0) {
+            return res.status(404).json({ message: "Rating not found or no change made" });
+          }
+          res.status(200).json({ message: "Rating updated successfully", data: result });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+          res.status(500).json({ message: "Internal server error", error: error.message });
         }
-    },
+      },
 
-    deleteMovieRating: async (req, res) => {    // need authentication that the user is logged in
-        const movieId = req.params.movieId;
-
+      deleteMovieRating: async (req, res) => {
         try {
-            // Assuming you have a userId from the auth token or session
-            const userId = req.user.id;
-            const result = await db_movie.deleteMovieRatingById(movieId, userId);
-
-            if (result) {
-                res.status(200).json({ message: "Rating deleted successfully" });
-            } else {
-                res.status(404).json({ message: "No movie/previous rating found for the provided movieId" });
-            }
+          const userId = req.user.id; // Assuming user ID is available from request object
+          const { movieId } = req.params; // Extract movieId from request parameters
+    
+          const result = await db_movie.deleteRating(userId, movieId);
+          if(result.length === 0) {
+            return res.status(404).json({ message: "Rating not found or already deleted" });
+          }
+          res.status(200).json({ message: "Rating deleted successfully", data: result });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+          res.status(500).json({ message: "Internal server error", error: error.message });
         }
-    },
+      },
 
     addToWatchlist: async (req, res) => {
         console.log(req.headers.authorization);
@@ -157,32 +137,17 @@ const moviesController = {
         const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
 
         try {
-            const result = await db_movie.addMovieToWatchlist(movieId, userId);
+            const result = await db_movie.addMovieToWatchlist(userId, movieId);
             if (result) {
                 res.status(201).json({ message: "Movie successfully added to watchlist" });
             } else {
-                res.status(404).json({ message: "Movie not found" });
+                res.status(500).json({ message: "Internal server error" });
             }
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     },
 
-    // removeFromWatchlist: async (req, res) => {
-    //     const movieId = req.params.movieId;
-    //     const userId = req.user.id; // Assuming you have a way to get userId from the request
-
-    //     try {
-    //         const result = await db_movie.removeMovieFromWatchlist(movieId, userId);
-    //         if (result) {
-    //             res.status(200).json({ message: "Movie successfully removed from watchlist" });
-    //         } else {
-    //             res.status(404).json({ message: "No movie/previous addition to watchlist found for the provided movieId" });
-    //         }
-    //     } catch (error) {
-    //         res.status(500).json({ message: error.message });
-    //     }
-    // },
     removeFromWatchlist: async (req, res) => {
         try {
           // Extract the movieId from the request parameters
@@ -209,7 +174,7 @@ const moviesController = {
         const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
 
         try {
-            const result = await db_movie.addMovieToWatchedlist(movieId, userId);
+            const result = await db_movie.addMovieToWatchedlist(userId, movieId);
             if (result) {
                 res.status(201).json({ message: "Movie successfully added to watched-list" });
             } else {
@@ -226,7 +191,7 @@ const moviesController = {
         const userId = req.user.id; // Assuming you have a way to get userId from the request
 
         try {
-            const result = await db_movie.removeMovieFromWatchedlist(movieId, userId);
+            const result = await db_movie.removeMovieFromWatchedlist(userId, movieId);
             if (result) {
                 res.status(200).json({ message: "Movie successfully removed from watched-list" });
             } else {

@@ -345,7 +345,7 @@ const addMovieToWatchlist = async (userId, movieId) => {
         .from('watch_list')
         .insert([
             { user_id: userId, movie_id: movieId }
-        ]);
+        ]).select('id');
 
     if (error) {
         console.error('Error adding movie to watchlist:', error);
@@ -394,8 +394,8 @@ async function addMovieToWatchedlist(userId, movieId) {
     const { data, error } = await supabase
       .from('watched_list')
       .insert([
-        { user_id: userId, movie_id: movieId, joined_for_discussion: false }
-      ]);
+        { user_id: userId, movie_id: movieId, joined_forum: false }
+      ]).select('id');
   
     if (error) {
       console.error('Error adding movie to watched list', error);
@@ -410,8 +410,8 @@ async function addMovieToWatchedlist(userId, movieId) {
     const { data, error } = await supabase
       .from('watched_list')
       .delete()
-      .match({ user_id: userId, movie_id: movieId });
-  
+      .match({ user_id: userId, movie_id: movieId })
+      .select('id');
     if (error) {
       console.error('Error removing movie from watched list', error);
       throw error;
@@ -426,9 +426,11 @@ async function addMovieToWatchedlist(userId, movieId) {
       .from('movie_has_user_rating')
       .insert([
         { user_id: userId, movie_id: movieId, rating: rating }
-      ]);
+      ])
+      .select('id');
     
     if (error) {
+        console.error('Error rating movie as current user', error);
       throw error;
     }
     
@@ -439,14 +441,28 @@ async function addMovieToWatchedlist(userId, movieId) {
     const { data, error } = await supabase
       .from('movie_has_user_rating')
       .update({ rating: rating })
-      .match({ user_id: userId, movie_id: movieId });
+      .match({ user_id: userId, movie_id: movieId })
+      .select('id');
+    if (error) {
+      throw error;
+    }
+    
+    return data;
+  }
+
+  async function deleteRating (userId, movieId) {
+    const { data, error } = await supabase
+      .from('movie_has_user_rating')
+      .delete()
+      .match({ user_id: userId, movie_id: movieId })
+      .select('id');
     
     if (error) {
       throw error;
     }
     
     return data;
-  },
+  }
 
 
 module.exports = {
@@ -459,5 +475,8 @@ module.exports = {
     removeMovieFromWatchlist,
     addMovieToWatchedlist,
     removeMovieFromWatchedlist,
+    submitRating, 
+    editRating,
+    deleteRating,
 
 };
