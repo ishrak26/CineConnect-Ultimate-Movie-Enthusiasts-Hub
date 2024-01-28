@@ -53,7 +53,7 @@ router.get('/v1/movie/:movieId/reviews', movieController.getMovieReviews);
 router.post('/v1/movie/:movieId/review/submit', movieController.submitMovieReview);
 
 // Route for getting a specific movie person
-router.get('v1/moviePerson/:moviePersonId', movieController.getMoviePersonById); // **//
+router.get('/v1/moviePerson/:moviePersonId', movieController.getMoviePersonById); // **//
 
 // Router to add a new movie to my watchlist
 router.post('/v1/movie/:movieId/watch', movieController.addToWatchlist);
