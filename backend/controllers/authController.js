@@ -17,10 +17,10 @@ const authController = {
             const { username, email, password, full_name } = req.body;
 
             console.log('req.body', req.body);
-            console.log('username', username);
-            console.log('email', email);
-            console.log('password', password);
-            console.log('full_name', full_name);
+            // console.log('username', username);
+            // console.log('email', email);
+            // console.log('password', password);
+            // console.log('full_name', full_name);
 
             // check conflicts
             // check if email exists
@@ -38,6 +38,7 @@ const authController = {
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
+            console.log('hashedPassword', hashedPassword);
 
             const user = await userModel.createUser({
                 username,
@@ -57,8 +58,9 @@ const authController = {
     login: async (req, res) => {
         try {
             const { username, password } = req.body;
-            console.log('username', username);
-            console.log('password', password);
+            console.log('login: ', req.body);
+            // console.log('username', username);
+            // console.log('password', password);
 
             const user = await userModel.findOne({ username });
 
@@ -71,10 +73,8 @@ const authController = {
 
             console.log('user', user);
 
-            // const hashedPassword = await bcrypt.hash(password, 10);
-
             // console.log('hashedPassword', hashedPassword);
-
+            console.log('user.password', user.password);
             const isPasswordCorrect = await bcrypt.compare(
                 password,
                 user.password

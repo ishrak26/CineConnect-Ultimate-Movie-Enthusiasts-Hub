@@ -215,7 +215,7 @@ async function fetchMoviesByTitle(title, offset, limit) {
     const { data, error } = await supabase
         .from('movie')
         .select('id, title, release_date, poster_url')
-        .ilike('title', title)  // ilike is case-insensitive. like is case-sensitive. 
+        .ilike('title', title) // ilike is case-insensitive. like is case-sensitive.
         .range(offset, offset + limit - 1);
 
     if (error) {
@@ -250,7 +250,7 @@ async function fetchMoviesByTitle(title, offset, limit) {
 
     should return an array of size 1
 */
-async function fetchMoviesById(id) {
+async function fetchMoviesById(id, user) {
     const { data, error } = await supabase
         .from('movie')
         .select(
@@ -289,12 +289,115 @@ async function fetchMoviesById(id) {
             if (rating) {
                 movie.rating = rating;
             }
+
+            if (user) {
+                // find user's rating for this movie
+                const { data: userRatingData, error: userRatingError } =
+                    await supabase
+                        .from('movie_has_user_rating')
+                        .select('rating')
+                        .eq('user_id', user.id)
+                        .eq('movie_id', movie.id);
+                if (userRatingError) {
+                    console.error(
+                        'Error fetching user rating',
+                        userRatingError
+                    );
+                    throw userRatingError;
+                }
+                if (userRatingData && userRatingData.length > 0) {
+                    movie.user_rating = userRatingData[0].rating;
+                }
+
+                // find if movie is in user's watchlist
+                const { data: watchlistData, error: watchlistError } =
+                    await supabase
+                        .from('watch_list')
+                        .select('id')
+                        .eq('user_id', user.id)
+                        .eq('movie_id', movie.id);
+                if (watchlistError) {
+                    console.error('Error fetching watchlist', watchlistError);
+                    throw watchlistError;
+                }
+                if (watchlistData && watchlistData.length > 0) {
+                    movie.in_watchlist = true;
+                }
+            }
         }
 
         console.log('Returning from fetchMoviesById:', data);
         // console.log(data[0].casts);
         // console.log(data[0].directors);
         return data;
+    }
+}
+
+/*
+returns the genre id of the genre with the given name
+*/
+
+async function getGenreIdByName(genreName) {
+    try {
+        const { data, error } = await supabase
+            .from('genre')
+            .select('id')
+            .ilike('name', genreName); // Using 'ilike' for case-insensitive matching
+
+        if (error) {
+            console.error('Error fetching genre id by name:', error);
+            throw error;
+        }
+
+        // Assuming 'name' is a unique field and should only return one record
+        if (data && data.length > 0) {
+            return data[0].id; // Return the first id (should be the only one)
+        } else {
+            return null; // No genre found with that name
+        }
+    } catch (error) {
+        console.error('Error in getGenreIdByName:', error);
+        throw error; // Rethrow the error and handle it in the controller
+    }
+}
+
+/*
+    returns array of json objects
+    each json object resembles a row from the movie table
+    key is the column name, value is the required value in db
+    returns only those rows where movie.id=movie_has_genre.movie_id
+
+    should return an array 
+*/
+
+async function fetchMoviesByGenre(genreName) {
+    try {
+        // Fetch the movie IDs associated with the given genre ID
+        const genreId = await getGenreIdByName(genreName);
+        const { data: movieGenreData, error: movieGenreError } = await supabase
+            .from('movie_has_genre')
+            .select('movie_id')
+            .eq('genre_id', genreId);
+
+        if (movieGenreError) throw movieGenreError;
+
+        // Extract just the movie IDs from the data
+        const movieIds = movieGenreData.map((entry) => entry.movie_id);
+        // map() returns an array of movie_ids, entry is a json object
+
+        // Fetch the movies that have the extracted movie IDs
+        const { data: moviesData, error: moviesError } = await supabase
+            .from('movie')
+            .select('id, title, release_date, poster_url')
+            .in('id', movieIds);
+
+        if (moviesError) throw moviesError;
+
+        // Return the array of movie records
+        return moviesData;
+    } catch (error) {
+        console.error('Error fetching movies by genre', error);
+        return null;
     }
 }
 
@@ -314,7 +417,7 @@ async function fetchMoviePersonsById(moviePersonId) {
         .select(
             'id, image_url, biography, date_of_birth, date_of_death, name, place_of_birth'
         )
-        .eq('id', moviePersonId);   // .eq -> equal
+        .eq('id', moviePersonId); // .eq -> equal
 
     if (error) {
         console.error('Error fetching movie persons by id', error);
@@ -343,9 +446,8 @@ async function fetchMoviePersonsById(moviePersonId) {
 const addMovieToWatchlist = async (userId, movieId) => {
     const { data, error } = await supabase
         .from('watch_list')
-        .insert([
-            { user_id: userId, movie_id: movieId }
-        ]).select('id');
+        .insert([{ user_id: userId, movie_id: movieId }])
+        .select('id');
 
     if (error) {
         console.error('Error adding movie to watchlist:', error);
@@ -357,13 +459,13 @@ const addMovieToWatchlist = async (userId, movieId) => {
 
 async function removeMovieFromWatchlist(userId, movieId) {
     // checking if the movie is in the user's watchlist
-    let { data: watchlistData, error: watchlistError } = await supabase // watchlistData is an array of json objects, and 
-                                                                        // watchlistError is an error object or null        
+    let { data: watchlistData, error: watchlistError } = await supabase // watchlistData is an array of json objects, and
+        // watchlistError is an error object or null
         .from('watch_list')
         .select('id')
         .eq('user_id', userId)
         .eq('movie_id', movieId)
-        .single();  // single() returns only one row
+        .single(); // single() returns only one row
 
     if (watchlistError) {
         console.error('Error fetching from watchlist:', watchlistError);
@@ -372,7 +474,7 @@ async function removeMovieFromWatchlist(userId, movieId) {
 
     // If the movie is not in the watchlist, we can't remove it
     if (!watchlistData) {
-        return { error: 'Movie not found in watchlist' };   // returns a json object with error field
+        return { error: 'Movie not found in watchlist' }; // returns a json object with error field
     }
 
     // If the movie is in the watchlist, proceed to delete it
@@ -392,82 +494,80 @@ async function removeMovieFromWatchlist(userId, movieId) {
 
 async function addMovieToWatchedlist(userId, movieId) {
     const { data, error } = await supabase
-      .from('watched_list')
-      .insert([
-        { user_id: userId, movie_id: movieId, joined_forum: false }
-      ]).select('id');
-  
-    if (error) {
-      console.error('Error adding movie to watched list', error);
-      throw error;
-    }
-    
-    return data;
-  }
-  
-  // Function to remove a movie from the watched list
-  async function removeMovieFromWatchedlist(userId, movieId) {
-    const { data, error } = await supabase
-      .from('watched_list')
-      .delete()
-      .match({ user_id: userId, movie_id: movieId })
-      .select('id');
-    if (error) {
-      console.error('Error removing movie from watched list', error);
-      throw error;
-    }
-    
-    return data;
-  }
+        .from('watched_list')
+        .insert([{ user_id: userId, movie_id: movieId, joined_forum: false }])
+        .select('id');
 
-  // Function to submit a rating for a movie
-  async function submitRating(userId, movieId, rating) {
+    if (error) {
+        console.error('Error adding movie to watched list', error);
+        throw error;
+    }
+
+    return data;
+}
+
+// Function to remove a movie from the watched list
+async function removeMovieFromWatchedlist(userId, movieId) {
     const { data, error } = await supabase
-      .from('movie_has_user_rating')
-      .insert([
-        { user_id: userId, movie_id: movieId, rating: rating }
-      ])
-      .select('id');
-    
+        .from('watched_list')
+        .delete()
+        .match({ user_id: userId, movie_id: movieId })
+        .select('id');
+    if (error) {
+        console.error('Error removing movie from watched list', error);
+        throw error;
+    }
+
+    return data;
+}
+
+// Function to submit a rating for a movie
+async function submitRating(userId, movieId, rating) {
+    const { data, error } = await supabase
+        .from('movie_has_user_rating')
+        .insert([{ user_id: userId, movie_id: movieId, rating: rating }])
+        .select('id');
+
     if (error) {
         console.error('Error rating movie as current user', error);
-      throw error;
+        throw error;
     }
-    
-    return data;
-  }
 
-  async function editRating (userId, movieId, rating) {
+    return data;
+}
+
+async function editRating(userId, movieId, rating) {
     const { data, error } = await supabase
-      .from('movie_has_user_rating')
-      .update({ rating: rating })
-      .match({ user_id: userId, movie_id: movieId })
-      .select('id');
-    if (error) {
-      throw error;
-    }
-    
-    return data;
-  }
+        .from('movie_has_user_rating')
+        .update({ rating: rating })
+        .match({ user_id: userId, movie_id: movieId })
+        .select('id');
 
-  async function deleteRating (userId, movieId) {
+    if (error) {
+        throw error;
+    }
+
+    return data;
+}
+
+async function deleteRating(userId, movieId) {
     const { data, error } = await supabase
-      .from('movie_has_user_rating')
-      .delete()
-      .match({ user_id: userId, movie_id: movieId })
-      .select('id');
-    
-    if (error) {
-      throw error;
-    }
-    
-    return data;
-  }
+        .from('movie_has_user_rating')
+        .delete()
+        .match({ user_id: userId, movie_id: movieId })
+        .select('id');
 
+    if (error) {
+        throw error;
+    }
+
+    return data;
+}
 
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
+    fetchMoviesByGenre,
     fetchMoviePersonsById,
     fetchTopCastsByMovieId,
     fetchDirectorsByMovieId,
@@ -475,8 +575,7 @@ module.exports = {
     removeMovieFromWatchlist,
     addMovieToWatchedlist,
     removeMovieFromWatchedlist,
-    submitRating, 
+    submitRating,
     editRating,
     deleteRating,
-
 };

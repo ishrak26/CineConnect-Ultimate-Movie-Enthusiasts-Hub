@@ -5,8 +5,8 @@ const { registerValidator } = require('../validators/userValidator');
 
 const router = express.Router();
 
-router.post('/register/', registerValidator, authController.register);
+router.post('/register/', registerValidator, authController.register); // /v1/auth/register
 
-router.post('/login/', authController.login);
+router.post('/login/', authController.login); // /v1/auth/login
 
 module.exports = router;
