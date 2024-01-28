@@ -89,17 +89,17 @@ export default function Home({ data, query }) {
               }
             />
 
-            {data.results?.length ? (
+            {data?.length ? (
               <div>
                 <div className="card-list">
-                  {data.results.map((result) => (
+                  {data.map((result) => (
                     <Card
                       key={result.id}
                       id={result.id}
-                      image={result.poster_path || result.profile_path}
+                      image={result.poster_url || result.profile_path}
                       title={result.title || result.name}
                       type={query.type || 'movie'}
-                      rating={result.vote_average}
+                      rating={result.rating}
                     />
                   ))}
                 </div>
@@ -142,8 +142,11 @@ export async function getServerSideProps({ query }) {
   //     ...query,
   //   },
   // })
+  
+  //Add query here 
 
-  const response = await fetch(`http://localhost:4000/v1/movies/${query}`).then((res) => res.json());
+  const response = await fetch(`http://localhost:4000/v1/movies/?title=${query.query}`).then((res) => res.json());
+
 
   // if (response.status === 404) {
   //   return {
@@ -165,7 +168,7 @@ export async function getServerSideProps({ query }) {
 
   return {
     props: {
-      data: response.data,
+      data: response,
       query,
     },
   }
