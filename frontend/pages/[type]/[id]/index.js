@@ -581,15 +581,7 @@ export async function getServerSideProps({ params }) {
 
   const response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
   const casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`).then((res) => res.json());
-
-  // const castArray = casts.map((cast) => ({
-  //   ...cast,
-  //   id : cast.movie_person.id,
-  //   name: cast.movie_person.name,
-  //   role_name: cast.role_name,
-  //   image_url: cast.movie_person.image_url,
-  // }));
-
+  
   // if (response.status === 404) {
   //   return {
   //     notFound: true,

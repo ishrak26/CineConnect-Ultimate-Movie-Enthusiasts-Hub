@@ -142,8 +142,7 @@ export async function getServerSideProps({ query }) {
   //     ...query,
   //   },
   // })
-  
-  //Add query here 
+
 
   const response = await fetch(`http://localhost:4000/v1/movies/?title=${query.query}`).then((res) => res.json());
 
