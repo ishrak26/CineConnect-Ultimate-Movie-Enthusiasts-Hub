@@ -8,6 +8,7 @@ export default function Card({
   image,
   title,
   type,
+  release_date,
   rating,
   className,
   children,
@@ -24,6 +25,7 @@ export default function Card({
         <Rating average={rating} className="absolute top-4 left-4" />
       )}
       {title && <div className="card-title">{title}</div>}
+      {release_date && <div className="card-date">{release_date}</div>}
       {children}
     </Link>
   )

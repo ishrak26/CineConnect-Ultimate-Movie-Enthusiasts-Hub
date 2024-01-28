@@ -2,8 +2,8 @@ import clsx from 'clsx'
 
 export default function Poster({ path, alt, size, className, ...props }) {
   const src = path
-    ? `https://image.tmdb.org/t/p/${size || 'w500'}${path}`
-    : '/placeholder.svg'
+    // ? `https://image.tmdb.org/t/p/${size || 'w500'}${path}`
+    // : '/placeholder.svg'
 
   return (
     <div className={clsx('aspect-poster relative', className)} {...props}>

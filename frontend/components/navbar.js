@@ -35,7 +35,26 @@ export default function Navbar() {
 
         <nav className="ml-auto flex items-center">
 
-        
+          <Link
+            href="/login"
+            className={clsx(
+              'nav-link',
+              router.pathname === '/login' && 'text-white-100'
+            )}
+          >
+            Login
+          </Link>
+
+          <Link
+            href="/register"
+            className={clsx(
+              'nav-link',
+              router.pathname === '/register' && 'text-white-100'
+            )}
+          >
+            Register
+          </Link>
+
            {/* <Link
             href="/movie"
             className={clsx(

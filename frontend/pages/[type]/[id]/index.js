@@ -66,9 +66,10 @@ export default function Home({
             <img
               // src={backdropData.img.src}
               src={
-                data.backdrop_path
-                  ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`
-                  : '/placeholder.svg'
+                data.poster_url
+                // data.backdrop_path
+                  // ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`
+                  // : '/placeholder.svg'
               }
               alt={data.title || data.name}
               className="h-96 md:h-[480px] w-full object-cover object-center rounded-[40px]"
@@ -122,9 +123,9 @@ export default function Home({
                   <img
                     // src={posterData.img.src}
                     src={
-                      data.poster_path
-                        ? `https://image.tmdb.org/t/p/w780${data.poster_path}`
-                        : '/placeholder.svg'
+                      data.poster_url
+                        // ? `https://image.tmdb.org/t/p/w780${data.poster_path}`
+                        // : '/placeholder.svg'
                     }
                     alt={data.title || data.name}
                     className="rounded-[40px] object-cover w-full h-full"
@@ -137,7 +138,7 @@ export default function Home({
               </div>
               <div className="lg:w-1/2 space-y-6">
                 <h2 className="heading">{data.tagline || 'Overview'}</h2>
-                <p className="text-white-65">{data.overview}</p>
+                <p className="text-white-65">{data.plot_summary}</p>
 
                 {/* <Link
                   href={`/${type}/${data.id}/watch`}
@@ -162,7 +163,8 @@ export default function Home({
 
                 <SetRating onRating={handleRating} />
 
-                <Rating average={data.vote_average} />
+                {/* <Rating average={data.vote_average} /> */}
+                <Rating average={data.rating} />
 
                 {type === 'movie' && (
                   <div className="space-y-6">
@@ -534,28 +536,30 @@ export default function Home({
 }
 
 export async function getServerSideProps({ params }) {
-  const response = await tmdb.get(`/${params.type}/${params.id}`, {
-    params: {
-      append_to_response: 'credits,videos,images,tv_credits,recommendations',
-    },
-  })
+  // const response = await tmdb.get(`/${params.type}/${params.id}`, {
+  //   params: {
+  //     append_to_response: 'credits,videos,images,tv_credits,recommendations',
+  //   },
+  // })
 
-  if (response.status === 404) {
-    return {
-      notFound: true,
-    }
-  }
+  const response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
 
-  if (response.data.success === false) {
-    return {
-      props: {
-        error: {
-          statusCode: response.status,
-          statusMessage: response.data.status_message,
-        },
-      },
-    }
-  }
+  // if (response.status === 404) {
+  //   return {
+  //     notFound: true,
+  //   }
+  // }
+
+  // if (response.data.success === false) {
+  //   return {
+  //     props: {
+  //       error: {
+  //         statusCode: response.status,
+  //         statusMessage: response.data.status_message,
+  //       },
+  //     },
+  //   }
+  // }
 
   // const backdropData = response.data.backdrop_path
   //   ? await getPlaiceholder(
@@ -589,7 +593,7 @@ export async function getServerSideProps({ params }) {
   return {
     props: {
       type: params.type,
-      data: response.data,
+      data: response,
       // backdropData,
       // posterData,
       // profileData,

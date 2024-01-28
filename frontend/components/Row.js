@@ -24,9 +24,9 @@ function Row({ movies, title, isMain }) {
     };
 
     return (
-        <div className={`${isMain && "pb-36"}`}>
+        <div className={`${isMain && "pb-30"}`}>
             <div
-                className={`${isMain ? "h-40" : "h-52"} space-y-0.5 md:space-y-2 px-4`}
+                className={`${isMain ? "h-41" : "h-52"} space-y-0.5 md:space-y-2 px-4`}
             >
                 <Container header={title} isTop={false}>
                     <div className="group relative md:-ml-2">
@@ -46,10 +46,11 @@ function Row({ movies, title, isMain }) {
                                             className="w-40 md:w-48"
                                             key={movie.id}
                                             id={movie.id}
-                                            image={movie.poster_path}
+                                            image={movie.poster_url}
                                             title={movie.title || movie.name}
-                                            type={movie.media_type}
-                                            rating={movie.vote_average}
+                                            // type={movie.media_type}
+                                            release_date={movie.release_date}
+                                            rating={movie.rating}
                                         />
                                     ))}
                                 </div>

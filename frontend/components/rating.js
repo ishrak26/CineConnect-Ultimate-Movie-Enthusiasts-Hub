@@ -11,7 +11,8 @@ export default function Rating({ average, className, ...props }) {
       {...props}
     >
       <Star />
-      <span className="ml-2">{average.toFixed(1)}</span>
+      {/* <span className="ml-2">{average.toFixed(1)}</span> */}
+      <span className="ml-2">{average}</span>
     </div>
   )
 }
