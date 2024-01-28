@@ -52,16 +52,16 @@ export default function MoviePage({ data, query, genres }) {
             </div>
           </div>
           <div className="w-full">
-            {data.results?.length ? (
+            {data?.length ? (
               <div>
                 <div className="card-list lg:grid-cols-2 xl:grid-cols-3">
-                  {data.results.map((result) => (
+                  {data.map((result) => (
                     <Card
                       key={result.id}
                       id={result.id}
-                      image={result.poster_path}
+                      image={result.poster_url}
                       title={result.title}
-                      rating={result.vote_average}
+                      rating={result.rating}
                       type="movie"
                     />
                   ))}
@@ -96,35 +96,37 @@ export default function MoviePage({ data, query, genres }) {
 }
 
 export async function getServerSideProps({ query }) {
-  const response = await tmdb.get('/discover/movie', {
-    params: {
-      ...query,
-    },
-  })
+  // const response = await tmdb.get('/discover/movie', {
+  //   params: {
+  //     ...query,
+  //   },
+  // })
 
-  if (response.status === 404) {
-    return {
-      notFound: true,
-    }
-  }
+  const response = await fetch(`http://localhost:4000/v1/movies`).then((res) => res.json());
 
-  if (response.data.success === false) {
-    return {
-      props: {
-        error: {
-          statusCode: response.status,
-          statusMessage:
-            response.data.errors[0] || response.data.status_message,
-        },
-      },
-    }
-  }
+  // if (response.status === 404) {
+  //   return {
+  //     notFound: true,
+  //   }
+  // }
+
+  // if (response.data.success === false) {
+  //   return {
+  //     props: {
+  //       error: {
+  //         statusCode: response.status,
+  //         statusMessage:
+  //           response.data.errors[0] || response.data.status_message,
+  //       },
+  //     },
+  //   }
+  // }
 
   const { data: genresData } = await tmdb.get('/genre/movie/list')
 
   return {
     props: {
-      data: response.data,
+      data: response,
       genres: genresData.genres,
       query,
     },

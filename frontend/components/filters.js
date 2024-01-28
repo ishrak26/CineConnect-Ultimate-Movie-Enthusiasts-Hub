@@ -223,6 +223,7 @@ function Genres({ genres }) {
                 isActive ? 'bg-primary-400' : 'bg-black-10'
               )}
               onClick={() =>
+                
                 setSelectedGenres(
                   isActive
                     ? selectedGenres.filter((id) => id != genre.id)
