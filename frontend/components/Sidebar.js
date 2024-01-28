@@ -22,7 +22,7 @@ const sidebarItems = [
   },
   {
     name: "Discover",
-    href: "/disocver",
+    href: "/discover",
     icon: RiCompassDiscoverLine,
   },
   {
