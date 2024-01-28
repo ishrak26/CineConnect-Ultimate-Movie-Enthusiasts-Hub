@@ -1,13 +1,12 @@
 {
-  "name": "movielister",
+  "name": "cineconnect",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "prepare": "husky install"
+    "lint": "next lint"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.10",
@@ -34,7 +33,9 @@
     "swiper": "^9.0.5",
     "tailwind-scrollbar": "^2.1.0",
     "tailwind-scrollbar-hide": "^1.1.7",
-    "sharp": "^0.31.2"
+    "sharp": "^0.31.2",
+    "bcryptjs": "^2.4.3",
+    "formik": "^2.2.9"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.5.1",

@@ -9,8 +9,9 @@ import Search from '@components/search'
 import Pagination from '@components/pagination'
 import BaseLayout from '@components/BaseLayout'
 import Row from '@components/Row'
+import Layout from './layout'
 
-export default function Home({ trending, netflixOriginals,actionMovies, query }) {
+export default function Home({ topRated, netflixOriginals,actionMovies, query }) {
   const router = useRouter()
 
   return (
@@ -51,20 +52,21 @@ export default function Home({ trending, netflixOriginals,actionMovies, query })
           </div>
 
           <section className="md:space-y-24 pt-5">
-            <div className="pb-14 my-6">
+            <div className="pb-4 my-5">
             <Row
-              movies={trending.results}
-              title="Trending Now"
+              // movies={trending.results}
+              movies={topRated}
+              title="Top Rated"
               isMain={true}
             />
             </div>
-            <div className="pb-14 my-6">
-            <Row movies={netflixOriginals.results} title="Netflix Originals" isMain={true} />
+            <div className="pb-4 my-5">
+            <Row movies={netflixOriginals} title="Netflix Originals" isMain={true} />
             </div>
 
-            <div className="pb-14 my-6">
+            <div className="pb-4 my-5">
               <Row
-                movies={actionMovies.results}
+                movies={actionMovies}
                 title="Action Thrillers"
                 isMain={true}
               />
@@ -139,28 +141,41 @@ export async function getServerSideProps({ query }) {
     }
   }
   // Fetch data for different categories
-  const trending = await fetchData(`/trending/${query.tab || 'all'}/week`, { page: query.page || 1 });
-  const netflixOriginals = await fetchData('/discover/movie', { with_networks: 213 });
-  const actionMovies = await fetchData('/discover/movie', { with_genres: 28 });
+  // const trending = await fetchData(`/trending/${query.tab || 'all'}/week`, { page: query.page || 1 });
+  // const netflixOriginals = await fetchData('/discover/movie', { with_networks: 213 });
+  // const actionMovies = await fetchData('/discover/movie', { with_genres: 28 });
+
+  const topRated = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
+  const netflixOriginals = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
+  const actionMovies = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
 
   // Consolidate errors and data
-  if (trending.notFound || netflixOriginals.notFound || actionMovies.notFound) {
+  if (topRated.notFound || netflixOriginals.notFound || actionMovies.notFound) {
     return { notFound: true };
   }
 
-  if (trending.error || netflixOriginals.error || actionMovies.error) {
+  if (topRated.error || netflixOriginals.error || actionMovies.error) {
     return {
       props: {
         error: {
-          message: trending.error || netflixOriginals.error || actionMovies.error,
+          message: topRated.error || netflixOriginals.error || actionMovies.error,
         },
       },
     };
   }
 
+  // return {
+  //   props: {
+  //     trending: trending,
+  //     netflixOriginals: netflixOriginals,
+  //     actionMovies: actionMovies,
+  //     query,
+  //   },
+  // };
+
   return {
     props: {
-      trending: trending,
+      topRated: topRated,
       netflixOriginals: netflixOriginals,
       actionMovies: actionMovies,
       query,
