@@ -71,12 +71,12 @@ const authController = {
 
             console.log('user', user);
 
-            const hashedPassword = await bcrypt.hash(password, 10);
+            // const hashedPassword = await bcrypt.hash(password, 10);
 
-            console.log('hashedPassword', hashedPassword);
+            // console.log('hashedPassword', hashedPassword);
 
             const isPasswordCorrect = await bcrypt.compare(
-                hashedPassword,
+                password,
                 user.password
             );
 

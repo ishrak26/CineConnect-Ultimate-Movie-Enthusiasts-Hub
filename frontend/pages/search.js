@@ -137,29 +137,31 @@ export async function getServerSideProps({ query }) {
     }
   }
 
-  const response = await tmdb.get(`/search/${query.type || 'movie'}`, {
-    params: {
-      ...query,
-    },
-  })
+  // const response = await tmdb.get(`/search/${query.type || 'movie'}`, {
+  //   params: {
+  //     ...query,
+  //   },
+  // })
 
-  if (response.status === 404) {
-    return {
-      notFound: true,
-    }
-  }
+  const response = await fetch(`http://localhost:4000/v1/movies/${query}`).then((res) => res.json());
 
-  if (response.data.success === false) {
-    return {
-      props: {
-        error: {
-          statusCode: response.status,
-          statusMessage:
-            response.data.errors[0] || response.data.status.message,
-        },
-      },
-    }
-  }
+  // if (response.status === 404) {
+  //   return {
+  //     notFound: true,
+  //   }
+  // }
+
+  // if (response.data.success === false) {
+  //   return {
+  //     props: {
+  //       error: {
+  //         statusCode: response.status,
+  //         statusMessage:
+  //           response.data.errors[0] || response.data.status.message,
+  //       },
+  //     },
+  //   }
+  // }
 
   return {
     props: {
