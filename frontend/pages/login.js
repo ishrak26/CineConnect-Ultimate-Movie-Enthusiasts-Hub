@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
+import bcrypt from 'bcryptjs';
 import Layout from "./layout";
-import Head from "next/head";
 import { useRouter } from "next/router";
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const router = useRouter();
 
     const submit = async (e) => {
         e.preventDefault();
 
-        await fetch('http://localhost:4000/v1/auth/login', {
+        // const hashedPassword = bcrypt.hashSync(password, 10); // Salt rounds = 10
+
+        const response = await fetch('http://localhost:4000/v1/auth/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',
             body: JSON.stringify({
-                email,
+                username,
                 password
             })
-        });
+        }).then(response => response.json());
+
+        // print the response to the console
+        console.log(response);
 
         await router.push('/');
     }
@@ -28,8 +33,8 @@ const Login = () => {
         <Layout>
             <form onSubmit={submit}>
                 <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
-                <input type="email" className="form-control" placeholder="Email" required
-                       onChange={e => setEmail(e.target.value)}
+                <input type="username" className="form-control" placeholder="Username" required
+                       onChange={e => setUsername(e.target.value)}
                 />
 
                 <input type="password" className="form-control" placeholder="Password" required
