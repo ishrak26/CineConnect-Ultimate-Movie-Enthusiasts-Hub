@@ -299,6 +299,74 @@ async function fetchMoviesById(id) {
 }
 
 /*
+returns the genre id of the genre with the given name
+*/
+
+async function getGenreIdByName(genreName) {
+    try {
+        const { data, error } = await supabase
+            .from('genre') 
+            .select('id')
+            .ilike('name', genreName); // Using 'ilike' for case-insensitive matching
+
+        if (error) {
+            console.error('Error fetching genre id by name:', error);
+            throw error;
+        }
+
+        // Assuming 'name' is a unique field and should only return one record
+        if (data && data.length > 0) {
+            return data[0].id; // Return the first id (should be the only one)
+        } else {
+            return null; // No genre found with that name
+        }
+    } catch (error) {
+        console.error('Error in getGenreIdByName:', error);
+        throw error; // Rethrow the error and handle it in the controller
+    }
+}
+
+/*
+    returns array of json objects
+    each json object resembles a row from the movie table
+    key is the column name, value is the required value in db
+    returns only those rows where movie.id=movie_has_genre.movie_id
+
+    should return an array 
+*/ 
+
+async function fetchMoviesByGenre(genreName) {
+    try {
+      // Fetch the movie IDs associated with the given genre ID
+      const genreId = await getGenreIdByName(genreName);
+      const { data: movieGenreData, error: movieGenreError } = await supabase
+        .from('movie_has_genre')
+        .select('movie_id')
+        .eq('genre_id', genreId);
+  
+      if (movieGenreError) throw movieGenreError;
+  
+      // Extract just the movie IDs from the data
+      const movieIds = movieGenreData.map(entry => entry.movie_id); 
+      // map() returns an array of movie_ids, entry is a json object
+  
+      // Fetch the movies that have the extracted movie IDs
+      const { data: moviesData, error: moviesError } = await supabase
+        .from('movie')
+        .select('id, title, release_date, poster_url')
+        .in('id', movieIds);
+  
+      if (moviesError) throw moviesError;
+  
+      // Return the array of movie records
+      return moviesData;
+    } catch (error) {
+      console.error('Error fetching movies by genre', error);
+      return null;
+    }
+  }
+
+/*
     arg: moviePersonId
 
     returns array of json objects
@@ -464,6 +532,7 @@ async function deleteRating(userId, movieId) {
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
+    fetchMoviesByGenre,
     fetchMoviePersonsById,
     fetchTopCastsByMovieId,
     fetchDirectorsByMovieId,
