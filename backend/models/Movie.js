@@ -250,7 +250,7 @@ async function fetchMoviesByTitle(title, offset, limit) {
 
     should return an array of size 1
 */
-async function fetchMoviesById(id) {
+async function fetchMoviesById(id, user) {
     const { data, error } = await supabase
         .from('movie')
         .select(
@@ -289,6 +289,41 @@ async function fetchMoviesById(id) {
             if (rating) {
                 movie.rating = rating;
             }
+
+            if (user) {
+                // find user's rating for this movie
+                const { data: userRatingData, error: userRatingError } =
+                    await supabase
+                        .from('movie_has_user_rating')
+                        .select('rating')
+                        .eq('user_id', user.id)
+                        .eq('movie_id', movie.id);
+                if (userRatingError) {
+                    console.error(
+                        'Error fetching user rating',
+                        userRatingError
+                    );
+                    throw userRatingError;
+                }
+                if (userRatingData && userRatingData.length > 0) {
+                    movie.user_rating = userRatingData[0].rating;
+                }
+
+                // find if movie is in user's watchlist
+                const { data: watchlistData, error: watchlistError } =
+                    await supabase
+                        .from('watch_list')
+                        .select('id')
+                        .eq('user_id', user.id)
+                        .eq('movie_id', movie.id);
+                if (watchlistError) {
+                    console.error('Error fetching watchlist', watchlistError);
+                    throw watchlistError;
+                }
+                if (watchlistData && watchlistData.length > 0) {
+                    movie.in_watchlist = true;
+                }
+            }
         }
 
         console.log('Returning from fetchMoviesById:', data);
@@ -305,7 +340,7 @@ returns the genre id of the genre with the given name
 async function getGenreIdByName(genreName) {
     try {
         const { data, error } = await supabase
-            .from('genre') 
+            .from('genre')
             .select('id')
             .ilike('name', genreName); // Using 'ilike' for case-insensitive matching
 
@@ -333,38 +368,38 @@ async function getGenreIdByName(genreName) {
     returns only those rows where movie.id=movie_has_genre.movie_id
 
     should return an array 
-*/ 
+*/
 
 async function fetchMoviesByGenre(genreName) {
     try {
-      // Fetch the movie IDs associated with the given genre ID
-      const genreId = await getGenreIdByName(genreName);
-      const { data: movieGenreData, error: movieGenreError } = await supabase
-        .from('movie_has_genre')
-        .select('movie_id')
-        .eq('genre_id', genreId);
-  
-      if (movieGenreError) throw movieGenreError;
-  
-      // Extract just the movie IDs from the data
-      const movieIds = movieGenreData.map(entry => entry.movie_id); 
-      // map() returns an array of movie_ids, entry is a json object
-  
-      // Fetch the movies that have the extracted movie IDs
-      const { data: moviesData, error: moviesError } = await supabase
-        .from('movie')
-        .select('id, title, release_date, poster_url')
-        .in('id', movieIds);
-  
-      if (moviesError) throw moviesError;
-  
-      // Return the array of movie records
-      return moviesData;
+        // Fetch the movie IDs associated with the given genre ID
+        const genreId = await getGenreIdByName(genreName);
+        const { data: movieGenreData, error: movieGenreError } = await supabase
+            .from('movie_has_genre')
+            .select('movie_id')
+            .eq('genre_id', genreId);
+
+        if (movieGenreError) throw movieGenreError;
+
+        // Extract just the movie IDs from the data
+        const movieIds = movieGenreData.map((entry) => entry.movie_id);
+        // map() returns an array of movie_ids, entry is a json object
+
+        // Fetch the movies that have the extracted movie IDs
+        const { data: moviesData, error: moviesError } = await supabase
+            .from('movie')
+            .select('id, title, release_date, poster_url')
+            .in('id', movieIds);
+
+        if (moviesError) throw moviesError;
+
+        // Return the array of movie records
+        return moviesData;
     } catch (error) {
-      console.error('Error fetching movies by genre', error);
-      return null;
+        console.error('Error fetching movies by genre', error);
+        return null;
     }
-  }
+}
 
 /*
     arg: moviePersonId

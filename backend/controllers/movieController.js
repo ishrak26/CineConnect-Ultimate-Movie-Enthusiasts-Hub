@@ -25,7 +25,7 @@ const moviesController = {
         try {
             // console.log(req.params);
             const movieId = req.params.movieId;
-            const movie = await db_movie.fetchMoviesById(movieId);
+            const movie = await db_movie.fetchMoviesById(movieId, req.user);
             if (movie && movie.length > 0) {
                 res.json(movie[0]);
             } else {
@@ -38,22 +38,29 @@ const moviesController = {
 
     getMoviesByGenre: async (req, res) => {
         try {
-          const genreId = req.params.genreId;
-    
-          // Use the model function to fetch movies by genre
-          const movies = await db_movie.fetchMoviesByGenre(genreId);
-    
-          if (!movies) {
-            return res.status(404).json({ message: "Movies for the specified genre not found." });
-          }
-    
-          // Send the movies as a response
-          res.status(200).json(movies);
+            const genreId = req.params.genreId;
+
+            // Use the model function to fetch movies by genre
+            const movies = await db_movie.fetchMoviesByGenre(genreId);
+
+            if (!movies) {
+                return res
+                    .status(404)
+                    .json({
+                        message: 'Movies for the specified genre not found.',
+                    });
+            }
+
+            // Send the movies as a response
+            res.status(200).json(movies);
         } catch (error) {
-          console.error(error);
-          res.status(500).json({ message: "Internal server error occurred while fetching movies by genre." });
+            console.error(error);
+            res.status(500).json({
+                message:
+                    'Internal server error occurred while fetching movies by genre.',
+            });
         }
-      },
+    },
 
     getMoviePersonById: async (req, res) => {
         const moviePersonId = req.params.moviePersonId;
