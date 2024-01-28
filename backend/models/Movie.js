@@ -299,6 +299,34 @@ async function fetchMoviesById(id) {
 }
 
 /*
+returns the genre id of the genre with the given name
+*/
+
+async function getGenreIdByName(genreName) {
+    try {
+        const { data, error } = await supabase
+            .from('genre') 
+            .select('id')
+            .ilike('name', genreName); // Using 'ilike' for case-insensitive matching
+
+        if (error) {
+            console.error('Error fetching genre id by name:', error);
+            throw error;
+        }
+
+        // Assuming 'name' is a unique field and should only return one record
+        if (data && data.length > 0) {
+            return data[0].id; // Return the first id (should be the only one)
+        } else {
+            return null; // No genre found with that name
+        }
+    } catch (error) {
+        console.error('Error in getGenreIdByName:', error);
+        throw error; // Rethrow the error and handle it in the controller
+    }
+}
+
+/*
     returns array of json objects
     each json object resembles a row from the movie table
     key is the column name, value is the required value in db
@@ -307,9 +335,10 @@ async function fetchMoviesById(id) {
     should return an array 
 */ 
 
-async function fetchMoviesByGenre(genreId) {
+async function fetchMoviesByGenre(genreName) {
     try {
       // Fetch the movie IDs associated with the given genre ID
+      const genreId = await getGenreIdByName(genreName);
       const { data: movieGenreData, error: movieGenreError } = await supabase
         .from('movie_has_genre')
         .select('movie_id')
