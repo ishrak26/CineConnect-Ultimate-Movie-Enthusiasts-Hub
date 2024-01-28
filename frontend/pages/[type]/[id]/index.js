@@ -25,6 +25,7 @@ export default function Home({
 
   data,
   type,
+  casts,
   // backdropData,
   // posterData,
   // profileData,
@@ -34,12 +35,46 @@ export default function Home({
 
   const handleClick = () => {
     setIsAdded(!isAdded);
+
     // Additional logic to handle adding/removing from watchlist
+    try{
+      const response = fetch(`http://localhost:4000/v1/movie/${data.id}/watch`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          movieId: data.id,
+          userId: 1,
+        }),
+      }).then((res) => res.json());
+    }
+    catch(err){
+      console.log(err);
+    }
+
   };
   
   const handleRating = (rate) => {
     console.log(`Rated with: ${rate}`);
     // Handle the rating logic (e.g., send to API)
+
+    try{
+      const response = fetch(`http://localhost:4000/v1/movie/${data.id}/rate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          movieId: data.id,
+          userId: 1,
+          rating: rate,
+        }),
+      }).then((res) => res.json());
+    }
+    catch(err){
+      console.log(err);
+    }
   };
 
   return (
@@ -115,7 +150,9 @@ export default function Home({
 
         {(type === 'movie' || type === 'tv') && (
           <div className="mt-8 md:m-12 md:mt-8 xl:m-20 xl:mt-8">
-            {data.credits?.cast.length > 0 && <Cast cast={data.credits.cast} />}
+            {/* {data.credits?.cast.length > 0 && <Cast cast={data.credits.cast} />} */}
+
+            {/* {casts && <Cast cast={casts} />} */}
 
             <div className="flex flex-col-reverse my-5 gap-12 md:gap-20 lg:flex-row">
               <div className="lg:w-1/2">
@@ -184,14 +221,14 @@ export default function Home({
                         </span>
                       </p>
                     )}
-                    {data.runtime && (
+                    {data.duration_in_mins && (
                       <p>
                         <span className="text-sm text-white-30">Runtime</span>
                         <span className="block mt-2">
                           {formatDuration(
                             intervalToDuration({
                               start: 0,
-                              end: data.runtime * 60000,
+                              end: data.duration_in_mins * 60000,
                             }),
                             {
                               format: ['hours', 'minutes'],
@@ -543,6 +580,15 @@ export async function getServerSideProps({ params }) {
   // })
 
   const response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
+  const casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`).then((res) => res.json());
+
+  // const castArray = casts.map((cast) => ({
+  //   ...cast,
+  //   id : cast.movie_person.id,
+  //   name: cast.movie_person.name,
+  //   role_name: cast.role_name,
+  //   image_url: cast.movie_person.image_url,
+  // }));
 
   // if (response.status === 404) {
   //   return {
@@ -592,8 +638,9 @@ export async function getServerSideProps({ params }) {
   //     }
   return {
     props: {
-      type: params.type,
+      type: "movie",
       data: response,
+      casts: casts,
       // backdropData,
       // posterData,
       // profileData,

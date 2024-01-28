@@ -48,7 +48,7 @@ function Row({ movies, title, isMain }) {
                                             id={movie.id}
                                             image={movie.poster_url}
                                             title={movie.title || movie.name}
-                                            // type={movie.media_type}
+                                            type={"movie"}
                                             release_date={movie.release_date}
                                             rating={movie.rating}
                                         />
