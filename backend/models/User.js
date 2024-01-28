@@ -37,7 +37,41 @@ async function findOne({ username }) {
     }
 }
 
+async function checkIfUserExists({ username }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id')
+        .eq('username', username);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data) {
+        return data[0];
+    }
+}
+
+async function checkIfEmailExists({ email }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id')
+        .eq('email', email);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data) {
+        return data[0];
+    }
+}
+
 module.exports = {
     createUser,
     findOne,
+    checkIfUserExists,
+    checkIfEmailExists,
 };
