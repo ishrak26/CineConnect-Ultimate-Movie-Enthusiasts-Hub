@@ -11,7 +11,12 @@ import BaseLayout from '@components/BaseLayout'
 import Row from '@components/Row'
 import Layout from './layout'
 
-export default function Home({ topRated, netflixOriginals,actionMovies, query }) {
+export default function Home({
+  topRated,
+  netflixOriginals,
+  actionMovies,
+  query,
+}) {
   const router = useRouter()
 
   return (
@@ -33,9 +38,7 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
       <Navbar />
 
       <BaseLayout>
-
         <div className="container">
-
           <div className="flex flex-row items-center justify-center">
             {/* Div for the image */}
             <div className="mr-20">
@@ -46,22 +49,27 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
             <div className="max-w-xl">
               <h1 className="heading-xl">CineConnect</h1>
               <p className="text-gray-400 mt-4">
-                Millions of movies, TV shows and people to discover. Explore now.
+                Millions of movies, TV shows and people to discover. Explore
+                now.
               </p>
             </div>
           </div>
 
           <section className="md:space-y-24 pt-5">
             <div className="pb-4 my-5">
-            <Row
-              // movies={trending.results}
-              movies={topRated}
-              title="Top Rated"
-              isMain={true}
-            />
+              <Row
+                // movies={trending.results}
+                movies={topRated}
+                title="Top Rated"
+                isMain={true}
+              />
             </div>
             <div className="pb-4 my-5">
-            <Row movies={netflixOriginals} title="Netflix Originals" isMain={true} />
+              <Row
+                movies={netflixOriginals}
+                title="Netflix Originals"
+                isMain={true}
+              />
             </div>
 
             <div className="pb-4 my-5">
@@ -71,7 +79,6 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
                 isMain={true}
               />
             </div>
-
           </section>
 
           {/* <Segmented
@@ -115,29 +122,27 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
             totalPages={trending.total_pages}
             className="mt-8"
           /> */}
-         
-         <div className="pb-14 my-40">
-          <Footer className="flex width-full" />
-          </div>
 
+          <div className="pb-14 my-40">
+            <Footer className="flex width-full" />
+          </div>
         </div>
       </BaseLayout>
-
     </div>
   )
 }
 
 export async function getServerSideProps({ query }) {
-   // Helper function to fetch data
-   async function fetchData(url, params) {
+  // Helper function to fetch data
+  async function fetchData(url, params) {
     try {
-      const response = await tmdb.get(url, { params });
-      return response.data;
+      const response = await tmdb.get(url, { params })
+      return response.data
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        return { notFound: true };
+        return { notFound: true }
       }
-      return { error: error.message };
+      return { error: error.message }
     }
   }
   // Fetch data for different categories
@@ -145,23 +150,32 @@ export async function getServerSideProps({ query }) {
   // const netflixOriginals = await fetchData('/discover/movie', { with_networks: 213 });
   // const actionMovies = await fetchData('/discover/movie', { with_genres: 28 });
 
-  const topRated = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
-  const netflixOriginals = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
-  const actionMovies = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
+  // const token = localStorage.getItem('token') // or sessionStorage
+
+  const topRated = await fetch(`http://localhost:4000/v1/movies/`).then((res) =>
+    res.json()
+  )
+  const netflixOriginals = await fetch(`http://localhost:4000/v1/movies/`).then(
+    (res) => res.json()
+  )
+  const actionMovies = await fetch(`http://localhost:4000/v1/movies/`).then(
+    (res) => res.json()
+  )
 
   // Consolidate errors and data
   if (topRated.notFound || netflixOriginals.notFound || actionMovies.notFound) {
-    return { notFound: true };
+    return { notFound: true }
   }
 
   if (topRated.error || netflixOriginals.error || actionMovies.error) {
     return {
       props: {
         error: {
-          message: topRated.error || netflixOriginals.error || actionMovies.error,
+          message:
+            topRated.error || netflixOriginals.error || actionMovies.error,
         },
       },
-    };
+    }
   }
 
   // return {
@@ -180,5 +194,5 @@ export async function getServerSideProps({ query }) {
       actionMovies: actionMovies,
       query,
     },
-  };
+  }
 }

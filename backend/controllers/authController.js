@@ -92,6 +92,12 @@ const authController = {
             const token = jwt.sign({ id: user.id }, SECRET_KEY, {
                 expiresIn: '1d',
             });
+            // Set the JWT in an HTTP-only cookie
+            res.cookie('token', token, {
+                httpOnly: true, // Makes the cookie inaccessible to client-side JS
+                secure: false, // Ensures the cookie is only sent over HTTPS
+                sameSite: 'strict', // Helps mitigate CSRF attacks
+            });
             return res.status(200).json({
                 user: { username: user.username, id: user.id, role: user.role },
                 token: token,

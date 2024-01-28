@@ -1,50 +1,62 @@
-import React, { useState } from 'react';
-import bcrypt from 'bcryptjs';
-import Layout from "./layout";
-import { useRouter } from "next/router";
+import React, { useState } from 'react'
+import bcrypt from 'bcryptjs'
+import Layout from './layout'
+import { useRouter } from 'next/router'
 
 const Login = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const router = useRouter();
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const router = useRouter()
 
-    const submit = async (e) => {
-        e.preventDefault();
+  const submit = async (e) => {
+    e.preventDefault()
 
-        // const hashedPassword = bcrypt.hashSync(password, 10); // Salt rounds = 10
+    // const hashedPassword = bcrypt.hashSync(password, 10); // Salt rounds = 10
 
-        const response = await fetch('http://localhost:4000/v1/auth/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include',
-            body: JSON.stringify({
-                username,
-                password
-            })
-        }).then(response => response.json());
+    const response = await fetch('http://localhost:4000/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    }).then((response) => response.json())
 
-        // print the response to the console
-        console.log(response);
+    // print the response to the console
+    console.log(response)
 
-        await router.push('/');
-    }
+    // localStorage.setItem('token', response.token)
 
-    return (
-        <Layout>
-            <form onSubmit={submit}>
-                <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
-                <input type="username" className="form-control" placeholder="Username" required
-                       onChange={e => setUsername(e.target.value)}
-                />
+    await router.push('/')
+  }
 
-                <input type="password" className="form-control" placeholder="Password" required
-                       onChange={e => setPassword(e.target.value)}
-                />
+  return (
+    <Layout>
+      <form onSubmit={submit}>
+        <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
+        <input
+          type="username"
+          className="form-control"
+          placeholder="Username"
+          required
+          onChange={(e) => setUsername(e.target.value)}
+        />
 
-                <button className="w-100 btn-lg btn-primary" type="submit">Sign in</button>
-            </form>
-        </Layout>
-    );
-};
+        <input
+          type="password"
+          className="form-control"
+          placeholder="Password"
+          required
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-export default Login;
+        <button className="w-100 btn-lg btn-primary" type="submit">
+          Sign in
+        </button>
+      </form>
+    </Layout>
+  )
+}
+
+export default Login
