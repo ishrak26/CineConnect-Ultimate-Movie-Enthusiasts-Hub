@@ -299,6 +299,44 @@ async function fetchMoviesById(id) {
 }
 
 /*
+    returns array of json objects
+    each json object resembles a row from the movie table
+    key is the column name, value is the required value in db
+    returns only those rows where movie_has_genre.genreId=genreId
+
+    should return an array of size 1
+*/ 
+
+async function fetchMoviesByGenre(genreId) {
+    try {
+      // Fetch the movie IDs associated with the given genre ID
+      const { data: movieGenreData, error: movieGenreError } = await supabase
+        .from('movie_has_genre')
+        .select('movie_id')
+        .eq('genre_id', genreId);
+  
+      if (movieGenreError) throw movieGenreError;
+  
+      // Extract just the movie IDs from the data
+      const movieIds = movieGenreData.map(entry => entry.movie_id); // map() returns an array of movie_ids, entry is a json object
+  
+      // Fetch the movies that have the extracted movie IDs
+      const { data: moviesData, error: moviesError } = await supabase
+        .from('movies')
+        .select(id, title, release_date, poster_url)
+        .in('id', movieIds);
+  
+      if (moviesError) throw moviesError;
+  
+      // Return the array of movie records
+      return moviesData;
+    } catch (error) {
+      console.error('Error fetching movies by genre', error);
+      return null;
+    }
+  }
+
+/*
     arg: moviePersonId
 
     returns array of json objects
@@ -468,6 +506,7 @@ async function addMovieToWatchedlist(userId, movieId) {
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
+    fetchMoviesByGenre,
     fetchMoviePersonsById,
     fetchTopCastsByMovieId,
     fetchDirectorsByMovieId,
