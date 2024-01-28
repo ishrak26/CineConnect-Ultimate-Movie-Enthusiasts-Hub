@@ -302,9 +302,9 @@ async function fetchMoviesById(id) {
     returns array of json objects
     each json object resembles a row from the movie table
     key is the column name, value is the required value in db
-    returns only those rows where movie_has_genre.genreId=genreId
+    returns only those rows where movie.id=movie_has_genre.movie_id
 
-    should return an array of size 1
+    should return an array 
 */ 
 
 async function fetchMoviesByGenre(genreId) {
@@ -318,12 +318,13 @@ async function fetchMoviesByGenre(genreId) {
       if (movieGenreError) throw movieGenreError;
   
       // Extract just the movie IDs from the data
-      const movieIds = movieGenreData.map(entry => entry.movie_id); // map() returns an array of movie_ids, entry is a json object
+      const movieIds = movieGenreData.map(entry => entry.movie_id); 
+      // map() returns an array of movie_ids, entry is a json object
   
       // Fetch the movies that have the extracted movie IDs
       const { data: moviesData, error: moviesError } = await supabase
-        .from('movies')
-        .select(id, title, release_date, poster_url)
+        .from('movie')
+        .select('id, title, release_date, poster_url')
         .in('id', movieIds);
   
       if (moviesError) throw moviesError;
