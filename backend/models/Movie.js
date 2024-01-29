@@ -529,6 +529,28 @@ async function deleteRating(userId, movieId) {
     return data;
 }
 
+const fetchTopCastsIdsByMovieId = async (movieId, offset = 0, limit = 5) => {
+    try {
+        const { data, error } = await supabase
+            .from('movie_has_cast')
+            .select('movie_person_id')
+            .eq('movie_id', movieId)
+            .range(offset, offset + limit - 1); // Adjust the range for pagination
+
+        if (error) {
+            throw error;
+        }
+
+        // Extract just the movie_person_id values from the data
+        const castIds = data.map(entry => entry.movie_person_id);
+
+        return castIds;
+    } catch (error) {
+        console.error('Error fetching top cast IDs by movie ID with pagination', error);
+        return null;
+    }
+};
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
