@@ -8,8 +8,11 @@ import Footer from '@components/footer'
 import Search from '@components/search'
 import Pagination from '@components/pagination'
 import BaseLayout from '@components/BaseLayout'
-import Row from '@components/Row'
+// import Row from '@components/Row'
 import Layout from './layout'
+import dynamic from 'next/dynamic'
+
+const Row = dynamic(() => import('@components/Row'))
 
 export default function Home({ topRated, netflixOriginals,actionMovies, query }) {
   const router = useRouter()
@@ -53,6 +56,7 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
 
           <section className="md:space-y-24 pt-5">
             <div className="pb-4 my-5">
+              
             <Row
               // movies={trending.results}
               movies={topRated}
@@ -73,6 +77,7 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
             </div>
 
           </section>
+
 
           {/* <Segmented
             className="my-6"

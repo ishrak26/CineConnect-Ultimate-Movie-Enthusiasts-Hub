@@ -3,7 +3,10 @@
 import React, { useRef, useState } from "react";
 import { BiChevronLeftCircle, BiChevronRightCircle } from "react-icons/bi";
 import Container from "./Container";
-import Card from "./card";
+// import Card from "./card";
+import dynamic from "next/dynamic";
+
+const Card = dynamic(() => import("./card"));
 
 function Row({ movies, title, isMain }) {
     const rowRef = useRef(null);
@@ -42,6 +45,7 @@ function Row({ movies, title, isMain }) {
                             {isMain && (
                                 <div className="flex items-center space-x-3 md:space-x-5">
                                     {movies?.map((movie) => (
+
                                         <Card
                                             className="w-40 md:w-48"
                                             key={movie.id}
