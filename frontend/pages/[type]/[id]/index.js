@@ -581,45 +581,56 @@ export default function Home({
   )
 }
 
-export async function getServerSideProps({ params }) {
+export async function getServerSideProps(context) {
   // const response = await tmdb.get(`/${params.type}/${params.id}`, {
   //   params: {
   //     append_to_response: 'credits,videos,images,tv_credits,recommendations',
   //   },
   // })
 
+  const params = context.params;
+  console.log(params);
+
+  const cookie = context.req.headers.cookie;
+  console.log(cookie);
+
   const response = await fetch(`http://localhost:4000/v1/movie/${params.id}`, {
     method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(cookie ? { Cookie: cookie } : {}),
+    },
     credentials: 'include',
   }).then((res) => res.json())
+
   const casts = await fetch(
-    `http://localhost:4000/v1/movie/${params.id}/casts`
+    `http://localhost:4000/v1/movie/${params.id}/casts` , {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(cookie ? { Cookie: cookie } : {}),
+      },
+      credentials: 'include',
+    }
   ).then((res) => res.json())
 
-  // const castArray = casts.map((cast) => ({
-  //   ...cast,
-  //   id : cast.movie_person.id,
-  //   name: cast.movie_person.name,
-  //   role_name: cast.role_name,
-  //   image_url: cast.movie_person.image_url,
-  // }));
 
-  // if (response.status === 404) {
-  //   return {
-  //     notFound: true,
-  //   }
-  // }
+  if (response.status === 404) {
+    return {
+      notFound: true,
+    }
+  }
 
-  // if (response.data.success === false) {
-  //   return {
-  //     props: {
-  //       error: {
-  //         statusCode: response.status,
-  //         statusMessage: response.data.status_message,
-  //       },
-  //     },
-  //   }
-  // }
+  if (response.success === false) {
+    return {
+      props: {
+        error: {
+          statusCode: response.status,
+          statusMessage: response.status_message,
+        },
+      },
+    }
+  }
 
   // const backdropData = response.data.backdrop_path
   //   ? await getPlaiceholder(
