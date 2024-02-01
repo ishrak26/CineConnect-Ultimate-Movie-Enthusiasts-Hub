@@ -17,7 +17,7 @@ import Card from '@components/card'
 import Link from 'next/link'
 import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
-import { FaPlus, FaCheck} from 'react-icons/fa'
+import { FaPlus, FaCheck } from 'react-icons/fa'
 import SetRating from '@components/SetRating'
 
 
@@ -34,7 +34,7 @@ export default function Home({
     setIsAdded(!isAdded);
 
     // Additional logic to handle adding/removing from watchlist
-    try{
+    try {
       const response = fetch(`http://localhost:4000/v1/movie/${data.id}/watch`, {
         method: 'POST',
         headers: {
@@ -46,17 +46,17 @@ export default function Home({
         }),
       }).then((res) => res.json());
     }
-    catch(err){
+    catch (err) {
       console.log(err);
     }
 
   };
-  
+
   const handleRating = (rate) => {
     console.log(`Rated with: ${rate}`);
     // Handle the rating logic (e.g., send to API)
 
-    try{
+    try {
       const response = fetch(`http://localhost:4000/v1/movie/${data.id}/rate`, {
         method: 'POST',
         headers: {
@@ -69,7 +69,7 @@ export default function Home({
         }),
       }).then((res) => res.json());
     }
-    catch(err){
+    catch (err) {
       console.log(err);
     }
   };
@@ -100,8 +100,8 @@ export default function Home({
               src={
                 data.poster_url
                 // data.backdrop_path
-                  // ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`
-                  // : '/placeholder.svg'
+                // ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`
+                // : '/placeholder.svg'
               }
               alt={data.title || data.name}
               className="h-96 md:h-[480px] w-full object-cover object-center rounded-[40px]"
@@ -148,7 +148,7 @@ export default function Home({
         {(type === 'movie' || type === 'tv') && (
           <div className="mt-8 md:m-12 md:mt-8 xl:m-20 xl:mt-8">
             {/* {data.credits?.cast.length > 0 && <Cast cast={data.credits.cast} />} */}
-            
+
             {casts && <Cast casts={casts} />}
 
             <div className="flex flex-col-reverse my-5 gap-12 md:gap-20 lg:flex-row">
@@ -158,8 +158,8 @@ export default function Home({
                     // src={posterData.img.src}
                     src={
                       data.poster_url
-                        // ? `https://image.tmdb.org/t/p/w780${data.poster_path}`
-                        // : '/placeholder.svg'
+                      // ? `https://image.tmdb.org/t/p/w780${data.poster_path}`
+                      // : '/placeholder.svg'
                     }
                     alt={data.title || data.name}
                     className="rounded-[40px] object-cover w-full h-full"
@@ -416,7 +416,7 @@ export default function Home({
         )} */}
 
         {data && type === 'cast' && (
-          
+
           <div>
             <div
               className={clsx(
@@ -429,8 +429,8 @@ export default function Home({
                   <img
                     src={
                       data[0].image_url
-                        // ? `https://image.tmdb.org/t/p/w780${data.profile_path}`
-                        // : '/placeholder.svg'
+                      // ? `https://image.tmdb.org/t/p/w780${data.profile_path}`
+                      // : '/placeholder.svg'
                     }
                     alt={data.name}
                     className="rounded-[40px] object-cover w-full h-full"
@@ -566,16 +566,23 @@ export async function getServerSideProps({ params }) {
   let response = "";
   let casts = "";
 
-  if(params.type === 'movie'){
-  response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
-  casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`).then((res) => res.json());
+  if (params.type === 'movie') {
+    response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
+    casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    }
+    ).then((res) => res.json());
   }
 
-  else if(params.type === 'cast'){
+  else if (params.type === 'cast') {
     response = await fetch(`http://localhost:4000/v1/moviePerson/${params.id}`).then((res) => res.json());
     casts = response;
   }
-  
+
 
   return {
     props: {
