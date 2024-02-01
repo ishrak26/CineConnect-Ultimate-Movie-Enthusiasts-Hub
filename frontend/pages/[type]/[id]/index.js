@@ -17,12 +17,10 @@ import Card from '@components/card'
 import Link from 'next/link'
 import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
-import { FaPlus, FaCheck} from 'react-icons/fa'
+import { FaPlus, FaCheck } from 'react-icons/fa'
 import SetRating from '@components/SetRating'
 
-
 export default function Home({
-
   data,
   type,
   casts,
@@ -30,36 +28,48 @@ export default function Home({
   // posterData,
   // profileData,
 }) {
-
-  const [isAdded, setIsAdded] = useState(false);
+  const [isAdded, setIsAdded] = useState(false)
 
   const handleClick = () => {
-    setIsAdded(!isAdded);
+    setIsAdded(!isAdded)
 
     // Additional logic to handle adding/removing from watchlist
-    try{
-      const response = fetch(`http://localhost:4000/v1/movie/${data.id}/watch`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          movieId: data.id,
-          userId: 1,
-        }),
-      }).then((res) => res.json());
+    try {
+      const response = fetch(
+        `http://localhost:4000/v1/movie/${data.id}/watch`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            movieId: data.id,
+            userId: 1,
+          }),
+        }
+      ).then((res) => res.json())
+    } catch (err) {
+      console.log(err)
     }
-    catch(err){
-      console.log(err);
-    }
+  }
 
-  };
-  
+  const handleClick2 = async () => {
+    const response = await fetch(
+      `http://localhost:4000/v1/movie/8eeb74ff-9606-4e99-bbd3-4517bf81bdf4`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      }
+    )
+    const data = await response.json()
+    console.log(data)
+  }
+
   const handleRating = (rate) => {
-    console.log(`Rated with: ${rate}`);
+    console.log(`Rated with: ${rate}`)
     // Handle the rating logic (e.g., send to API)
 
-    try{
+    try {
       const response = fetch(`http://localhost:4000/v1/movie/${data.id}/rate`, {
         method: 'POST',
         headers: {
@@ -70,12 +80,11 @@ export default function Home({
           userId: 1,
           rating: rate,
         }),
-      }).then((res) => res.json());
+      }).then((res) => res.json())
+    } catch (err) {
+      console.log(err)
     }
-    catch(err){
-      console.log(err);
-    }
-  };
+  }
 
   return (
     <div>
@@ -103,16 +112,16 @@ export default function Home({
               src={
                 data.poster_url
                 // data.backdrop_path
-                  // ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`
-                  // : '/placeholder.svg'
+                // ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`
+                // : '/placeholder.svg'
               }
               alt={data.title || data.name}
               className="h-96 md:h-[480px] w-full object-cover object-center rounded-[40px]"
               loading="eager"
-            // blurDataURL={backdropData.base64}
-            // placeholder={backdropData.base64 ? 'blur' : 'empty'}
-            // width={1600}
-            // height={900}
+              // blurDataURL={backdropData.base64}
+              // placeholder={backdropData.base64 ? 'blur' : 'empty'}
+              // width={1600}
+              // height={900}
             />
           </div>
         )}
@@ -134,10 +143,10 @@ export default function Home({
                   type === 'movie'
                     ? 'Movies'
                     : type === 'tv'
-                      ? 'TV Shows'
-                      : type === 'person'
-                        ? 'Person'
-                        : 'Collection',
+                    ? 'TV Shows'
+                    : type === 'person'
+                    ? 'Person'
+                    : 'Collection',
               },
               {
                 href: '##',
@@ -161,15 +170,15 @@ export default function Home({
                     // src={posterData.img.src}
                     src={
                       data.poster_url
-                        // ? `https://image.tmdb.org/t/p/w780${data.poster_path}`
-                        // : '/placeholder.svg'
+                      // ? `https://image.tmdb.org/t/p/w780${data.poster_path}`
+                      // : '/placeholder.svg'
                     }
                     alt={data.title || data.name}
                     className="rounded-[40px] object-cover w-full h-full"
-                  // placeholder={posterData.base64 ? 'blur' : 'empty'}
-                  // blurDataURL={posterData.base64}
-                  // width={480}
-                  // height={710}
+                    // placeholder={posterData.base64 ? 'blur' : 'empty'}
+                    // blurDataURL={posterData.base64}
+                    // width={480}
+                    // height={710}
                   />
                 </div>
               </div>
@@ -184,7 +193,7 @@ export default function Home({
                   Watch
                 </Link> */}
                 <button
-                  onClick={handleClick}
+                  onClick={handleClick2}
                   className="flex items-center justify-center button button-primary"
                 >
                   {isAdded ? (
@@ -437,10 +446,10 @@ export default function Home({
                     }
                     alt={data.name}
                     className="rounded-[40px] object-cover w-full h-full"
-                  // placeholder={profileData.base64 ? 'blur' : 'empty'}
-                  // blurDataURL={profileData.base64}
-                  // width={480}
-                  // height={710}
+                    // placeholder={profileData.base64 ? 'blur' : 'empty'}
+                    // blurDataURL={profileData.base64}
+                    // width={480}
+                    // height={710}
                   />
                 </div>
               </div>
@@ -579,8 +588,13 @@ export async function getServerSideProps({ params }) {
   //   },
   // })
 
-  const response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
-  const casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`).then((res) => res.json());
+  const response = await fetch(`http://localhost:4000/v1/movie/${params.id}`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then((res) => res.json())
+  const casts = await fetch(
+    `http://localhost:4000/v1/movie/${params.id}/casts`
+  ).then((res) => res.json())
 
   // const castArray = casts.map((cast) => ({
   //   ...cast,
@@ -638,7 +652,7 @@ export async function getServerSideProps({ params }) {
   //     }
   return {
     props: {
-      type: "movie",
+      type: 'movie',
       data: response,
       casts: casts,
       // backdropData,

@@ -92,6 +92,16 @@ const authController = {
             const token = jwt.sign({ id: user.id }, SECRET_KEY, {
                 expiresIn: '1d',
             });
+
+            // Set token in an HTTP-only cookie
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: false, // no Send only over HTTPS
+                // sameSite: 'Lax', // no Strict SameSite policy
+                maxAge: 3600000 * 24, // Cookie expiry set to match token expiry // 1d
+                path: '/', // Set the path to root
+            });
+
             return res.status(200).json({
                 user: { username: user.username, id: user.id, role: user.role },
                 token: token,
