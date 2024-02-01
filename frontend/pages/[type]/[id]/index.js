@@ -26,9 +26,6 @@ export default function Home({
   data,
   type,
   casts,
-  // backdropData,
-  // posterData,
-  // profileData,
 }) {
 
   const [isAdded, setIsAdded] = useState(false);
@@ -80,7 +77,7 @@ export default function Home({
   return (
     <div>
       <Head>
-        <title>{`${data.title || data.name} — CineConnect`}</title>
+        <title>{`CineConnect`}</title>
         <meta
           name="description"
           content="Millions of movies, TV shows and people to discover. Explore now."
@@ -96,7 +93,7 @@ export default function Home({
       <Navbar />
 
       <div className="container pb-12 mt-10">
-        {type !== 'person' && (
+        {type !== 'cast' && (
           <div className="w-full relative">
             <img
               // src={backdropData.img.src}
@@ -119,7 +116,7 @@ export default function Home({
         <div
           className={clsx(
             'p-8 md:p-10 rounded-[40px] bg-grey-900 bg-opacity-80 backdrop-blur-md max-w-xl relative',
-            type !== 'person' && '-top-16 lg:ml-20 -mb-16'
+            type !== 'cast' && '-top-16 lg:ml-20 -mb-16'
           )}
         >
           <Breadcrumb
@@ -135,7 +132,7 @@ export default function Home({
                     ? 'Movies'
                     : type === 'tv'
                       ? 'TV Shows'
-                      : type === 'person'
+                      : type === 'cast'
                         ? 'Person'
                         : 'Collection',
               },
@@ -151,8 +148,8 @@ export default function Home({
         {(type === 'movie' || type === 'tv') && (
           <div className="mt-8 md:m-12 md:mt-8 xl:m-20 xl:mt-8">
             {/* {data.credits?.cast.length > 0 && <Cast cast={data.credits.cast} />} */}
-
-            {/* {casts && <Cast cast={casts} />} */}
+            
+            {casts && <Cast casts={casts} />}
 
             <div className="flex flex-col-reverse my-5 gap-12 md:gap-20 lg:flex-row">
               <div className="lg:w-1/2">
@@ -383,7 +380,7 @@ export default function Home({
           </div>
         )}
 
-        {type === 'collection' && (
+        {/* {type === 'collection' && (
           <div className="mt-8 md:mx-12 xl:mx-20 space-y-6">
             {data.overview && (
               <div>
@@ -416,94 +413,81 @@ export default function Home({
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
-        {type === 'person' && (
+        {data && type === 'cast' && (
+          
           <div>
             <div
               className={clsx(
                 'flex my-5 gap-12 md:gap-20 lg:flex-row',
-                type === 'person' ? 'flex-col' : 'flex-col-reverse'
+                type === 'cast' ? 'flex-col' : 'flex-col-reverse'
               )}
             >
               <div className="lg:w-1/2">
                 <div className="aspect-poster">
                   <img
-                    // src={profileData.img.src}
                     src={
-                      data.profile_path
-                        ? `https://image.tmdb.org/t/p/w780${data.profile_path}`
-                        : '/placeholder.svg'
+                      data[0].image_url
+                        // ? `https://image.tmdb.org/t/p/w780${data.profile_path}`
+                        // : '/placeholder.svg'
                     }
                     alt={data.name}
                     className="rounded-[40px] object-cover w-full h-full"
-                  // placeholder={profileData.base64 ? 'blur' : 'empty'}
-                  // blurDataURL={profileData.base64}
-                  // width={480}
-                  // height={710}
+
                   />
                 </div>
               </div>
 
               <div className="lg:w-1/2 space-y-6">
-                {data.biography && (
+                {data[0].biography && (
                   <div>
                     <h2 className="heading">Biography</h2>
-                    <p className="text-white-65">{data.biography}</p>
+                    <p className="text-white-65">{data[0].biography}</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 gap-6">
-                  {data.known_for_department && (
+                  {/* {data.known_for_department && (
                     <p>
                       <span className="text-sm text-white-30">Known for</span>
                       <span className="block mt-2">
                         {data.known_for_department}
                       </span>
                     </p>
-                  )}
+                  )} */}
 
-                  {data.birthday && (
+                  {data[0].date_of_birth && (
                     <p>
                       <span className="text-sm text-white-30">Birthday</span>
                       <span className="block mt-2">
-                        {format(new Date(data.birthday), 'dd MMMM, yyyy')}
+                        {format(new Date(data[0].date_of_birth), 'dd MMMM, yyyy')}
                       </span>
                     </p>
                   )}
 
-                  {data.place_of_birth && (
+                  {data[0].place_of_birth && (
                     <p>
                       <span className="text-sm text-white-30">
                         Place of Birth
                       </span>
-                      <span className="block mt-2">{data.place_of_birth}</span>
+                      <span className="block mt-2">{data[0].place_of_birth}</span>
                     </p>
                   )}
 
-                  {data.also_known_as.length > 0 && (
-                    <p>
-                      <span className="text-sm text-white-30">
-                        Also known as
-                      </span>
-                      <span className="block mt-2">
-                        {data.also_known_as.join(', ')}
-                      </span>
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
 
-            {data.images.profiles.length > 1 && (
+            {/* {data.images.profiles.length > 1 && (
               <div>
                 <h3 className="heading mb-4">Images</h3>
                 <Profiles profiles={data.images.profiles} />
               </div>
-            )}
+            )} */}
 
             <div className="space-y-4">
-              {data.known_for_department === 'Directing' && (
+              {/* {data.known_for_department === 'Directing' && (
                 <div>
                   <h3 className="heading mb-4">Directing Credits</h3>
                   <div className="card-list">
@@ -521,28 +505,28 @@ export default function Home({
                       ))}
                   </div>
                 </div>
-              )}
-              {data.credits?.cast?.length > 0 && (
+              )} */}
+              {data[0].movies?.length > 0 && (
                 <div>
                   <h3 className="heading mb-4">
-                    Movie Credits ({data.credits.cast.length})
+                    Movie Credits ({data[0].movies.length})
                   </h3>
                   <ScrollContent className="gap-4">
-                    {data.credits?.cast?.map((credit) => (
+                    {data[0].movies?.map((credit) => (
                       <Card
-                        key={credit.credit_id}
+                        key={credit.id}
                         id={credit.id}
-                        image={credit.poster_path}
+                        image={credit.poster_url}
                         title={credit.title}
                         type="movie"
-                        rating={credit.vote_average}
+                        rating={credit.rating}
                         className="w-64 flex-shrink-0"
                       />
                     ))}
                   </ScrollContent>
                 </div>
               )}
-              {data.tv_credits?.cast?.length > 0 && (
+              {/* {data.tv_credits?.cast?.length > 0 && (
                 <div>
                   <h3 className="heading mb-4">
                     TV Credits ({data.tv_credits.cast.length})
@@ -561,7 +545,7 @@ export default function Home({
                     ))}
                   </ScrollContent>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         )}
@@ -579,63 +563,26 @@ export async function getServerSideProps({ params }) {
   //   },
   // })
 
-  const response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
-  const casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`).then((res) => res.json());
+  let response = "";
+  let casts = "";
+
+  if(params.type === 'movie'){
+  response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
+  casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`).then((res) => res.json());
+  }
+
+  else if(params.type === 'cast'){
+    response = await fetch(`http://localhost:4000/v1/moviePerson/${params.id}`).then((res) => res.json());
+    casts = response;
+  }
   
-  // if (response.status === 404) {
-  //   return {
-  //     notFound: true,
-  //   }
-  // }
 
-  // if (response.data.success === false) {
-  //   return {
-  //     props: {
-  //       error: {
-  //         statusCode: response.status,
-  //         statusMessage: response.data.status_message,
-  //       },
-  //     },
-  //   }
-  // }
-
-  // const backdropData = response.data.backdrop_path
-  //   ? await getPlaiceholder(
-  //       `https://image.tmdb.org/t/p/original${response.data.backdrop_path}`
-  //     )
-  //   : {
-  //       img: {
-  //         src: '/placeholder.svg',
-  //       },
-  //     }
-
-  // const posterData = response.data.poster_path
-  //   ? await getPlaiceholder(
-  //       `https://image.tmdb.org/t/p/w780${response.data.poster_path}`
-  //     )
-  //   : {
-  //       img: {
-  //         src: '/placeholder.svg',
-  //       },
-  //     }
-
-  // const profileData = response.data.profile_path
-  //   ? await getPlaiceholder(
-  //       `https://image.tmdb.org/t/p/original${response.data.profile_path}`
-  //     )
-  //   : {
-  //       img: {
-  //         src: '/placeholder.svg',
-  //       },
-  //     }
   return {
     props: {
-      type: "movie",
+      type: params.type,
       data: response,
       casts: casts,
-      // backdropData,
-      // posterData,
-      // profileData,
+
     },
   }
 }

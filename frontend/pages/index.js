@@ -133,11 +133,16 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
 }
 
 export async function getServerSideProps({ query }) {
-   // Helper function to fetch data
-   async function fetchData(url, params) {
+  // Helper function to fetch data
+  async function fetchData(url, params) {
     try {
-      const response = await tmdb.get(url, { params });
-      return response.data;
+      const response = await fetch(url, { 
+        method: 'GET', 
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+        ...params 
+      });
+      return await response.json();
     } catch (error) {
       if (error.response && error.response.status === 404) {
         return { notFound: true };
@@ -145,45 +150,35 @@ export async function getServerSideProps({ query }) {
       return { error: error.message };
     }
   }
-  // Fetch data for different categories
-  // const trending = await fetchData(`/trending/${query.tab || 'all'}/week`, { page: query.page || 1 });
-  // const netflixOriginals = await fetchData('/discover/movie', { with_networks: 213 });
-  // const actionMovies = await fetchData('/discover/movie', { with_genres: 28 });
 
-  const topRated = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
-  const netflixOriginals = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
-  const actionMovies = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
+  // Use Promise.all to fetch data for different categories concurrently
+  try {
+    const [topRated, netflixOriginals, actionMovies] = await Promise.all([
+      fetchData(`http://localhost:4000/v1/movies/`),
+      fetchData(`http://localhost:4000/v1/movies/`),
+      fetchData(`http://localhost:4000/v1/movies/`)
+    ]);
 
-  // Consolidate errors and data
-  if (topRated.notFound || netflixOriginals.notFound || actionMovies.notFound) {
-    return { notFound: true };
-  }
+    // Check if any of the responses indicate 'not found'
+    if (topRated.notFound || netflixOriginals.notFound || actionMovies.notFound) {
+      return { notFound: true };
+    }
 
-  if (topRated.error || netflixOriginals.error || actionMovies.error) {
     return {
       props: {
-        error: {
-          message: topRated.error || netflixOriginals.error || actionMovies.error,
-        },
+        topRated,
+        netflixOriginals,
+        actionMovies
+        // Add other props as needed
       },
     };
+  } catch (error) {
+    console.error("Error during data fetching:", error);
+    return {
+      props: {
+        error: error.message
+      }
+    };
   }
-
-  // return {
-  //   props: {
-  //     trending: trending,
-  //     netflixOriginals: netflixOriginals,
-  //     actionMovies: actionMovies,
-  //     query,
-  //   },
-  // };
-
-  return {
-    props: {
-      topRated: topRated,
-      netflixOriginals: netflixOriginals,
-      actionMovies: actionMovies,
-      query,
-    },
-  };
 }
+

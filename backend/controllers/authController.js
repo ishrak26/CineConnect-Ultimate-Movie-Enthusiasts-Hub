@@ -17,10 +17,6 @@ const authController = {
             const { username, email, password, full_name } = req.body;
 
             console.log('req.body', req.body);
-            // console.log('username', username);
-            // console.log('email', email);
-            // console.log('password', password);
-            // console.log('full_name', full_name);
 
             // check conflicts
             // check if email exists
