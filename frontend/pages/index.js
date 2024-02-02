@@ -14,7 +14,7 @@ import dynamic from 'next/dynamic'
 
 const Row = dynamic(() => import('@components/Row'))
 
-export default function Home({ topRated, netflixOriginals,actionMovies, query }) {
+export default function Home({ topRated, netflixOriginals, actionMovies, query }) {
   const router = useRouter()
 
   return (
@@ -56,16 +56,16 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
 
           <section className="md:space-y-24 pt-5">
             <div className="pb-4 my-5">
-              
-            <Row
-              // movies={trending.results}
-              movies={topRated}
-              title="Top Rated"
-              isMain={true}
-            />
+
+              <Row
+                // movies={trending.results}
+                movies={topRated}
+                title="Top Rated"
+                isMain={true}
+              />
             </div>
             <div className="pb-4 my-5">
-            <Row movies={netflixOriginals} title="Netflix Originals" isMain={true} />
+              <Row movies={netflixOriginals} title="Netflix Originals" isMain={true} />
             </div>
 
             <div className="pb-4 my-5">
@@ -120,9 +120,9 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
             totalPages={trending.total_pages}
             className="mt-8"
           /> */}
-         
-         <div className="pb-14 my-40">
-          <Footer className="flex width-full" />
+
+          <div className="pb-14 my-40">
+            <Footer className="flex width-full" />
           </div>
 
         </div>
@@ -132,15 +132,22 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
   )
 }
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps(context) {
+
+  const query = context.query;
+  const cookie = context.req.headers.cookie;
+
   // Helper function to fetch data
   async function fetchData(url, params) {
     try {
-      const response = await fetch(url, { 
-        method: 'GET', 
-        headers: {'Content-Type': 'application/json'},
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
         credentials: 'include',
-        ...params 
+        ...params
       });
       return await response.json();
     } catch (error) {

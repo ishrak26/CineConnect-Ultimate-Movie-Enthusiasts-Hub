@@ -8,6 +8,7 @@ const moviesController = {
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
         try {
             console.log('title: ', req.query.title);
+
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(
                 title,
