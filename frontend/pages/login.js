@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import bcrypt from 'bcryptjs';
 import Layout from "./layout";
 import { useRouter } from "next/router";
+import jwt_decode from "jwt-decode";
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -25,6 +25,11 @@ const Login = () => {
 
         // print the response to the console
         console.log(response);
+
+        // decode the token
+        const token = localStorage.getItem('token');
+        const decoded = jwt_decode(token);
+        console.log(decoded);
 
         await router.push('/');
     }

@@ -7,6 +7,7 @@ import '@fontsource/poppins/700.css'
 import Script from 'next/script'
 import ScrollTop from '@components/scroll-top'
 import { SidebarProvider } from 'context/SidebarContext'
+import { Suspense } from 'react'
 
 function MyApp({ Component, pageProps }) {
   if (pageProps.error)
@@ -39,6 +40,7 @@ function MyApp({ Component, pageProps }) {
       <SidebarProvider>
         <Component {...pageProps} />
       </SidebarProvider>
+
       <ScrollTop />
     </>
   )
