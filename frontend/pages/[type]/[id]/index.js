@@ -53,18 +53,6 @@ export default function Home({
     }
   }
 
-  const handleClick2 = async () => {
-    const response = await fetch(
-      `http://localhost:4000/v1/movie/8eeb74ff-9606-4e99-bbd3-4517bf81bdf4`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      }
-    )
-    const data = await response.json()
-    console.log(data)
-  }
-
   const handleRating = (rate) => {
     console.log(`Rated with: ${rate}`)
     // Handle the rating logic (e.g., send to API)
@@ -193,7 +181,7 @@ export default function Home({
                   Watch
                 </Link> */}
                 <button
-                  onClick={handleClick2}
+                  onClick={handleClick}
                   className="flex items-center justify-center button button-primary"
                 >
                   {isAdded ? (
@@ -588,11 +576,11 @@ export async function getServerSideProps(context) {
   //   },
   // })
 
-  const params = context.params;
-  console.log(params);
+  const params = context.params
+  // console.log(params);
 
-  const cookie = context.req.headers.cookie;
-  console.log(cookie);
+  const cookie = context.req.headers.cookie
+  // console.log(cookie);
 
   const response = await fetch(`http://localhost:4000/v1/movie/${params.id}`, {
     method: 'GET',
@@ -604,7 +592,8 @@ export async function getServerSideProps(context) {
   }).then((res) => res.json())
 
   const casts = await fetch(
-    `http://localhost:4000/v1/movie/${params.id}/casts` , {
+    `http://localhost:4000/v1/movie/${params.id}/casts`,
+    {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -613,7 +602,6 @@ export async function getServerSideProps(context) {
       credentials: 'include',
     }
   ).then((res) => res.json())
-
 
   if (response.status === 404) {
     return {
