@@ -91,13 +91,9 @@ async function fetchCastsByMovieId(movieId) {
 async function fetchDirectorsByMovieId(movieId) {
     const { data, error } = await supabase
         .from('movie_has_director')
-        .select(
-            `
-        movie_person (
-            id, 
-            name
-        )`
-        )
+        .select(`
+            movie_person:movie_person_id (id, name)
+        `)
         .eq('movie_id', movieId);
 
     if (error) {
@@ -105,10 +101,21 @@ async function fetchDirectorsByMovieId(movieId) {
         return null;
     }
 
-    if (data) {
-        console.log('Returning from fetchDirectorsByMovieId:', data);
-        return data;
+    // Map over the data to restructure the objects to a non-nested format
+    const reformattedData = data.map(director => {
+        return {
+            id: director.movie_person.id, 
+            name: director.movie_person.name
+        };
+    });
+
+    if (reformattedData.length > 0) {
+        console.log('Returning from fetchDirectorsByMovieId:', reformattedData);
+        return reformattedData;
     }
+
+    // If no data was found or there was an error, return null
+    return null;
 }
 
 /*
@@ -118,15 +125,10 @@ async function fetchDirectorsByMovieId(movieId) {
 async function fetchTopCastsByMovieId(movieId, offset, limit) {
     const { data, error } = await supabase
         .from('movie_has_cast')
-        .select(
-            `
-        role_name,
-        movie_person (
-            id, 
-            name, 
-            image_url
-        )`
-        )
+        .select(`
+            role_name,
+            movie_person:movie_person_id (id, name, image_url)
+        `)
         .eq('movie_id', movieId)
         .range(offset, offset + limit - 1);
 
@@ -135,10 +137,23 @@ async function fetchTopCastsByMovieId(movieId, offset, limit) {
         return null;
     }
 
-    if (data) {
-        console.log('Returning from fetchTopCastsByMovieId:', data);
-        return data;
+    // Map over the data to restructure the objects to a non-nested format
+    const reformattedData = data.map(cast => {
+        return {
+            role_name: cast.role_name,
+            id: cast.movie_person.id, 
+            name: cast.movie_person.name, 
+            image_url: cast.movie_person.image_url
+        };
+    });
+
+    if (reformattedData.length > 0) {
+        console.log('Returning from fetchTopCastsByMovieId:', reformattedData);
+        return reformattedData;
     }
+
+    // If no data was found or there was an error, return null
+    return null;
 }
 
 /*
@@ -250,7 +265,7 @@ async function fetchMoviesByTitle(title, offset, limit) {
 
     should return an array of size 1
 */
-async function fetchMoviesById(id) {
+async function fetchMoviesById(id, user) {
     const { data, error } = await supabase
         .from('movie')
         .select(
@@ -289,12 +304,115 @@ async function fetchMoviesById(id) {
             if (rating) {
                 movie.rating = rating;
             }
+
+            if (user) {
+                // find user's rating for this movie
+                const { data: userRatingData, error: userRatingError } =
+                    await supabase
+                        .from('movie_has_user_rating')
+                        .select('rating')
+                        .eq('user_id', user.id)
+                        .eq('movie_id', movie.id);
+                if (userRatingError) {
+                    console.error(
+                        'Error fetching user rating',
+                        userRatingError
+                    );
+                    throw userRatingError;
+                }
+                if (userRatingData && userRatingData.length > 0) {
+                    movie.user_rating = userRatingData[0].rating;
+                }
+
+                // find if movie is in user's watchlist
+                const { data: watchlistData, error: watchlistError } =
+                    await supabase
+                        .from('watch_list')
+                        .select('id')
+                        .eq('user_id', user.id)
+                        .eq('movie_id', movie.id);
+                if (watchlistError) {
+                    console.error('Error fetching watchlist', watchlistError);
+                    throw watchlistError;
+                }
+                if (watchlistData && watchlistData.length > 0) {
+                    movie.in_watchlist = true;
+                }
+            }
         }
 
         console.log('Returning from fetchMoviesById:', data);
         // console.log(data[0].casts);
         // console.log(data[0].directors);
         return data;
+    }
+}
+
+/*
+returns the genre id of the genre with the given name
+*/
+
+async function getGenreIdByName(genreName) {
+    try {
+        const { data, error } = await supabase
+            .from('genre')
+            .select('id')
+            .ilike('name', genreName); // Using 'ilike' for case-insensitive matching
+
+        if (error) {
+            console.error('Error fetching genre id by name:', error);
+            throw error;
+        }
+
+        // Assuming 'name' is a unique field and should only return one record
+        if (data && data.length > 0) {
+            return data[0].id; // Return the first id (should be the only one)
+        } else {
+            return null; // No genre found with that name
+        }
+    } catch (error) {
+        console.error('Error in getGenreIdByName:', error);
+        throw error; // Rethrow the error and handle it in the controller
+    }
+}
+
+/*
+    returns array of json objects
+    each json object resembles a row from the movie table
+    key is the column name, value is the required value in db
+    returns only those rows where movie.id=movie_has_genre.movie_id
+
+    should return an array 
+*/
+
+async function fetchMoviesByGenre(genreName) {
+    try {
+        // Fetch the movie IDs associated with the given genre ID
+        const genreId = await getGenreIdByName(genreName);
+        const { data: movieGenreData, error: movieGenreError } = await supabase
+            .from('movie_has_genre')
+            .select('movie_id')
+            .eq('genre_id', genreId);
+
+        if (movieGenreError) throw movieGenreError;
+
+        // Extract just the movie IDs from the data
+        const movieIds = movieGenreData.map((entry) => entry.movie_id);
+        // map() returns an array of movie_ids, entry is a json object
+
+        // Fetch the movies that have the extracted movie IDs
+        const { data: moviesData, error: moviesError } = await supabase
+            .from('movie')
+            .select('id, title, release_date, poster_url')
+            .in('id', movieIds);
+
+        if (moviesError) throw moviesError;
+
+        // Return the array of movie records
+        return moviesData;
+    } catch (error) {
+        console.error('Error fetching movies by genre', error);
+        return null;
     }
 }
 
@@ -461,9 +579,32 @@ async function deleteRating(userId, movieId) {
     return data;
 }
 
+const fetchTopCastsIdsByMovieId = async (movieId, offset = 0, limit = 5) => {
+    try {
+        const { data, error } = await supabase
+            .from('movie_has_cast')
+            .select('movie_person_id')
+            .eq('movie_id', movieId)
+            .range(offset, offset + limit - 1); // Adjust the range for pagination
+
+        if (error) {
+            throw error;
+        }
+
+        // Extract just the movie_person_id values from the data
+        const castIds = data.map(entry => entry.movie_person_id);
+
+        return castIds;
+    } catch (error) {
+        console.error('Error fetching top cast IDs by movie ID with pagination', error);
+        return null;
+    }
+};
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
+    fetchMoviesByGenre,
     fetchMoviePersonsById,
     fetchTopCastsByMovieId,
     fetchDirectorsByMovieId,

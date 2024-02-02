@@ -7,8 +7,8 @@ const port = process.env.PORT || 3000;
 
 // const movie = require('./models/Movie');
 // movie.fetchMoviesByTitle('godfather');
-
-app.listen(port, () => {
+let server
+server = app.listen(port, () => {
     console.log(`Server listening on http://localhost:${port}`);
     // You can perform any additional startup logic here if needed
 });
@@ -16,12 +16,12 @@ app.listen(port, () => {
 // Handling graceful shutdown
 process.once('SIGTERM', () => {
     console.log('SIGTERM received. Shutting down gracefully.');
-    app.close(() => {
+    server.close(() => {
         console.log('Server shut down.');
     });
 }).once('SIGINT', () => {
     console.log('SIGINT received. Shutting down gracefully.');
-    app.close(() => {
+    server.close(() => {
         console.log('Server shut down.');
     });
 });

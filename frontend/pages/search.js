@@ -89,17 +89,17 @@ export default function Home({ data, query }) {
               }
             />
 
-            {data.results?.length ? (
+            {data?.length ? (
               <div>
                 <div className="card-list">
-                  {data.results.map((result) => (
+                  {data.map((result) => (
                     <Card
                       key={result.id}
                       id={result.id}
-                      image={result.poster_path || result.profile_path}
+                      image={result.poster_url || result.profile_path}
                       title={result.title || result.name}
                       type={query.type || 'movie'}
-                      rating={result.vote_average}
+                      rating={result.rating}
                     />
                   ))}
                 </div>
@@ -137,33 +137,37 @@ export async function getServerSideProps({ query }) {
     }
   }
 
-  const response = await tmdb.get(`/search/${query.type || 'movie'}`, {
-    params: {
-      ...query,
-    },
-  })
+  // const response = await tmdb.get(`/search/${query.type || 'movie'}`, {
+  //   params: {
+  //     ...query,
+  //   },
+  // })
 
-  if (response.status === 404) {
-    return {
-      notFound: true,
-    }
-  }
 
-  if (response.data.success === false) {
-    return {
-      props: {
-        error: {
-          statusCode: response.status,
-          statusMessage:
-            response.data.errors[0] || response.data.status.message,
-        },
-      },
-    }
-  }
+  const response = await fetch(`http://localhost:4000/v1/movies/?title=${query.query}`).then((res) => res.json());
+
+
+  // if (response.status === 404) {
+  //   return {
+  //     notFound: true,
+  //   }
+  // }
+
+  // if (response.data.success === false) {
+  //   return {
+  //     props: {
+  //       error: {
+  //         statusCode: response.status,
+  //         statusMessage:
+  //           response.data.errors[0] || response.data.status.message,
+  //       },
+  //     },
+  //   }
+  // }
 
   return {
     props: {
-      data: response.data,
+      data: response,
       query,
     },
   }
