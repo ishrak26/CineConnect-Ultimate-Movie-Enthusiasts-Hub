@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link'
 import Poster from './poster'
 import clsx from 'clsx'
@@ -19,8 +21,10 @@ export default function Card({
       href={`/${type}/${id}`}
       className={clsx('card', className)}
       {...props}
-    >
+    > 
+
       <Poster path={image} alt={title} />
+
       {rating >= 0 && (
         <Rating average={rating} className="absolute top-4 left-4" />
       )}

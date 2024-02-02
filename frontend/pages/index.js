@@ -8,10 +8,13 @@ import Footer from '@components/footer'
 import Search from '@components/search'
 import Pagination from '@components/pagination'
 import BaseLayout from '@components/BaseLayout'
-import Row from '@components/Row'
+// import Row from '@components/Row'
 import Layout from './layout'
+import dynamic from 'next/dynamic'
 
-export default function Home({ topRated, netflixOriginals,actionMovies, query }) {
+const Row = dynamic(() => import('@components/Row'))
+
+export default function Home({ topRated, netflixOriginals, actionMovies, query }) {
   const router = useRouter()
 
   return (
@@ -53,15 +56,16 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
 
           <section className="md:space-y-24 pt-5">
             <div className="pb-4 my-5">
-            <Row
-              // movies={trending.results}
-              movies={topRated}
-              title="Top Rated"
-              isMain={true}
-            />
+
+              <Row
+                // movies={trending.results}
+                movies={topRated}
+                title="Top Rated"
+                isMain={true}
+              />
             </div>
             <div className="pb-4 my-5">
-            <Row movies={netflixOriginals} title="Netflix Originals" isMain={true} />
+              <Row movies={netflixOriginals} title="Netflix Originals" isMain={true} />
             </div>
 
             <div className="pb-4 my-5">
@@ -73,6 +77,7 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
             </div>
 
           </section>
+
 
           {/* <Segmented
             className="my-6"
@@ -115,9 +120,9 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
             totalPages={trending.total_pages}
             className="mt-8"
           /> */}
-         
-         <div className="pb-14 my-40">
-          <Footer className="flex width-full" />
+
+          <div className="pb-14 my-40">
+            <Footer className="flex width-full" />
           </div>
 
         </div>
@@ -127,12 +132,24 @@ export default function Home({ topRated, netflixOriginals,actionMovies, query })
   )
 }
 
-export async function getServerSideProps({ query }) {
-   // Helper function to fetch data
-   async function fetchData(url, params) {
+export async function getServerSideProps(context) {
+
+  const query = context.query;
+  const cookie = context.req.headers.cookie;
+
+  // Helper function to fetch data
+  async function fetchData(url, params) {
     try {
-      const response = await tmdb.get(url, { params });
-      return response.data;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+        ...params
+      });
+      return await response.json();
     } catch (error) {
       if (error.response && error.response.status === 404) {
         return { notFound: true };
@@ -140,45 +157,35 @@ export async function getServerSideProps({ query }) {
       return { error: error.message };
     }
   }
-  // Fetch data for different categories
-  // const trending = await fetchData(`/trending/${query.tab || 'all'}/week`, { page: query.page || 1 });
-  // const netflixOriginals = await fetchData('/discover/movie', { with_networks: 213 });
-  // const actionMovies = await fetchData('/discover/movie', { with_genres: 28 });
 
-  const topRated = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
-  const netflixOriginals = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
-  const actionMovies = await fetch(`http://localhost:4000/v1/movies/`).then((res) => res.json());
+  // Use Promise.all to fetch data for different categories concurrently
+  try {
+    const [topRated, netflixOriginals, actionMovies] = await Promise.all([
+      fetchData(`http://localhost:4000/v1/movies/`),
+      fetchData(`http://localhost:4000/v1/movies/`),
+      fetchData(`http://localhost:4000/v1/movies/`)
+    ]);
 
-  // Consolidate errors and data
-  if (topRated.notFound || netflixOriginals.notFound || actionMovies.notFound) {
-    return { notFound: true };
-  }
+    // Check if any of the responses indicate 'not found'
+    if (topRated.notFound || netflixOriginals.notFound || actionMovies.notFound) {
+      return { notFound: true };
+    }
 
-  if (topRated.error || netflixOriginals.error || actionMovies.error) {
     return {
       props: {
-        error: {
-          message: topRated.error || netflixOriginals.error || actionMovies.error,
-        },
+        topRated,
+        netflixOriginals,
+        actionMovies
+        // Add other props as needed
       },
     };
+  } catch (error) {
+    console.error("Error during data fetching:", error);
+    return {
+      props: {
+        error: error.message
+      }
+    };
   }
-
-  // return {
-  //   props: {
-  //     trending: trending,
-  //     netflixOriginals: netflixOriginals,
-  //     actionMovies: actionMovies,
-  //     query,
-  //   },
-  // };
-
-  return {
-    props: {
-      topRated: topRated,
-      netflixOriginals: netflixOriginals,
-      actionMovies: actionMovies,
-      query,
-    },
-  };
 }
+
