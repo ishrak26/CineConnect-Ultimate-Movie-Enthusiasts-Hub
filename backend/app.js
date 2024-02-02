@@ -30,14 +30,14 @@ app.use(
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// cookie parser
-app.use(cookieParser());
-
 // logging
 app.use(morgan('tiny'));
 
 // // static files
 // app.use(express.static('public'));
+
+// cookie parser
+app.use(cookieParser());
 
 // routers
 // app.use('/', adminRouter);

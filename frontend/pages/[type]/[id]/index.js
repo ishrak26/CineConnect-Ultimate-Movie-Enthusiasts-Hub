@@ -20,21 +20,19 @@ import ScrollContent from '@components/scroll-content'
 import { FaPlus, FaCheck } from 'react-icons/fa'
 import SetRating from '@components/SetRating'
 
-
 export default function Home({
-
   data,
   type,
   casts,
 }) {
-
-  const [isAdded, setIsAdded] = useState(false);
+  const [isAdded, setIsAdded] = useState(false)
 
   const handleClick = () => {
-    setIsAdded(!isAdded);
+    setIsAdded(!isAdded)
 
     // Additional logic to handle adding/removing from watchlist
     try {
+
       const response = fetch(`http://localhost:4000/v1/movie/${data.id}/watch`, {
         method: 'POST',
         headers: {
@@ -48,12 +46,15 @@ export default function Home({
     }
     catch (err) {
       console.log(err);
+
     }
+  }
 
   };
 
+
   const handleRating = (rate) => {
-    console.log(`Rated with: ${rate}`);
+    console.log(`Rated with: ${rate}`)
     // Handle the rating logic (e.g., send to API)
 
     try {
@@ -67,12 +68,13 @@ export default function Home({
           userId: 1,
           rating: rate,
         }),
+
       }).then((res) => res.json());
     }
     catch (err) {
       console.log(err);
     }
-  };
+  }
 
   return (
     <div>
@@ -106,10 +108,10 @@ export default function Home({
               alt={data.title || data.name}
               className="h-96 md:h-[480px] w-full object-cover object-center rounded-[40px]"
               loading="eager"
-            // blurDataURL={backdropData.base64}
-            // placeholder={backdropData.base64 ? 'blur' : 'empty'}
-            // width={1600}
-            // height={900}
+              // blurDataURL={backdropData.base64}
+              // placeholder={backdropData.base64 ? 'blur' : 'empty'}
+              // width={1600}
+              // height={900}
             />
           </div>
         )}
@@ -131,10 +133,12 @@ export default function Home({
                   type === 'movie'
                     ? 'Movies'
                     : type === 'tv'
+
                       ? 'TV Shows'
                       : type === 'cast'
                         ? 'Person'
                         : 'Collection',
+
               },
               {
                 href: '##',
@@ -163,10 +167,10 @@ export default function Home({
                     }
                     alt={data.title || data.name}
                     className="rounded-[40px] object-cover w-full h-full"
-                  // placeholder={posterData.base64 ? 'blur' : 'empty'}
-                  // blurDataURL={posterData.base64}
-                  // width={480}
-                  // height={710}
+                    // placeholder={posterData.base64 ? 'blur' : 'empty'}
+                    // blurDataURL={posterData.base64}
+                    // width={480}
+                    // height={710}
                   />
                 </div>
               </div>
@@ -435,6 +439,11 @@ export default function Home({
                     alt={data.name}
                     className="rounded-[40px] object-cover w-full h-full"
 
+                    // placeholder={profileData.base64 ? 'blur' : 'empty'}
+                    // blurDataURL={profileData.base64}
+                    // width={480}
+                    // height={710}
+
                   />
                 </div>
               </div>
@@ -563,6 +572,7 @@ export async function getServerSideProps(context) {
   //   },
   // })
 
+
   const params = context.params;
   const cookie = context.req.headers.cookie;
 
@@ -571,6 +581,7 @@ export async function getServerSideProps(context) {
 
   if (params.type === 'movie') {
     response = await fetch(`http://localhost:4000/v1/movie/${params.id}`, {
+
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -578,6 +589,7 @@ export async function getServerSideProps(context) {
       },
       credentials: 'include',
     }
+
     ).then((res) => res.json());
 
     casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`, {
