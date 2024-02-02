@@ -5,13 +5,14 @@ import Head from 'next/head'
 import styles from '../styles/Form.module.css';
 import { registerValidate } from '../lib/validate'
 
-import { Link } from 'next/link';
+import Link from 'next/link';
 import toast, { Toaster } from 'react-hot-toast';
 import { useFormik } from 'formik';
 import convertToBase64 from '../lib/convert';
 import { registerUser } from '../lib/helper'
+import { de } from 'date-fns/locale';
 
-const Register = () => {
+export default function Register() {
 
     const router = useRouter();
     const [file, setFile] = useState()
@@ -67,38 +68,39 @@ const Register = () => {
                 <Toaster position='top-center' reverseOrder={false}></Toaster>
 
                 <div className='flex justify-center items-center h-screen'>
-                    <div className={styles.glass} style={{ width: "65%", paddingTop: '3em' }}>
+                    <div className={styles.glass} style={{ width: "100%", paddingTop: '3em' }}>
 
-                        <div className="title flex flex-col items-center">
-                            <h4 className='text-5xl font-bold'>Register</h4>
-                            <span className='py-4 text-xl w-2/3 text-center text-gray-500'>
+                    <div className="title flex flex-col items-center">
+                        <h4 className='text-5xl font-bold'>Register</h4>
+                        <span className='py-4 text-xl w-2/3 text-center text-gray-500'>
 
-                            </span>
+                        </span>
+                    </div>
+
+                    <form className='py-1' onSubmit={formik.handleSubmit}>
+
+                        <div className="textbox flex flex-col items-center gap-6">
+                            <input {...formik.getFieldProps('name')} className={styles.textbox} type="text" placeholder='Full Name*' />
+                            <input {...formik.getFieldProps('email')} className={styles.textbox} type="text" placeholder='Email*' />
+                            <input {...formik.getFieldProps('username')} className={styles.textbox} type="text" placeholder='Username*' />
+                            <input {...formik.getFieldProps('password')} className={styles.textbox} type="text" placeholder='Password*' />
+                            <button className={styles.btn} type='submit'>Register</button>
+
                         </div>
 
-                        <form className='py-1' onSubmit={formik.handleSubmit}>
+                        <div className="text-2xl text-center py-16">
+                            <span className='text-gray-500'>Already Registered? <Link href="/login" className='text-red-500'>Login Now</Link></span>
+                        </div>
 
-                            <div className="textbox flex flex-col items-center gap-6">
-                                <input {...formik.getFieldProps('name')} className={styles.textbox} type="text" placeholder='Full Name*' />
-                                <input {...formik.getFieldProps('email')} className={styles.textbox} type="text" placeholder='Email*' />
-                                <input {...formik.getFieldProps('username')} className={styles.textbox} type="text" placeholder='Username*' />
-                                <input {...formik.getFieldProps('password')} className={styles.textbox} type="text" placeholder='Password*' />
-                                <button className={styles.btn} type='submit'>Register</button>
-                                <Link href='/login'
-                                    className='text-xl text-gray-500'>Already have an account? Login</Link>
+                    </form>
 
-                            </div>
-
-                        </form>
-
-                    </div>
                 </div>
-                
             </div>
 
-            
-        </Layout>
+        </div>
+
+
+        </Layout >
     );
 };
 
-export default Register;

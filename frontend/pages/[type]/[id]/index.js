@@ -556,22 +556,35 @@ export default function Home({
   )
 }
 
-export async function getServerSideProps({ params }) {
+export async function getServerSideProps(context) {
   // const response = await tmdb.get(`/${params.type}/${params.id}`, {
   //   params: {
   //     append_to_response: 'credits,videos,images,tv_credits,recommendations',
   //   },
   // })
 
+  const params = context.params;
+  const cookie = context.req.headers.cookie;
+
   let response = "";
   let casts = "";
 
   if (params.type === 'movie') {
-    response = await fetch(`http://localhost:4000/v1/movie/${params.id}`).then((res) => res.json());
+    response = await fetch(`http://localhost:4000/v1/movie/${params.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(cookie ? { Cookie: cookie } : {}),
+      },
+      credentials: 'include',
+    }
+    ).then((res) => res.json());
+
     casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        ...(cookie ? { Cookie: cookie } : {}),
       },
       credentials: 'include',
     }
@@ -579,7 +592,15 @@ export async function getServerSideProps({ params }) {
   }
 
   else if (params.type === 'cast') {
-    response = await fetch(`http://localhost:4000/v1/moviePerson/${params.id}`).then((res) => res.json());
+    response = await fetch(`http://localhost:4000/v1/moviePerson/${params.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(cookie ? { Cookie: cookie } : {}),
+      },
+      credentials: 'include',
+    }
+    ).then((res) => res.json());
     casts = response;
   }
 
