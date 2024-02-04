@@ -8,8 +8,8 @@ const authenticateTokens = async (req, res, next) => {
 
     // const token = req.header('Authorization')?.split(' ')[1];
     // console.log('req', req);
-    console.log('req.cookies', req.cookies);
-    console.log('req.headers', req.headers);
+    // console.log('req.cookies', req.cookies);
+    // console.log('req.headers', req.headers);
 
     if (!req.cookies) {
         next();

@@ -7,7 +7,7 @@ const moviesController = {
         const limit = req.query.limit || 10; // Default limit to 10 if not specified
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
         try {
-            console.log('title: ', req.query.title);
+            // console.log('title: ', req.query.title);
 
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(
@@ -45,11 +45,9 @@ const moviesController = {
             const movies = await db_movie.fetchMoviesByGenre(genreId);
 
             if (!movies) {
-                return res
-                    .status(404)
-                    .json({
-                        message: 'Movies for the specified genre not found.',
-                    });
+                return res.status(404).json({
+                    message: 'Movies for the specified genre not found.',
+                });
             }
 
             // Send the movies as a response

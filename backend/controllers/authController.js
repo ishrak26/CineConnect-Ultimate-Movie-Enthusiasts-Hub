@@ -6,7 +6,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 const authController = {
     register: async (req, res) => {
-        console.log('req.body', req.body);
+        // console.log('req.body', req.body);
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             console.log('errors', errors);
@@ -16,7 +16,7 @@ const authController = {
         try {
             const { username, email, password, full_name } = req.body;
 
-            console.log('req.body', req.body);
+            // console.log('req.body', req.body);
 
             // check conflicts
             // check if email exists
@@ -34,7 +34,7 @@ const authController = {
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
-            console.log('hashedPassword', hashedPassword);
+            // console.log('hashedPassword', hashedPassword);
 
             const user = await userModel.createUser({
                 username,
@@ -54,7 +54,7 @@ const authController = {
     login: async (req, res) => {
         try {
             const { username, password } = req.body;
-            console.log('login: ', req.body);
+            // console.log('login: ', req.body);
             // console.log('username', username);
             // console.log('password', password);
 
@@ -67,10 +67,10 @@ const authController = {
                     .json({ errors: 'Username or password is incorrect' });
             }
 
-            console.log('user', user);
+            // console.log('user', user);
 
             // console.log('hashedPassword', hashedPassword);
-            console.log('user.password', user.password);
+            // console.log('user.password', user.password);
             const isPasswordCorrect = await bcrypt.compare(
                 password,
                 user.password
@@ -83,9 +83,13 @@ const authController = {
                     .json({ errors: 'Username or password is incorrect' });
             }
 
-            const token = jwt.sign({ id: user.id }, SECRET_KEY, {
-                expiresIn: '1d',
-            });
+            const token = jwt.sign(
+                { id: user.id, role: user.role },
+                SECRET_KEY,
+                {
+                    expiresIn: '1d',
+                }
+            );
 
             // Set token in an HTTP-only cookie
             res.cookie('token', token, {
@@ -98,7 +102,6 @@ const authController = {
 
             return res.status(200).json({
                 user: { username: user.username, id: user.id, role: user.role },
-                token: token,
             });
         } catch (err) {
             console.error(err);
