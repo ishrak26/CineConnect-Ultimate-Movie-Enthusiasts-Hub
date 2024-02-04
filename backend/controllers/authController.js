@@ -105,6 +105,22 @@ const authController = {
             return res.status(500).json({ errors: err });
         }
     },
+
+    logout: async (req, res) => {
+        try {
+            res.cookie('token', '', {
+                httpOnly: true, // This makes the cookie inaccessible to client-side scripts, enhancing security
+                secure: false, // Ensures the cookie is sent over HTTPS --> no
+                expires: new Date(0), // Setting the cookie's expiry date to Unix Epoch (January 1, 1970) ensures it's in the past
+                // sameSite: 'strict' // This setting controls whether the cookie is sent in cross-site requests
+                path: '/', // Set the path to root
+            });
+            return res.status(200).json({ success: true });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ errors: err });
+        }
+    },
 };
 
 module.exports = authController;
