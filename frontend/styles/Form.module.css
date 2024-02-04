@@ -8,6 +8,13 @@
     @apply border-4 border-gray-50 shrink-0 h-3/4 w-[50%] rounded-3xl py-20 px-12 min-w-max;
 }
 
+.errmsg {
+    background-color: lightpink;
+    color: firebrick;
+    font-weight: bold;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
 
 
 .profile_img {
@@ -16,7 +23,7 @@
 }
 
 .textbox {
-    @apply border-0 px-20 py-4 rounded-xl shadow-sm text-lg text-gray-700;
+    @apply border-0 w-[350px] px-10 py-4 rounded-xl shadow-sm text-lg text-gray-700;
     @apply focus:outline-none;
 }
 
@@ -28,6 +35,3 @@
     background-color: #ff6a6a;
 }
 
-/* input[type='file']{
-    display: none;
-} */

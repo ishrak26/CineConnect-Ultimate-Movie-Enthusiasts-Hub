@@ -1,38 +1,67 @@
-import React, { useState } from 'react';
+import { useRef, useState, useEffect } from "react";
 import Layout from "./layout";
 import { useRouter } from "next/router";
 import Head from 'next/head'
 import styles from '../styles/Form.module.css';
-import { registerValidate } from '../lib/validate'
-
+import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from 'next/link';
 import toast, { Toaster } from 'react-hot-toast';
-import { useFormik } from 'formik';
-import convertToBase64 from '../lib/convert';
-import { de } from 'date-fns/locale';
+
+const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
+const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+
 
 export default function Register() {
 
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
+
+    const userRef = useRef();
+    const errRef = useRef();
+
+    const [validName, setValidName] = useState(false);
+    const [userFocus, setUserFocus] = useState(false);
+
+    const [validPwd, setValidPwd] = useState(false);
+    const [pwdFocus, setPwdFocus] = useState(false);
+
+    const [matchPwd, setMatchPwd] = useState('');
+    const [validMatch, setValidMatch] = useState(false);
+    const [matchFocus, setMatchFocus] = useState(false);
+
+    const [errMsg, setErrMsg] = useState('');
+    const [success, setSuccess] = useState(false);
+
+
     const router = useRouter();
-    const [file, setFile] = useState()
 
-    const [show, setShow] = useState({ password: false, cpassword: false })
-    const formik = useFormik({
-        initialValues: {
-            name: '',
-            username: '',
-            email: '',
-            password: '',
-            cpassword: ''
-        },
-        validate: registerValidate,
-        validateOnBlur: false,
-        validateOnChange: false,
-        onSubmit
-    })
+    useEffect(() => {
+        setValidName(USER_REGEX.test(username));
+    }, [username]);
 
-    async function onSubmit(values) {
-        const options = {
+    useEffect(() => {
+        setValidPwd(PWD_REGEX.test(password));
+        setValidMatch(password === matchPwd);
+    }, [password, matchPwd]);
+
+    useEffect(() => {
+        setErrMsg('');
+    }, [username, password, matchPwd])
+
+    const submit = async (e) => {
+        e.preventDefault();
+
+        const v1 = USER_REGEX.test(username);
+        const v2 = PWD_REGEX.test(password);
+        if (!v1 || !v2) {
+            setErrMsg("Invalid Entry");
+            return;
+        }
+
+        await fetch('http://localhost:4000/v1/auth/register', {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -41,20 +70,11 @@ export default function Register() {
                 password,
                 full_name: name
             })
-        }
+        });
 
-        await fetch('http://localhost:4000/v1/auth/register', options)
-            .then(res => res.json())
-            .then((data) => {
-                if (data) router.push('/login')
-            })
+        await router.push('/login');
     }
 
-    /** formik doensn't support file upload so we need to create this handler */
-    const onUpload = async e => {
-        const base64 = await convertToBase64(e.target.files[0]);
-        setFile(base64);
-    }
 
 
     return (
@@ -75,14 +95,32 @@ export default function Register() {
 
                             </span>
                         </div>
-
-                        <form className='py-1' onSubmit={formik.handleSubmit}>
+                        <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+                        <form className='py-1' onSubmit={submit}>
 
                             <div className="textbox flex flex-col items-center gap-6">
-                                <input {...formik.getFieldProps('name')} className={styles.textbox} type="text" placeholder='Full Name*' />
-                                <input {...formik.getFieldProps('email')} className={styles.textbox} type="text" placeholder='Email*' />
-                                <input {...formik.getFieldProps('username')} className={styles.textbox} type="text" placeholder='Username*' />
-                                <input {...formik.getFieldProps('password')} className={styles.textbox} type="text" placeholder='Password*' />
+
+                                <input className={styles.textbox} type="text" placeholder='Full Name' required
+                                    onChange={e => setName(e.target.value)} />
+                                <input className={styles.textbox} type="text" placeholder='Email' required
+                                    onChange={e => setEmail(e.target.value)}
+                                />
+                                <input className={styles.textbox} type="text" placeholder='Username' required
+                        
+                                id="username"
+                                ref={userRef}
+                                autoComplete="off"
+                                onChange={e => setUsername(e.target.value)}
+                                value={username}
+                                aria-invalid={validName ? "false" : "true"}
+                                aria-describedby="uidnote"
+                                onFocus={() => setUserFocus(true)}
+                                onBlur={() => setUserFocus(false)}
+                                    
+                                />
+                                <input className={styles.textbox} type="text" placeholder='Password' required
+                                    onChange={e => setPassword(e.target.value)}
+                                />
                                 <button className={styles.btn} type='submit'>Register</button>
 
                             </div>
