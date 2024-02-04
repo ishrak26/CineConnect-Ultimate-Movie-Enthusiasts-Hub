@@ -20,11 +20,7 @@ import ScrollContent from '@components/scroll-content'
 import { FaPlus, FaCheck } from 'react-icons/fa'
 import SetRating from '@components/SetRating'
 
-export default function Home({
-  data,
-  type,
-  casts,
-}) {
+export default function Home({ data, type, casts }) {
   const [isAdded, setIsAdded] = useState(false)
 
   const handleClick = () => {
@@ -32,26 +28,23 @@ export default function Home({
 
     // Additional logic to handle adding/removing from watchlist
     try {
-
-      const response = fetch(`http://localhost:4000/v1/movie/${data.id}/watch`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          movieId: data.id,
-          userId: 1,
-        }),
-      }).then((res) => res.json());
-    }
-    catch (err) {
-      console.log(err);
-
+      const response = fetch(
+        `http://localhost:4000/v1/movie/${data.id}/watch`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            movieId: data.id,
+            userId: 1,
+          }),
+        }
+      ).then((res) => res.json())
+    } catch (err) {
+      console.log(err)
     }
   }
-
-  };
-
 
   const handleRating = (rate) => {
     console.log(`Rated with: ${rate}`)
@@ -68,11 +61,9 @@ export default function Home({
           userId: 1,
           rating: rate,
         }),
-
-      }).then((res) => res.json());
-    }
-    catch (err) {
-      console.log(err);
+      }).then((res) => res.json())
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -133,12 +124,10 @@ export default function Home({
                   type === 'movie'
                     ? 'Movies'
                     : type === 'tv'
-
-                      ? 'TV Shows'
-                      : type === 'cast'
-                        ? 'Person'
-                        : 'Collection',
-
+                    ? 'TV Shows'
+                    : type === 'cast'
+                    ? 'Person'
+                    : 'Collection',
               },
               {
                 href: '##',
@@ -420,7 +409,6 @@ export default function Home({
         )} */}
 
         {data && type === 'cast' && (
-
           <div>
             <div
               className={clsx(
@@ -443,7 +431,6 @@ export default function Home({
                     // blurDataURL={profileData.base64}
                     // width={480}
                     // height={710}
-
                   />
                 </div>
               </div>
@@ -470,7 +457,10 @@ export default function Home({
                     <p>
                       <span className="text-sm text-white-30">Birthday</span>
                       <span className="block mt-2">
-                        {format(new Date(data[0].date_of_birth), 'dd MMMM, yyyy')}
+                        {format(
+                          new Date(data[0].date_of_birth),
+                          'dd MMMM, yyyy'
+                        )}
                       </span>
                     </p>
                   )}
@@ -480,10 +470,11 @@ export default function Home({
                       <span className="text-sm text-white-30">
                         Place of Birth
                       </span>
-                      <span className="block mt-2">{data[0].place_of_birth}</span>
+                      <span className="block mt-2">
+                        {data[0].place_of_birth}
+                      </span>
                     </p>
                   )}
-
                 </div>
               </div>
             </div>
@@ -572,25 +563,21 @@ export async function getServerSideProps(context) {
   //   },
   // })
 
+  const params = context.params
+  const cookie = context.req.headers.cookie
 
-  const params = context.params;
-  const cookie = context.req.headers.cookie;
-
-  let response = "";
-  let casts = "";
+  let response = ''
+  let casts = ''
 
   if (params.type === 'movie') {
     response = await fetch(`http://localhost:4000/v1/movie/${params.id}`, {
-
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         ...(cookie ? { Cookie: cookie } : {}),
       },
       credentials: 'include',
-    }
-
-    ).then((res) => res.json());
+    }).then((res) => res.json())
 
     casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`, {
       method: 'GET',
@@ -599,30 +586,27 @@ export async function getServerSideProps(context) {
         ...(cookie ? { Cookie: cookie } : {}),
       },
       credentials: 'include',
-    }
-    ).then((res) => res.json());
+    }).then((res) => res.json())
+  } else if (params.type === 'cast') {
+    response = await fetch(
+      `http://localhost:4000/v1/moviePerson/${params.id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+      }
+    ).then((res) => res.json())
+    casts = response
   }
-
-  else if (params.type === 'cast') {
-    response = await fetch(`http://localhost:4000/v1/moviePerson/${params.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(cookie ? { Cookie: cookie } : {}),
-      },
-      credentials: 'include',
-    }
-    ).then((res) => res.json());
-    casts = response;
-  }
-
 
   return {
     props: {
       type: params.type,
       data: response,
       casts: casts,
-
     },
   }
 }
