@@ -67,6 +67,8 @@ router.post('/v1/movie/:movieId/watched', movieController.markAsWatched);
 // Router to unmark a movie as watched
 router.delete('/v1/movie/:movieId/watched', movieController.unmarkAsWatched);
 
+// Router to get all movie genres 
+router.get('/v1/genres', movieController.getMovieGenres);
 
 // Router to filter movies by genre
 router.get('/v1/genre/:genreId/movies', movieController.getMoviesByGenre);

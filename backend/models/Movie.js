@@ -251,7 +251,7 @@ async function fetchMoviesByTitle(title, offset, limit) {
             }
             // console.log('movie', movie);
         }
-        console.log('Returning from fetchMoviesByTitle:', data);
+        // console.log('Returning from fetchMoviesByTitle:', data);
         // console.log(data[0].genres);
         return data;
     }
@@ -385,10 +385,23 @@ async function getGenreIdByName(genreName) {
     should return an array 
 */
 
-async function fetchMoviesByGenre(genreName) {
+async function fetchAllGenres() {
+    const { data, error } = await supabase
+        .from('genre')
+        .select('id, name');
+
+    if (error) {
+        console.error('Error fetching all genres', error);
+        return null;
+    }
+
+    return data; // Returns an array of genre objects with id and name properties
+}
+
+async function fetchMoviesByGenre(genreId) {
     try {
         // Fetch the movie IDs associated with the given genre ID
-        const genreId = await getGenreIdByName(genreName);
+        // const genreId = await getGenreIdByName(genreName);
         const { data: movieGenreData, error: movieGenreError } = await supabase
             .from('movie_has_genre')
             .select('movie_id')
@@ -604,6 +617,7 @@ const fetchTopCastsIdsByMovieId = async (movieId, offset = 0, limit = 5) => {
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
+    fetchAllGenres,
     fetchMoviesByGenre,
     fetchMoviePersonsById,
     fetchTopCastsByMovieId,
