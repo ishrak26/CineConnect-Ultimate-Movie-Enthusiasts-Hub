@@ -1,5 +1,6 @@
 const express = require('express');
 const userController = require('../controllers/userController');
+const { authenticateTokens } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -28,5 +29,8 @@ router.get('/profile/watchlist', userController.getWatchlist);
 
 // Route to delete a movie from watchlist by username and movieId
 router.delete('/profile/watchlist', userController.removeFromWatchlist);
+
+// Route for searching profiles by username
+router.get('/profile/search', authenticateTokens, userController.searchProfilesByUsername);
 
 module.exports = router;

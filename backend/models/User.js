@@ -314,6 +314,23 @@ const removeFromWatchlist = async ({ userId, movieId }) => {
     }
 }
 
+const searchProfilesByUsername = async ({ username }) => {
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .select('id, username, full_name')
+            .ilike('username', `%${username}%`);
+
+        if (error) throw error;
+
+        return data;
+
+    } catch (error) {
+        console.error('Error searching profiles:', error.message);
+        throw error;
+    }
+}
+
 module.exports = {
     createUser,
     findOne,
@@ -328,4 +345,5 @@ module.exports = {
     getWatchedMovies,
     getWatchlist,
     removeFromWatchlist,
+    searchProfilesByUsername,
 };
