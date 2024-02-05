@@ -1,39 +1,38 @@
-import React, { ChangeEvent, useState, useRef, useEffect } from "react";
-import mockCountries from "@/mocks/mockSearchData";
-import { Country } from "@/types/data";
+import React, { useState, useRef, useEffect } from "react";
 import useKeyboardNavigation from "@/hooks/useKeyboardNavigation";
-import SearchInput from "../common/SearchInput";
+import SearchInput from "./search";
 import "@/styles/ScrollBar.css";
 
-const SyncSearch: React.FC = () => {
-  const [countries, setCountries] = useState<Country[]>([...mockCountries]);
-  const [searchInput, setSearchInput] = useState<string>("");
-  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+const SyncSearch = () => {
+  const [countries, setCountries] = useState([...mockCountries]);
+  const [searchInput, setSearchInput] = useState("");
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
-  const resultElementRef = useRef<HTMLDivElement>(null);
-  const filteredCountries = searchInput
-    ? countries.filter((country) =>
-        country.name.toLowerCase().includes(searchInput.toLowerCase())
-      )
-    : countries;
+  const resultElementRef = useRef(null);
+
+  // const filteredData = searchInput
+  //   ? countries.filter((country) =>
+  //       country.name.toLowerCase().includes(searchInput.toLowerCase())
+  //     )
+  //   : countries;
 
   const { focusedIndex, handleKeyDown } = useKeyboardNavigation({
-    itemCount: filteredCountries.length,
+    itemCount: filteredData.length,
     isDropdownVisible: dropdownVisible,
-    onEnter: (index: number) => {
-      handleCheckboxChange(filteredCountries[index].code);
+    onEnter: (index) => {
+      handleCheckboxChange(filteredData[index].code);
     },
     onEscape: () => {
       setDropdownVisible(false);
     },
   });
 
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
     setDropdownVisible(true);
   };
 
-  const handleCheckboxChange = (code: string) => {
+  const handleCheckboxChange = (code) => {
     setCountries(
       countries.map((country) =>
         country.code === code
@@ -43,7 +42,7 @@ const SyncSearch: React.FC = () => {
     );
   };
 
-  const handleContainerBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+  const handleContainerBlur = (event) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
       setDropdownVisible(false);
     }
@@ -78,8 +77,8 @@ const SyncSearch: React.FC = () => {
           ref={resultElementRef}
           className="absolute z-50 bg-white shadow-lg rounded-md max-h-60 overflow-y-auto hide-scrollbar"
         >
-          {filteredCountries.length > 0 ? (
-            filteredCountries.map((country, index) => (
+          {filteredData.length > 0 ? (
+            filteredData.map((country, index) => (
               <div
                 key={index}
                 style={{
