@@ -7,7 +7,6 @@ import clsx from 'clsx'
 
 import React, { useEffect } from "react";
 import useKeyboardNavigation from "../hooks/useKeyboardNavigation";
-// import "../styles/ScrollBar.css";
 
 export default function Search({ forwardedRef }) {
   const ref = useRef(null)
@@ -39,7 +38,7 @@ export default function Search({ forwardedRef }) {
     itemCount: filteredData.length,
     isDropdownVisible: dropdownVisible,
     onEnter: (index) => {
-      handleCheckboxChange(filteredData[index].code);
+      handleSelection(filteredData[index].name);
     },
     onEscape: () => {
       setDropdownVisible(false);
@@ -51,14 +50,10 @@ export default function Search({ forwardedRef }) {
     setDropdownVisible(true);
   };
 
-  const handleCheckboxChange = (code) => {
-    setData(
-      Data.map((info) =>
-        info.code === code
-          ? { ...info, selected: !info.selected }
-          : info
-      )
-    );
+  const handleSelection = (name) => {
+    setValue(name);
+    setDropdownVisible(false); // Close the dropdown after selection
+    ref.current.focus(); // Focus the search input after selection
   };
 
   const handleContainerBlur = (event) => {
@@ -112,29 +107,24 @@ export default function Search({ forwardedRef }) {
           {dropdownVisible && (
             <div
               ref={resultElementRef}
-              className="absolute z-50 bg-white shadow-lg rounded-md max-h-60 overflow-y-auto hide-scrollbar"
+              className="absolute mx-10 z-50 bg-white shadow-lg rounded-md max-h-60 overflow-y-auto hide-scrollbar"
             >
               {filteredData.length > 0 ? (
-                filteredData.map((country, index) => (
+                filteredData.map((Data, index) => (
                   <div
                     key={index}
                     style={{
                       backgroundColor:
                         index === focusedIndex ? "rgba(0,0,0,0.1)" : "",
                     }}
-                    className="flex w-80 overflow-hidden items-center p-2 border-b cursor-pointer hover:bg-black hover:bg-opacity-10"
+                    className="flex w-80 overflow-hidden items-center p-2 border-b cursor-pointer hover:bg-primary-600 hover:bg-opacity-70"
+                    onClick={() => handleSelection(Data.name)}
                   >
                     <div className="flex-grow mr-4">
                       <div className="truncate w-60">
-                        <span>{country.name}</span>
+                        <span>{Data.name}</span>
                       </div>
                     </div>
-                    <input
-                      className="form-checkbox h-5 w-5 text-blue-600"
-                      type="checkbox"
-                      checked={country.selected}
-                      onChange={() => handleCheckboxChange(country.code)}
-                    />
                   </div>
                 ))
               ) : (
@@ -160,3 +150,90 @@ export default function Search({ forwardedRef }) {
     </div>
   )
 }
+
+// export default function Search({ forwardedRef }) {
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [loading, setLoading] = useState(false);
+//   const [searchResults, setSearchResults] = useState([]);
+//   const [dropdownVisible, setDropdownVisible] = useState(false);
+//   const router = useRouter();
+//   const searchRef = useRef(null);
+
+//   const fetchSearchResults = async (query) => {
+//     setLoading(true);
+//     try {
+//       const response = await fetch(`YOUR_API_ENDPOINT?search=${query}`);
+//       const data = await response.json();
+//       setSearchResults(data);
+//     } catch (error) {
+//       console.error('Failed to fetch search results', error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Debounce fetchSearchResults to avoid excessive API calls
+//   const debouncedFetchSearchResults = useRef(debounce(fetchSearchResults, 300)).current;
+
+//   useEffect(() => {
+//     if (searchQuery.length > 2) { // Only fetch if query length is more than 2 characters
+//       debouncedFetchSearchResults(searchQuery);
+//     } else {
+//       setSearchResults([]);
+//     }
+//   }, [searchQuery, debouncedFetchSearchResults]);
+
+//   const handleSubmit = (event) => {
+//     event.preventDefault();
+//     router.push(`/search?query=${searchQuery}`);
+//   };
+
+//   const { focusedIndex, handleKeyDown } = useKeyboardNavigation({
+//     itemCount: searchResults.length,
+//     isDropdownVisible: dropdownVisible,
+//     onEnter: (index) => {
+//       const selectedItem = searchResults[index];
+//       router.push(`/details/${selectedItem.id}`); // Assuming each search result has an ID
+//       setDropdownVisible(false);
+//     },
+//     onEscape: () => setDropdownVisible(false),
+//   });
+
+//   return (
+//     <div className="relative" onBlur={() => setDropdownVisible(false)} tabIndex={-1} onKeyDown={handleKeyDown}>
+//       <form onSubmit={handleSubmit}>
+//         <input
+//           type="text"
+//           placeholder="Search..."
+//           value={searchQuery}
+//           onChange={(e) => setSearchQuery(e.target.value)}
+//           onFocus={() => setDropdownVisible(true)}
+//           className="search-input"
+//           ref={forwardedRef || searchRef}
+//         />
+//         {loading && <div>Loading...</div>}
+//         {dropdownVisible && (
+//           <div className="search-results-dropdown">
+//             {searchResults.map((result, index) => (
+//               <div key={result.id} className={`result-item ${index === focusedIndex ? 'focused' : ''}`}>
+//                 {result.name}
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//         <button type="submit"><SearchIcon /></button>
+//         {searchQuery && (
+//           <button
+//             type="button"
+//             onClick={() => {
+//               setSearchQuery('');
+//               searchRef.current.focus();
+//             }}
+//           >
+//             <TimesIcon />
+//           </button>
+//         )}
+//       </form>
+//     </div>
+//   );
+// }
