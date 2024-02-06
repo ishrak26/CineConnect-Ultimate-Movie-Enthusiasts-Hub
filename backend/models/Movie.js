@@ -91,9 +91,11 @@ async function fetchCastsByMovieId(movieId) {
 async function fetchDirectorsByMovieId(movieId) {
     const { data, error } = await supabase
         .from('movie_has_director')
-        .select(`
+        .select(
+            `
             movie_person:movie_person_id (id, name)
-        `)
+        `
+        )
         .eq('movie_id', movieId);
 
     if (error) {
@@ -102,15 +104,15 @@ async function fetchDirectorsByMovieId(movieId) {
     }
 
     // Map over the data to restructure the objects to a non-nested format
-    const reformattedData = data.map(director => {
+    const reformattedData = data.map((director) => {
         return {
-            id: director.movie_person.id, 
-            name: director.movie_person.name
+            id: director.movie_person.id,
+            name: director.movie_person.name,
         };
     });
 
     if (reformattedData.length > 0) {
-        console.log('Returning from fetchDirectorsByMovieId:', reformattedData);
+        // console.log('Returning from fetchDirectorsByMovieId:', reformattedData);
         return reformattedData;
     }
 
@@ -125,10 +127,12 @@ async function fetchDirectorsByMovieId(movieId) {
 async function fetchTopCastsByMovieId(movieId, offset, limit) {
     const { data, error } = await supabase
         .from('movie_has_cast')
-        .select(`
+        .select(
+            `
             role_name,
             movie_person:movie_person_id (id, name, image_url)
-        `)
+        `
+        )
         .eq('movie_id', movieId)
         .range(offset, offset + limit - 1);
 
@@ -138,17 +142,17 @@ async function fetchTopCastsByMovieId(movieId, offset, limit) {
     }
 
     // Map over the data to restructure the objects to a non-nested format
-    const reformattedData = data.map(cast => {
+    const reformattedData = data.map((cast) => {
         return {
             role_name: cast.role_name,
-            id: cast.movie_person.id, 
-            name: cast.movie_person.name, 
-            image_url: cast.movie_person.image_url
+            id: cast.movie_person.id,
+            name: cast.movie_person.name,
+            image_url: cast.movie_person.image_url,
         };
     });
 
     if (reformattedData.length > 0) {
-        console.log('Returning from fetchTopCastsByMovieId:', reformattedData);
+        // console.log('Returning from fetchTopCastsByMovieId:', reformattedData);
         return reformattedData;
     }
 
@@ -251,7 +255,7 @@ async function fetchMoviesByTitle(title, offset, limit) {
             }
             // console.log('movie', movie);
         }
-        console.log('Returning from fetchMoviesByTitle:', data);
+        // console.log('Returning from fetchMoviesByTitle:', data);
         // console.log(data[0].genres);
         return data;
     }
@@ -341,7 +345,7 @@ async function fetchMoviesById(id, user) {
             }
         }
 
-        console.log('Returning from fetchMoviesById:', data);
+        // console.log('Returning from fetchMoviesById:', data);
         // console.log(data[0].casts);
         // console.log(data[0].directors);
         return data;
@@ -452,7 +456,7 @@ async function fetchMoviePersonsById(moviePersonId) {
             }
         }
 
-        console.log('Returning from fetchMoviePersonsById:', data);
+        // console.log('Returning from fetchMoviePersonsById:', data);
         // console.log(data[0].movies);
         return data;
     }
@@ -592,11 +596,14 @@ const fetchTopCastsIdsByMovieId = async (movieId, offset = 0, limit = 5) => {
         }
 
         // Extract just the movie_person_id values from the data
-        const castIds = data.map(entry => entry.movie_person_id);
+        const castIds = data.map((entry) => entry.movie_person_id);
 
         return castIds;
     } catch (error) {
-        console.error('Error fetching top cast IDs by movie ID with pagination', error);
+        console.error(
+            'Error fetching top cast IDs by movie ID with pagination',
+            error
+        );
         return null;
     }
 };
