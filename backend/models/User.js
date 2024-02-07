@@ -1,3 +1,4 @@
+const { parse } = require('dotenv');
 const supabase = require('../config/supabaseConfig');
 
 async function createUser(user) {
@@ -79,7 +80,7 @@ async function getCineFellows({ userId, limit, offset}) {
                 user_info:fellow2_id (id, username, full_name, image_url, email)
             `)
             .eq('fellow1_id', userId)
-            .range(offset, offset + limit - 1);
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
         if (error1) throw error1;
 
@@ -244,7 +245,7 @@ const getPendingRequests = async ({ userId, limit, offset }) => {
             .select('*')
             .eq('to_id', userId)
             .eq('status', 'pending')
-            .range(offset, offset + limit - 1);
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
         if (incomingError) throw incomingError;
 
@@ -330,7 +331,7 @@ const getWatchedMovies = async ({ userId, limit, offset}) => {
             movie:movie_id (id, title, release_date, poster_url)
             `)
             .eq('user_id', userId)
-            .range(offset, offset + limit - 1);
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
         if (error) throw error;
 
@@ -351,7 +352,7 @@ const getWatchlist = async ({ userId, limit, offset }) => {
             movie:movie_id (id, title, release_date, poster_url)
         `)
         .eq('user_id', userId)
-        .range(offset, offset + limit - 1);
+        .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
     
         if (error) throw error;
 
@@ -387,7 +388,7 @@ const searchProfilesByUsername = async ({ username , limit, offset}) => {
             .from('user_info')
             .select('id, username, full_name')
             .ilike('username', `%${username}%`)
-            .range(offset, offset + limit - 1);
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
         if (error) throw error;
 
