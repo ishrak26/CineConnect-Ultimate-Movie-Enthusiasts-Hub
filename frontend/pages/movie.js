@@ -102,35 +102,42 @@ export async function getServerSideProps({ query }) {
   //   },
   // })
 
+  let response;
   const limit = 10
-  const response = await fetch(
-    `http://localhost:4000/v1/movies?limit=${limit}`
-  ).then((res) => res.json())
 
-  // if (response.status === 404) {
-  //   return {
-  //     notFound: true,
-  //   }
-  // }
+  if (query.with_genres) {
+    response = await fetch(`http://localhost:4000/v1/genre/${query.with_genres}/movies?limit=${limit}`).then((res) => res.json());
+  }
 
-  // if (response.data.success === false) {
-  //   return {
-  //     props: {
-  //       error: {
-  //         statusCode: response.status,
-  //         statusMessage:
-  //           response.data.errors[0] || response.data.status_message,
-  //       },
-  //     },
-  //   }
-  // }
+  else {
+    response = await fetch(`http://localhost:4000/v1/movies?limit=${limit}`).then((res) => res.json());
+  }
 
-  const { data: genresData } = await tmdb.get('/genre/movie/list')
+  if (response.status === 404) {
+    return {
+      notFound: true,
+    }
+  }
+
+  if (response.success === false) {
+    return {
+      props: {
+        error: {
+          statusCode: response.status,
+          statusMessage:
+            response.errors[0] || response.status_message,
+        },
+      },
+    }
+  }
+
+  // const { data: genresData } = await tmdb.get('/genre/movie/list')
+  const genres = await fetch(`http://localhost:4000/v1/genres`).then((res) => res.json());
 
   return {
     props: {
       data: response,
-      genres: genresData.genres,
+      genres: genres,
       query,
     },
   }
