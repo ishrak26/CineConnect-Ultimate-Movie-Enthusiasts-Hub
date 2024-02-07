@@ -608,6 +608,19 @@ const fetchTopCastsIdsByMovieId = async (movieId, offset = 0, limit = 5) => {
     }
 };
 
+const fetchTotalMovieCount = async () => {
+    const { error, count } = await supabase
+        .from('movie')
+        .select('*', { count: 'exact', head: true });
+
+    if (error) {
+        console.error('Error fetching total movie count', error);
+        return null;
+    }
+
+    return count;
+};
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -622,4 +635,5 @@ module.exports = {
     submitRating,
     editRating,
     deleteRating,
+    fetchTotalMovieCount,
 };
