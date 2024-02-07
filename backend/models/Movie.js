@@ -273,7 +273,7 @@ async function fetchMoviesById(id, user) {
     const { data, error } = await supabase
         .from('movie')
         .select(
-            'id, title, release_date, plot_summary, poster_url, trailer_url, duration_in_mins, language, country_of_first_release, certification'
+            'id, title, release_date, plot_summary, poster_url, trailer_url, duration_in_mins, language, country_of_first_release, certification, backdrop_url'
         )
         .eq('id', id);
 
