@@ -69,45 +69,85 @@ async function checkIfEmailExists({ email }) {
     }
 }
 
-async function getCineFellows({ userId }) {
-    // Attempt to fetch where the user is fellow1
+async function getCineFellows({ userId, limit, offset}) {
+    try {
+        // Fetch fellow1 details
+        const { data: fellowsAsFellow1, error: error1 } = await supabase
+            .from('cinefellow')
+            .select(`
+                fellow2_id,
+                user_info:fellow2_id (id, username, full_name, image_url, email)
+            `)
+            .eq('fellow1_id', userId)
+            .range(offset, offset + limit - 1);
 
-    const { data: data1, error: error1 } = await supabase
-        .from('cinefellow')
-        .select('fellow2_id')
-        .eq('fellow1_id', userId);
+        if (error1) throw error1;
 
-    if (error1) {
-        console.error('Error fetching where user is fellow1:', error1);
+        // Fetch fellow2 details
+        const { data: fellowsAsFellow2, error: error2 } = await supabase
+            .from('cinefellow')
+            .select(`
+                fellow1_id,
+                user_info:fellow1_id (id, username, full_name, image_url, email)
+            `)
+            .eq('fellow2_id', userId);
+
+        if (error2) throw error2;
+
+        // Map and combine the results to a unified structure
+        const combinedFellows = [
+            ...fellowsAsFellow1.map(item => item.user_info),
+            ...fellowsAsFellow2.map(item => item.user_info),
+        ];
+
+        console.log(combinedFellows);
+
+        return combinedFellows;
+
+    } catch (error) {
+        console.error('Error fetching CineFellows:', error.message);
         return null;
     }
-
-    // Attempt to fetch where the user is fellow2
-    const { data: data2, error: error2 } = await supabase
-        .from('cinefellow')
-        .select('fellow1_id')
-        .eq('fellow2_id', userId);
-
-    if (error2) {
-        console.error('Error fetching where user is fellow2:', error2);
-        return null;
-    }
-
-
-    for (let data of data1) {
-        data.cine_fellow_id = data.fellow2_id;
-    }
-    for (let data of data2) {
-        data.cine_fellow_id = data.fellow1_id;
-    }
-
-
-    // Combine the results from both queries
-    const combinedData = [...data1, ...data2].map(item => item.cine_fellow_id);
-    console.log('combinedData', combinedData);
-
-    return combinedData;
 }
+
+async function getCineFellowCount({ userId }) {
+    try {
+        // Count where the user is fellow1
+        const { count: count1, error: error1 } = await supabase
+            .from('cinefellow')
+            .select('fellow2_id', { count: 'exact' }) // Use count feature
+            .eq('fellow1_id', userId)
+            .single(); // Assuming count returns a single object
+
+        if (error1) {
+            console.error('Error counting where user is fellow1:', error1);
+            throw error1; // Throw to catch block
+        }
+
+        // Count where the user is fellow2
+        const { count: count2, error: error2 } = await supabase
+            .from('cinefellow')
+            .select('fellow1_id', { count: 'exact' }) // Use count feature
+            .eq('fellow2_id', userId)
+            .single(); // Assuming count returns a single object
+
+        if (error2) {
+            console.error('Error counting where user is fellow2:', error2);
+            throw error2; // Throw to catch block
+        }
+
+        // Combine the counts from both queries
+        const totalCount = count1 + count2;
+
+        console.log(totalCount);
+
+        return totalCount;
+    } catch (error) {
+        console.error('Error fetching CineFellow count:', error.message);
+        return null; // Or handle error as appropriate
+    }
+}
+
 
 async function followCinefellow({ userId, fellowId }) {
     try {
@@ -177,14 +217,15 @@ async function unfollowCinefellow({ userId, fellowId }) {
     }
 }
 
-const getPendingRequests = async ({ userId }) => {
+const getPendingRequests = async ({ userId, limit, offset }) => {
     try {
         // Fetch incoming requests
         const { data: incomingRequests, error: incomingError } = await supabase
             .from('cinefellow_request')
             .select('*')
             .eq('to_id', userId)
-            .eq('status', 'pending');
+            .eq('status', 'pending')
+            .range(offset, offset + limit - 1);
 
         if (incomingError) throw incomingError;
 
@@ -230,7 +271,6 @@ const acceptCineFellowRequest = async ({ requestId, userId }) => {
             .from('cinefellow')
             .insert([
                 { fellow1_id: requestData.from_id, fellow2_id: requestData.to_id },
-                { fellow1_id: requestData.to_id, fellow2_id: requestData.from_id },
             ]);
 
         if (cinefellowError) throw cinefellowError;
@@ -262,12 +302,16 @@ const rejectCineFellowRequest = async ({ requestId, userId }) => {
     }
 }
 
-const getWatchedMovies = async ({ userId }) => {
+const getWatchedMovies = async ({ userId, limit, offset}) => {
     try {
         const { data, error } = await supabase
             .from('watched_list')
-            .select('movie_id')
-            .eq('user_id', userId);
+            .select(`
+            movie_id,
+            movie:movie_id (id, title, release_date, poster_url)
+            `)
+            .eq('user_id', userId)
+            .range(offset, offset + limit - 1);
 
         if (error) throw error;
 
@@ -279,16 +323,20 @@ const getWatchedMovies = async ({ userId }) => {
     }
 }
 
-const getWatchlist = async ({ userId }) => {
+const getWatchlist = async ({ userId, limit, offset }) => {
     try {
         const { data, error } = await supabase
-            .from('watch_list')
-            .select('movie_id')
-            .eq('user_id', userId);
-
+        .from('watch_list')
+        .select(`
+            movie_id,
+            movie:movie_id (id, title, release_date, poster_url)
+        `)
+        .eq('user_id', userId)
+        .range(offset, offset + limit - 1);
+    
         if (error) throw error;
 
-        return data.map(item => item.movie_id);
+        return data.map(item => item.movie);
 
     } catch (error) {
         console.error('Error fetching watchlist:', error.message);
@@ -314,12 +362,13 @@ const removeFromWatchlist = async ({ userId, movieId }) => {
     }
 }
 
-const searchProfilesByUsername = async ({ username }) => {
+const searchProfilesByUsername = async ({ username , limit, offset}) => {
     try {
         const { data, error } = await supabase
             .from('user_info')
             .select('id, username, full_name')
-            .ilike('username', `%${username}%`);
+            .ilike('username', `%${username}%`)
+            .range(offset, offset + limit - 1);
 
         if (error) throw error;
 
@@ -337,6 +386,7 @@ module.exports = {
     checkIfUserExists,
     checkIfEmailExists,
     getCineFellows,
+    getCineFellowCount,
     followCinefellow,
     unfollowCinefellow,
     getPendingRequests,

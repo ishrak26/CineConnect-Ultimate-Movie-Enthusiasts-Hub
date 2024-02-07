@@ -4,13 +4,40 @@ const db_user = require('../models/User.js');
 const userController = {
     getCineFellows: async (req, res) => {
         try {
-            const userId = req.user.id;
-            const cineFellows = await db_user.getCineFellows({ userId });
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
+            const cineFellows = await db_user.getCineFellows({ 
+                userId,
+                limit,
+                offset,
+            });
 
             res.status(200).json({ cineFellows });
+
         } catch (error) {
             console.error('Failed to fetch cinefellows:', error.message);
             return res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getCineFellowCount: async (req, res) => {
+        try {
+            const { username } = req.params;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
+            const count = await db_user.getCineFellowCount({ userId });
+
+            res.json({ count });
+
+        } catch (error) {
+            console.error('Error getting CineFellow count:', error);
+            res.status(500).json({ message: 'Internal server error' });
         }
     },
 
@@ -18,8 +45,11 @@ const userController = {
     followCineFellow: async (req, res) => {
         try {
             const { fellowId } = req.body;
-            const userId = req.user.id;
-            const result = await db_user.followCineFellow({ userId, fellowId });
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
+            const result = await db_user.followCinefellow({ userId, fellowId });
 
             if (result) {
                 res.status(200).json({ message: 'CineFellow followed successfully.' });
@@ -35,8 +65,11 @@ const userController = {
     unfollowCineFellow: async (req, res) => {
         try {
             const { fellowId } = req.body;
-            const userId = req.user.id;
-            const result = await db_user.unfollowCineFellow({ userId, fellowId });
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
+            const result = await db_user.unfollowCinefellow({ userId, fellowId });
 
             if (result) {
                 res.status(200).json({ message: 'CineFellow unfollowed successfully.' });
@@ -51,12 +84,26 @@ const userController = {
 
     getPendingRequests: async (req, res) => {
         try {
-            const userId = req.user.id;
-            // Assuming functions for fetching pending and outgoing requests exist
-            const pendingRequests = await db_user.getPendingRequests({ userId });
-            const outgoingRequests = await db_user.getOutgoingRequests({ userId });
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
+            const pendingRequests = await db_user.getPendingRequests({ 
+                userId,
+                limit,
+                offset,
+            });
+            const outgoingRequests = await db_user.getOutgoingRequests({ 
+                userId,
+                limit,
+                offset,
+            });
 
             res.status(200).json({ pendingRequests, outgoingRequests });
+
         } catch (error) {
             console.error('Failed to fetch pending requests:', error.message);
             res.status(500).json({ message: 'Internal server error' });
@@ -66,8 +113,10 @@ const userController = {
     acceptCineFellowRequest: async (req, res) => {
         try {
             const { requestId } = req.body;
-            const userId = req.user.id;
-            // Assuming a function to accept a cinefellow request
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
             const result = await db_user.acceptCineFellowRequest({ requestId, userId });
 
             if (result) {
@@ -84,8 +133,10 @@ const userController = {
     rejectCineFellowRequest: async (req, res) => {
         try {
             const { requestId } = req.body;
-            const userId = req.user.id;
-            // Assuming a function to reject or cancel a cinefellow request
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
             const result = await db_user.rejectCineFellowRequest({ requestId, userId });
 
             if (result) {
@@ -101,22 +152,42 @@ const userController = {
 
     getWatchedMovies: async (req, res) => {
         try {
-            const userId = req.user.id;
-            // Assuming a function to get watched movies by userid
-            const watchedMovies = await db_user.getWatchedMovies({ userId });
-
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+    
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+    
+            // Pass limit and offset to the database query
+            const watchedMovies = await db_user.getWatchedMovies({
+                userId,
+                limit,
+                offset,
+            });
+    
             res.status(200).json({ watchedMovies });
         } catch (error) {
             console.error('Failed to fetch watched movies:', error.message);
             res.status(500).json({ message: 'Internal server error' });
         }
     },
+    
 
     getWatchlist: async (req, res) => {
         try {
-            const userId = req.user.id;
-            // Assuming a function to get watchlist by userid
-            const watchlist = await db_user.getWatchlist({ userId });
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
+            const watchlist = await db_user.getWatchlist({ 
+                userId,
+                limit,
+                offset,
+            });
 
             res.status(200).json({ watchlist });
         } catch (error) {
@@ -128,8 +199,10 @@ const userController = {
     removeFromWatchlist: async (req, res) => {
         try {
             const { movieId } = req.body;
-            const userId = req.user.id;
-            // Assuming a function to remove a movie from watchlist
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
             const result = await db_user.removeFromWatchlist({ userId, movieId });
 
             if (result) {
@@ -145,9 +218,18 @@ const userController = {
 
     searchProfilesByUsername: async (req, res) => {
         try {
-            const { username } = req.query;
-            // Assuming a function to search profiles by username
-            const profiles = await db_user.searchProfilesByUsername({ username });
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
+            const profiles = await db_user.searchProfilesByUsername({ 
+                userId,
+                limit,
+                offset,
+            });
 
             res.status(200).json({ profiles });
         } catch (error) {

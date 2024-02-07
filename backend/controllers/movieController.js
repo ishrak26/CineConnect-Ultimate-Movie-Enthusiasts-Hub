@@ -15,6 +15,7 @@ const moviesController = {
                 offset,
                 limit
             );
+            
             res.json(movies || []);
         } catch (error) {
             console.log('in catch: ', error.message);
