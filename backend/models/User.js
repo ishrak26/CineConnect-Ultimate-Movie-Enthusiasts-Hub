@@ -217,6 +217,25 @@ async function unfollowCinefellow({ userId, fellowId }) {
     }
 }
 
+async function isFollowing({ userId, fellowId }) {
+    try {
+        // Check if the user is following the fellow
+        const { data, error } = await supabase
+            .from('cinefellow')
+            .select('id')
+            .or(`fellow1_id.eq.${userId},fellow2_id.eq.${userId}`)
+            .or(`fellow1_id.eq.${fellowId},fellow2_id.eq.${fellowId}`);
+
+        if (error) throw error;
+
+        return data.length > 0;
+
+    } catch (error) {
+        console.error('Error checking if following:', error.message);
+        throw error;
+    }
+}
+
 const getPendingRequests = async ({ userId, limit, offset }) => {
     try {
         // Fetch incoming requests
@@ -389,6 +408,7 @@ module.exports = {
     getCineFellowCount,
     followCinefellow,
     unfollowCinefellow,
+    isFollowing,
     getPendingRequests,
     acceptCineFellowRequest,
     rejectCineFellowRequest,

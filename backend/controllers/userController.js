@@ -4,9 +4,17 @@ const db_user = require('../models/User.js');
 const userController = {
     getCineFellows: async (req, res) => {
         try {
+
+            if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
             const username = req.params.username;
             const user = await db_user.findOne({ username });
             const userId = user ? user.id : null;
+
+            // If user not found
+            if (!userId) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
 
             const limit = req.query.limit || 10; // Default limit to 10 if not specified
             const offset = req.query.offset || 0; // Default offset to 0 if not specified
@@ -44,10 +52,35 @@ const userController = {
 
     followCineFellow: async (req, res) => {
         try {
+
+            if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+            // If the user is trying to follow themselves
+            if (req.user.username === req.params.username) {
+                return res.status(400).json({ message: 'You cannot follow yourself.' });
+            }
+
+            // If the user is trying to follow someone they are already following
+            const requestor = await db_user.findOne({ username: req.user.username });
+            const requestee = await db_user.findOne({ username: req.params.username });
+            const requestorId = requestor ? requestor.id : null;
+            const requesteeId = requestee ? requestee.id : null;
+
+            // If any of the users are not found
+            if (!requestorId || !requesteeId) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+
+            const isFollowing = await db_user.isFollowing({ requestorId, requesteeId });
+
+            if (isFollowing) {
+                return res.status(400).json({ message: 'You are already following this user.' });
+            }
+
             const { fellowId } = req.body;
             const username = req.params.username;
             const user = await db_user.findOne({ username });
-            const userId = user ? user.id : null;
+            const userId = user.id;
 
             const result = await db_user.followCinefellow({ userId, fellowId });
 
@@ -64,10 +97,35 @@ const userController = {
 
     unfollowCineFellow: async (req, res) => {
         try {
+            
+            if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+            // If the user is trying to unfollow themselves
+            if (req.user.username === req.params.username) {
+                return res.status(400).json({ message: 'You cannot unfollow yourself.' });
+            }
+
+            // If the user is trying to unfollow someone they are not following
+            const requestor = await db_user.findOne({ username: req.user.username });
+            const requestee = await db_user.findOne({ username: req.params.username });
+            const requestorId = requestor ? requestor.id : null;
+            const requesteeId = requestee ? requestee.id : null;
+
+            // If any of the users are not found
+            if (!requestorId || !requesteeId) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+
+            const isFollowing = await db_user.isFollowing({ requestorId, requesteeId });
+
+            if (!isFollowing) {
+                return res.status(400).json({ message: 'You are not following this user.' });
+            }
+
             const { fellowId } = req.body;
             const username = req.params.username;
             const user = await db_user.findOne({ username });
-            const userId = user ? user.id : null;
+            const userId = user.id;
 
             const result = await db_user.unfollowCinefellow({ userId, fellowId });
 
@@ -84,9 +142,23 @@ const userController = {
 
     getPendingRequests: async (req, res) => {
         try {
+
+            if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+            // If the user is trying to fetch pending requests for someone else
+            if (req.user.username !== req.params.username) {
+                return res.status(400).json({ message: 'You cannot fetch pending requests for another user.' });
+            }
+
+
             const username = req.params.username;
             const user = await db_user.findOne({ username });
             const userId = user ? user.id : null;
+
+            // If user not found
+            if (!userId) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
 
             const limit = req.query.limit || 10; // Default limit to 10 if not specified
             const offset = req.query.offset || 0; // Default offset to 0 if not specified
@@ -112,10 +184,28 @@ const userController = {
 
     acceptCineFellowRequest: async (req, res) => {
         try {
+
+            if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+            // If the user is trying to accept a request for someone else
+            if (req.user.username !== req.params.username) {
+                return res.status(400).json({ message: 'You cannot accept requests for another user.' });
+            }
+
             const { requestId } = req.body;
             const username = req.params.username;
             const user = await db_user.findOne({ username });
             const userId = user ? user.id : null;
+
+            // If the user is trying to accept a request that doesn't exist
+            if (!requestId) {
+                return res.status(404).json({ message: 'Request not found.' });
+            }
+
+            // If user not found
+            if (!userId) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
 
             const result = await db_user.acceptCineFellowRequest({ requestId, userId });
 
@@ -132,10 +222,28 @@ const userController = {
 
     rejectCineFellowRequest: async (req, res) => {
         try {
+
+            if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+            // If the user is trying to reject a request for someone else
+            if (req.user.username !== req.params.username) {
+                return res.status(400).json({ message: 'You cannot reject requests for another user.' });
+            }
+
             const { requestId } = req.body;
             const username = req.params.username;
             const user = await db_user.findOne({ username });
             const userId = user ? user.id : null;
+
+            // If the user is trying to reject a request that doesn't exist
+            if (!requestId) {
+                return res.status(404).json({ message: 'Request not found.' });
+            }
+
+            // If user not found
+            if (!userId) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
 
             const result = await db_user.rejectCineFellowRequest({ requestId, userId });
 
@@ -198,10 +306,18 @@ const userController = {
 
     removeFromWatchlist: async (req, res) => {
         try {
+
+            if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+            // If the user is trying to remove a movie from watchlist for someone else
+            if (req.user.username !== req.params.username) {
+                return res.status(400).json({ message: 'You cannot remove movies from watchlist for another user.' });
+            }
+
             const { movieId } = req.body;
             const username = req.params.username;
             const user = await db_user.findOne({ username });
-            const userId = user ? user.id : null;
+            const userId = user.id;  
 
             const result = await db_user.removeFromWatchlist({ userId, movieId });
 
@@ -221,6 +337,11 @@ const userController = {
             const username = req.params.username;
             const user = await db_user.findOne({ username });
             const userId = user ? user.id : null;
+
+            // If user not found
+            if (!userId) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
 
             const limit = req.query.limit || 10; // Default limit to 10 if not specified
             const offset = req.query.offset || 0; // Default offset to 0 if not specified
