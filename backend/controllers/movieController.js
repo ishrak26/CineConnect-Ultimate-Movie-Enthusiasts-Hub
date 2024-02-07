@@ -7,7 +7,6 @@ const moviesController = {
         const limit = req.query.limit || 10; // Default limit to 10 if not specified
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
         try {
-
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(
                 title,
@@ -60,11 +59,9 @@ const moviesController = {
             );
 
             if (!movies) {
-                return res
-                    .status(404)
-                    .json({
-                        message: 'Movies for the specified genre not found.',
-                    });
+                return res.status(404).json({
+                    message: 'Movies for the specified genre not found.',
+                });
             }
 
             // Send the movies as a response
@@ -463,6 +460,15 @@ const moviesController = {
             } else {
                 res.status(404).json({ message: 'Movie not found' });
             }
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    getTotalMovieCount: async (req, res) => {
+        try {
+            const count = await db_movie.fetchTotalMovieCount();
+            res.status(200).json({ count });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }

@@ -134,7 +134,7 @@ async function fetchTopCastsByMovieId(movieId, offset, limit) {
         `
         )
         .eq('movie_id', movieId)
-        .range(offset, offset + limit - 1);
+        .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
     if (error) {
         console.error('Error fetching top casts by movie id', error);
@@ -235,7 +235,8 @@ async function fetchMoviesByTitle(title, offset, limit) {
         .from('movie')
         .select('id, title, release_date, poster_url')
         .ilike('title', title) // ilike is case-insensitive. like is case-sensitive.
-        .range(offset, offset + limit - 1);
+        .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1)
+        .order('title', { ascending: true });
 
     if (error) {
         console.error('Error fetching movies by title', error);
@@ -390,9 +391,7 @@ async function getGenreIdByName(genreName) {
 */
 
 async function fetchAllGenres() {
-    const { data, error } = await supabase
-        .from('genre')
-        .select('id, name');
+    const { data, error } = await supabase.from('genre').select('id, name');
 
     if (error) {
         console.error('Error fetching all genres', error);
@@ -410,7 +409,7 @@ async function fetchMoviesByGenre(genreId, limit, offset) {
             .from('movie_has_genre')
             .select('movie_id')
             .eq('genre_id', genreId)
-            .range(offset, offset + limit - 1); // Adjust the range for pagination
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1); // Adjust the range for pagination
 
         if (movieGenreError) throw movieGenreError;
 
@@ -603,7 +602,7 @@ const fetchTopCastsIdsByMovieId = async (movieId, offset = 0, limit = 5) => {
             .from('movie_has_cast')
             .select('movie_person_id')
             .eq('movie_id', movieId)
-            .range(offset, offset + limit - 1); // Adjust the range for pagination
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1); // Adjust the range for pagination
 
         if (error) {
             throw error;
