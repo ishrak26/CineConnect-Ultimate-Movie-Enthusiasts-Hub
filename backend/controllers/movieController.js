@@ -49,8 +49,15 @@ const moviesController = {
         try {
             const genreId = req.params.genreId;
 
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
             // Use the model function to fetch movies by genre
-            const movies = await db_movie.fetchMoviesByGenre(genreId);
+            const movies = await db_movie.fetchMoviesByGenre(
+                genreId,
+                limit,
+                offset
+            );
 
             if (!movies) {
                 return res

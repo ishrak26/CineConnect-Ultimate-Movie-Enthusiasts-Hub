@@ -398,14 +398,15 @@ async function fetchAllGenres() {
     return data; // Returns an array of genre objects with id and name properties
 }
 
-async function fetchMoviesByGenre(genreId) {
+async function fetchMoviesByGenre(genreId, limit, offset) {
     try {
         // Fetch the movie IDs associated with the given genre ID
         // const genreId = await getGenreIdByName(genreName);
         const { data: movieGenreData, error: movieGenreError } = await supabase
             .from('movie_has_genre')
             .select('movie_id')
-            .eq('genre_id', genreId);
+            .eq('genre_id', genreId)
+            .range(offset, offset + limit - 1); // Adjust the range for pagination
 
         if (movieGenreError) throw movieGenreError;
 
