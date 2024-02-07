@@ -91,7 +91,7 @@ export default function Home({ data, type, casts }) {
             <img
               // src={backdropData.img.src}
               src={
-                data.poster_url
+                data.backdrop_url
                 // data.backdrop_path
                 // ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`
                 // : '/placeholder.svg'
