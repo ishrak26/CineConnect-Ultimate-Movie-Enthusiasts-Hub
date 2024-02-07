@@ -57,13 +57,12 @@ const userController = {
 
             // If the user is trying to follow themselves
             if (req.user.username === req.params.username) {
-                return res.status(400).json({ message: 'You cannot follow yourself.' });
+                return res.status(400).json({ message: 'Unauthorized' });
             }
 
             // If the user is trying to follow someone they are already following
-            const requestor = await db_user.findOne({ username: req.user.username });
             const requestee = await db_user.findOne({ username: req.params.username });
-            const requestorId = requestor ? requestor.id : null;
+            const requestorId = req.user.id;
             const requesteeId = requestee ? requestee.id : null;
 
             // If any of the users are not found
@@ -102,13 +101,12 @@ const userController = {
 
             // If the user is trying to unfollow themselves
             if (req.user.username === req.params.username) {
-                return res.status(400).json({ message: 'You cannot unfollow yourself.' });
+                return res.status(400).json({ message: 'Unauthorized' });
             }
 
             // If the user is trying to unfollow someone they are not following
-            const requestor = await db_user.findOne({ username: req.user.username });
             const requestee = await db_user.findOne({ username: req.params.username });
-            const requestorId = requestor ? requestor.id : null;
+            const requestorId = req.user.id;
             const requesteeId = requestee ? requestee.id : null;
 
             // If any of the users are not found
@@ -147,7 +145,7 @@ const userController = {
 
             // If the user is trying to fetch pending requests for someone else
             if (req.user.username !== req.params.username) {
-                return res.status(400).json({ message: 'You cannot fetch pending requests for another user.' });
+                return res.status(400).json({ message: 'Unauthorized' });
             }
 
 
@@ -189,7 +187,7 @@ const userController = {
 
             // If the user is trying to accept a request for someone else
             if (req.user.username !== req.params.username) {
-                return res.status(400).json({ message: 'You cannot accept requests for another user.' });
+                return res.status(400).json({ message: 'Unauthorized' });
             }
 
             const { requestId } = req.body;
@@ -227,7 +225,7 @@ const userController = {
 
             // If the user is trying to reject a request for someone else
             if (req.user.username !== req.params.username) {
-                return res.status(400).json({ message: 'You cannot reject requests for another user.' });
+                return res.status(400).json({ message: 'Unauthorized' });
             }
 
             const { requestId } = req.body;

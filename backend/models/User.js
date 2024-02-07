@@ -76,10 +76,10 @@ async function getCineFellows({ userId, limit, offset}) {
         const { data: fellowsAsFellow1, error: error1 } = await supabase
             .from('cinefellow')
             .select(`
-                fellow2_id,
-                user_info:fellow2_id (id, username, full_name, image_url, email)
+                requestee_id,
+                user_info:requestee_id (id, username, full_name, image_url, email)
             `)
-            .eq('fellow1_id', userId)
+            .eq('requestor_id', userId)
             .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
         if (error1) throw error1;
@@ -88,10 +88,10 @@ async function getCineFellows({ userId, limit, offset}) {
         const { data: fellowsAsFellow2, error: error2 } = await supabase
             .from('cinefellow')
             .select(`
-                fellow1_id,
-                user_info:fellow1_id (id, username, full_name, image_url, email)
+                requestor_id,
+                user_info:requestor_id (id, username, full_name, image_url, email)
             `)
-            .eq('fellow2_id', userId);
+            .eq('requestee_id', userId);
 
         if (error2) throw error2;
 
@@ -116,8 +116,8 @@ async function getCineFellowCount({ userId }) {
         // Count where the user is fellow1
         const { count: count1, error: error1 } = await supabase
             .from('cinefellow')
-            .select('fellow2_id', { count: 'exact' }) // Use count feature
-            .eq('fellow1_id', userId)
+            .select('requestee_id', { count: 'exact' }) // Use count feature
+            .eq('requestor_id', userId)
             .single(); // Assuming count returns a single object
 
         if (error1) {
@@ -128,8 +128,8 @@ async function getCineFellowCount({ userId }) {
         // Count where the user is fellow2
         const { count: count2, error: error2 } = await supabase
             .from('cinefellow')
-            .select('fellow1_id', { count: 'exact' }) // Use count feature
-            .eq('fellow2_id', userId)
+            .select('requestor_id', { count: 'exact' }) // Use count feature
+            .eq('requestee_id', userId)
             .single(); // Assuming count returns a single object
 
         if (error2) {
@@ -192,8 +192,8 @@ async function unfollowCinefellow({ userId, fellowId }) {
         const { data, error } = await supabase
             .from('cinefellow')
             .select('id')
-            .or(`fellow1_id.eq.${userId},fellow2_id.eq.${userId}`)
-            .or(`fellow1_id.eq.${fellowId},fellow2_id.eq.${fellowId}`);
+            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
+            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
 
         if (error) throw error;
 
@@ -205,8 +205,8 @@ async function unfollowCinefellow({ userId, fellowId }) {
         const { error: deleteError } = await supabase
             .from('cinefellow')
             .delete()
-            .or(`fellow1_id.eq.${userId},fellow2_id.eq.${userId}`)
-            .or(`fellow1_id.eq.${fellowId},fellow2_id.eq.${fellowId}`);
+            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
+            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
 
         if (deleteError) throw deleteError;
 
@@ -224,8 +224,8 @@ async function isFollowing({ userId, fellowId }) {
         const { data, error } = await supabase
             .from('cinefellow')
             .select('id')
-            .or(`fellow1_id.eq.${userId},fellow2_id.eq.${userId}`)
-            .or(`fellow1_id.eq.${fellowId},fellow2_id.eq.${fellowId}`);
+            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
+            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
 
         if (error) throw error;
 
@@ -290,7 +290,7 @@ const acceptCineFellowRequest = async ({ requestId, userId }) => {
         const { error: cinefellowError } = await supabase
             .from('cinefellow')
             .insert([
-                { fellow1_id: requestData.from_id, fellow2_id: requestData.to_id },
+                { requestor_id: requestData.from_id, requestee_id: requestData.to_id },
             ]);
 
         if (cinefellowError) throw cinefellowError;
