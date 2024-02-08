@@ -1,0 +1,68 @@
+/* ReviewCard.module.css */
+.reviewCard {
+    display: flex;
+    border: 1px solid #ccc;
+    margin-bottom: 20px; /* Space between cards */
+    padding: 10px;
+  }
+  
+  .movieInfo {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Space between movie info and review content */
+  }
+  
+  .movieImage {
+    width: 100px; /* Adjust as needed */
+    height: auto;
+    border-radius: 5px;
+  }
+  
+  .movieDetails {
+    margin-left: 10px;
+  }
+  
+  .movieName {
+    font-size: 1.2rem;
+    color: #171616; /* Movie name color */
+  }
+  
+  /* .rating {
+    // Styling for rating 
+  } */
+  
+  .reviewContent {
+    flex-grow: 1;
+  }
+  
+  .timestamp {
+    font-size: 0.8rem;
+    color: #777;
+    margin-bottom: 5px;
+  }
+  
+  .snippetReview {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Number of lines to show */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* .fullReview {
+    // Full review may have similar styles without the text clamping
+  } */
+  
+  .seeMoreButton {
+    background-color: #171616;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .seeMoreButton:hover {
+    background-color: #FFD700; /* Yellow color on hover */
+  }
+  

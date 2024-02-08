@@ -15,6 +15,7 @@ const moviesController = {
                 offset,
                 limit
             );
+            
             res.json(movies || []);
         } catch (error) {
             console.log('in catch: ', error.message);
@@ -265,7 +266,7 @@ const moviesController = {
         }
 
         const movieId = req.params.movieId;
-        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
+        const userId = req.user.id; 
 
         try {
             const result = await db_movie.addMovieToWatchedlist(

@@ -8,6 +8,7 @@ import Footer from '@components/footer'
 import Search from '@components/search'
 import Pagination from '@components/pagination'
 import BaseLayout from '@components/BaseLayout'
+import Profile from '@components/profiles'
 // import Row from '@components/Row'
 import Layout from './layout'
 import dynamic from 'next/dynamic'
@@ -21,7 +22,7 @@ export default function Home({ topRated, netflixOriginals, actionMovies, query }
     <div>
       <Head>
         <title>CineConnect</title>
-        <meta
+        <meta // meta tags for SEO, works to improve the search engine ranking
           name="description"
           content="Millions of movies, TV shows and people to discover. Explore now."
         />
@@ -53,7 +54,6 @@ export default function Home({ topRated, netflixOriginals, actionMovies, query }
               </p>
             </div>
           </div>
-
           <section className="md:space-y-24 pt-5">
             <div className="pb-4 my-5">
 
