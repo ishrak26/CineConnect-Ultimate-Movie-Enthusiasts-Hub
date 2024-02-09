@@ -125,6 +125,21 @@ async function isJoinedForum(userId, movieId) {
     return count === 1;
 }
 
+async function joinForum(id) {
+    const { data, error } = await supabase
+        .from('watched_list')
+        .update({ joined_forum: true })
+        .eq('id', id)
+        .select();
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
 async function fetchMovieIdByPostId(postId) {
     const { data, error } = await supabase
         .from('movie_has_reviews_and_posts')
@@ -145,4 +160,5 @@ module.exports = {
     createNewPost,
     isJoinedForum,
     fetchMovieIdByPostId,
+    joinForum,
 };

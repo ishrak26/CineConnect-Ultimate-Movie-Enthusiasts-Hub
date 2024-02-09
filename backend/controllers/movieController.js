@@ -280,6 +280,15 @@ const moviesController = {
         const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
 
         try {
+            const alreadyWatched = await db_movie.isMovieInWatchedlist(
+                userId,
+                movieId
+            );
+            if (alreadyWatched) {
+                return res
+                    .status(400)
+                    .json({ message: 'Movie already marked as watched' });
+            }
             const result = await db_movie.addMovieToWatchedlist(
                 userId,
                 movieId

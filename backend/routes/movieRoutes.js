@@ -91,4 +91,7 @@ router.post(
     postController.createNewForumPost
 ); // **//
 
+// Route for joining a forum
+router.post('/v1/movie/:movieId/forum/join', postController.joinNewForum); // **//
+
 module.exports = router;

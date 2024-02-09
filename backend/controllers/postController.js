@@ -1,6 +1,7 @@
 const { supabase } = require('../config/supabaseConfig');
 
 const dbPost = require('../models/Post');
+const dbMovie = require('../models/Movie');
 
 const postController = {
     getPostById: async (req, res) => {
@@ -98,6 +99,47 @@ const postController = {
                     .status(500)
                     .json({ message: 'Failed to create new post' });
             }
+            res.status(201).json({
+                success: true,
+            });
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    joinNewForum: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const movieId = req.params.movieId;
+
+            const isMovieInWatchedList = await dbMovie.isMovieInWatchedlist(
+                userId,
+                movieId
+            );
+            if (!isMovieInWatchedList) {
+                return res
+                    .status(400)
+                    .json({ message: 'Movie not in user watched-list' });
+            }
+
+            const isJoined = isMovieInWatchedList.joined_forum;
+            if (isJoined) {
+                return res
+                    .status(400)
+                    .json({ message: 'User already joined the forum' });
+            }
+
+            const joinForum = await dbPost.joinForum(isMovieInWatchedList.id);
+            if (!joinForum) {
+                return res
+                    .status(500)
+                    .json({ message: 'Failed to join the forum' });
+            }
+
             res.status(201).json({
                 success: true,
             });
