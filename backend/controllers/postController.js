@@ -149,6 +149,54 @@ const postController = {
         }
     },
 
+    getAllPosts: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const movieId = req.params.movieId;
+
+            const isJoined = await dbPost.isJoinedForum(userId, movieId);
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const limit = req.query.limit || 10;
+            const offset = req.query.offset || 0;
+            const posts = await dbPost.fetchPostsByMovieId(
+                movieId,
+                parseInt(limit),
+                parseInt(offset)
+            );
+            if (posts) {
+                const data = [];
+                for (let post of posts) {
+                    data.push({
+                        postId: post.post_id,
+                        author: {
+                            id: post.author_id,
+                            username: post.username,
+                            image_url: post.user_image_url,
+                        },
+                        content: post.content,
+                        totalImages: post.total_images,
+                        topImage: post.top_post_image_url,
+                        created_at: post.created_at,
+                    });
+                }
+                res.status(200).json(data);
+            } else {
+                res.status(404).json({ message: 'Posts not found' });
+            }
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 

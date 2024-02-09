@@ -156,10 +156,32 @@ async function fetchMovieIdByPostId(postId) {
     return data.movie_id;
 }
 
+async function fetchPostsByMovieId(movieId, limit, offset) {
+    try {
+        const { data, error } = await supabase.rpc('fetch_posts_by_movie', {
+            m_id: movieId,
+            post_limit: limit,
+            post_offset: offset,
+        });
+
+        if (error) {
+            console.error('Error fetching posts by movieId:', error.message);
+            return null;
+        }
+
+        // console.log('Returning from fetchPostsByMovieId:', data);
+
+        return data;
+    } catch (err) {
+        console.error('Exception fetching posts by movieId:', err.message);
+    }
+}
+
 module.exports = {
     fetchPostById,
     createNewPost,
     isJoinedForum,
     fetchMovieIdByPostId,
     joinForum,
+    fetchPostsByMovieId,
 };
