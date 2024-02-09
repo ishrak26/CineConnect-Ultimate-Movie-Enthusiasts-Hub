@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { IoPeopleCircleOutline } from "react-icons/io5";
 // import { firestore } from "./firebase/clientApp"; 
 // import useCommunityData from "./useCommunityData"; 
-// import useCustomToast from "./useCustomToast"; 
+import useCustomToast from "../../hooks/useCustomToast";
 
 const Recommendations = () => {
   return (
@@ -50,7 +50,7 @@ const SuggestedCommunitiesList = () => {
   const [loading, setLoading] = useState(false);
   const [communities, setCommunities] = useState([]);
   const router = useRouter();
-//   const showToast = useCustomToast();
+  const showToast = useCustomToast();
 
   const getCommunityRecommendations = async () => {
     setLoading(true);

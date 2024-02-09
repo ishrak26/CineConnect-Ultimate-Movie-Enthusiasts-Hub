@@ -1,4 +1,3 @@
-import { Post } from "@/atoms/postsAtom";
 import useCustomToast from "@/hooks/useCustomToast";
 import {
   Button,
@@ -25,53 +24,9 @@ import {
   IoPeopleCircleOutline,
 } from "react-icons/io5";
 import { MdOutlineDelete } from "react-icons/md";
-import PostItemError from "../atoms/ErrorMessage";
+// import PostItemError from "../atoms/ErrorMessage";
 
-/**
- * @param {Post} post - post object
- * @param {boolean} userIsCreator - is the currently logged in user the creator of post
- * @param {number} userVoteValue - whether the currently logged in user has voted on the post (1, -1, or 0)
- * @param {function} onVote - function to handle voting
- * @param {function} onDeletePost - function to handle deleting post
- * @param {function} onSelectPost - function to handle selecting post
- * @param {boolean} showCommunityImage - whether to show the community image
- */
-type PostItemProps = {
-  post: Post;
-  userIsCreator: boolean; // is the currently logged in user the creator of post
-  userVoteValue?: number; // value of the vote of the currently logged in user
-  onVote: (
-    event: React.MouseEvent<SVGElement, MouseEvent>,
-    post: Post,
-    vote: number,
-    communityId: string
-  ) => void; // function to handle voting
-  onDeletePost: (post: Post) => Promise<boolean>; // function to handle deleting post
-  onSelectPost?: (post: Post) => void; // optional because once a post is selected it cannot be reselected
-  showCommunityImage?: boolean;
-};
-
-/**
- * Component to display a post:
- *  - Post title
- *  - Post text
- *  - Post creator
- *  - Post community
- *  - Post vote count
- *  - Post vote buttons
- *  - Post delete button (if user is creator)
- *  - Post select button (if post is not selected)
- *  - Post community image (if showCommunityImage is true)
- * @param {Post} post - post object
- * @param {boolean} userIsCreator - is the currently logged in user the creator of post
- * @param {number} userVoteValue - whether the currently logged in user has voted on the post (1, -1, or 0)
- * @param {function} onVote - function to handle voting
- * @param {function} onDeletePost - function to handle deleting post
- * @param {function} onSelectPost - function to handle selecting post
- * @param {boolean} showCommunityImage - whether to show the community image
- * @returns {React.FC<PostItemProps>} - card displaying post
- */
-const PostItem: React.FC<PostItemProps> = ({
+const PostItem = ({
   post,
   userIsCreator,
   userVoteValue,
@@ -86,29 +41,17 @@ const PostItem: React.FC<PostItemProps> = ({
   const router = useRouter();
   const showToast = useCustomToast();
   const { onCopy, value, setValue, hasCopied } = useClipboard("");
-  /**
-   * If there is no selected post then post is already selected
-   */
+
   const singlePostPage = !onSelectPost;
 
-  /**
-   * Will call the `handleDelete` from prop (usePosts hook).
-   * This function provides the error handling for the delete functionality.
-   * Each component may choose to the error handling differently.
-   * Core functionality is shared.
-   * @param {React.MouseEvent<HTMLButtonElement, MouseEvent>} event - click event on delete button to prevent from post being selected
-   */
-  const handleDelete = async (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.stopPropagation(); // stop event bubbling up to parent
+  const handleDelete = async (event) => {
+    event.stopPropagation();
     setLoadingDelete(true);
     try {
-      const success: boolean = await onDeletePost(post); // call the delete function from usePosts hook
+      const success = await onDeletePost(post);
 
       if (!success) {
-        // if the post was not deleted successfully
-        throw new Error("Post could not be deleted"); // throw error
+        throw new Error("Post could not be deleted");
       }
 
       showToast({
@@ -116,12 +59,11 @@ const PostItem: React.FC<PostItemProps> = ({
         description: "Your post has been deleted",
         status: "success",
       });
-      // if the user deletes post from the single post page, they should be redirected to the post's community page
+
       if (singlePostPage) {
-        // if the post is on the single post page
-        router.push(`/community/${post.communityId}`); // redirect to the community page
+        router.push(`/community/${post.communityId}`);
       }
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message);
       showToast({
         title: "Post not Deleted",
@@ -133,19 +75,12 @@ const PostItem: React.FC<PostItemProps> = ({
     }
   };
 
-  /**
-   * Added functionality to share a post by copying the link to the post to the clipboard.
-   * Router will check base URL to copy the correct link depending on the name of the site.
-   * @param {React.MouseEvent<HTMLButtonElement, MouseEvent>} event - click event on share button to prevent from post being selected
-   */
-  const handleShare = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.stopPropagation(); // stop event bubbling up to parent
+  const handleShare = (event) => {
+    event.stopPropagation();
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
     const postLink = `${baseUrl}/community/${post.communityId}/comments/${post.id}`;
     setValue(postLink);
-    onCopy(); // copy link to clipboard
+    onCopy();
 
     showToast({
       title: "Link Copied",
@@ -154,10 +89,8 @@ const PostItem: React.FC<PostItemProps> = ({
     });
   };
 
-  const handleSave = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.stopPropagation(); // stop event bubbling up to parent
+  const handleSave = (event) => {
+    event.stopPropagation();
 
     showToast({
       title: "Functionality Coming Soon",
@@ -224,42 +157,9 @@ const PostItem: React.FC<PostItemProps> = ({
 };
 export default PostItem;
 
-/**
- * @param {number} userVoteValue - whether the currently logged in user has voted on the post (1, -1, or 0)
- * @param {function} onVote - function to handle voting
- * @param {Post} post - post object
- */
-type VoteSectionProps = {
-  userVoteValue?: number;
-  onVote: (
-    event: React.MouseEvent<SVGElement, MouseEvent>,
-    post: Post,
-    vote: number,
-    communityId: string
-  ) => void;
-  post: Post;
-};
-
-/**
- * Displays the vote section of a post.
- * Contains:
- * - Like button
- * - Vote status (number of likes and dislikes combined)
- * - Dislike button
- * @param {number} userVoteValue - whether the currently logged in user has voted on the post (1, -1, or 0)
- * @param {function} onVote - function to handle voting
- * @param {Post} post - post object
- *
- * @returns {React.FC<VoteSectionProps>} - component to display the vote section of a post
- */
-const VoteSection: React.FC<VoteSectionProps> = ({
-  userVoteValue,
-  onVote,
-  post,
-}) => {
+const VoteSection = ({ userVoteValue, onVote, post }) => {
   return (
     <>
-      {/* like button */}
       <Icon
         as={userVoteValue === 1 ? IoArrowUpCircleSharp : IoArrowUpCircleOutline}
         color={userVoteValue === 1 ? "red.500" : "gray.500"}
@@ -268,17 +168,11 @@ const VoteSection: React.FC<VoteSectionProps> = ({
         _hover={{ color: "red.300" }}
         onClick={(event) => onVote(event, post, 1, post.communityId)}
       />
-      {/* number of likes  */}
       <Text fontSize="12pt" color="gray.600">
         {post.voteStatus}
       </Text>
-      {/* dislike button */}
       <Icon
-        as={
-          userVoteValue === -1
-            ? IoArrowDownCircleSharp
-            : IoArrowDownCircleOutline
-        }
+        as={userVoteValue === -1 ? IoArrowDownCircleSharp : IoArrowDownCircleOutline}
         color={userVoteValue === -1 ? "red.500" : "gray.500"}
         _hover={{ color: "red.300" }}
         fontSize={22}
@@ -289,45 +183,12 @@ const VoteSection: React.FC<VoteSectionProps> = ({
   );
 };
 
-/**
- * @param {boolean} showCommunityImage - whether to show the community image
- * @param {Post} post - post object
- */
-type PostDetailsProps = {
-  showCommunityImage?: boolean;
-  post: Post;
-};
 
-/**
- * Displays the details of a post at the top of the post card.
- * Contains:
- * - Community image (if needed)
- * - Author of the post
- * - Time of creation
- * @param {boolean} showCommunityImage - whether to show the community image
- * @param {Post} post - post object
- *
- * @returns {React.FC<PostDetailsProps>} - component to display the details of a post
- */
-const PostDetails = ({ showCommunityImage, post }: PostDetailsProps) => {
-  /**
-   * Text to be displayed on top of the post.
-   * Displays the author and the time of creation.
-   */
-  const topText: string = `By ${post.creatorUsername} ${moment(
-    new Date(post.createTime.seconds * 1000)
-  ).fromNow()}`;
+const PostDetails = ({ showCommunityImage, post }) => {
+  const topText = `By ${post.creatorUsername} ${moment(new Date(post.createTime.seconds * 1000)).fromNow()}`;
+
   return (
-    <Stack
-      direction="row"
-      spacing={0.5}
-      align="center"
-      fontSize="9pt"
-      borderRadius="full"
-      boxSize="18px"
-      mr={2}
-      width="100%"
-    >
+    <Stack direction="row" spacing={0.5} align="center" fontSize="9pt">
       {showCommunityImage && (
         <>
           {post.communityImageURL ? (
@@ -339,20 +200,10 @@ const PostDetails = ({ showCommunityImage, post }: PostDetailsProps) => {
               alt="Community logo"
             />
           ) : (
-            <Icon
-              as={IoPeopleCircleOutline}
-              mr={1}
-              fontSize="18pt"
-              color="red.500"
-            />
+            <Icon as={IoPeopleCircleOutline} mr={1} fontSize="18pt" color="red.500" />
           )}
-          <Link href={`/community/${post.communityId}`}>
-            <Text
-              fontWeight={700}
-              _hover={{ textDecoration: "underline" }}
-              pr={2}
-              onClick={(event) => event.stopPropagation()}
-            >
+          <Link href={`/community/${post.communityId}`} isExternal>
+            <Text fontWeight={700} _hover={{ textDecoration: "underline" }} pr={2}>
               {post.communityId}
             </Text>
           </Link>
@@ -363,20 +214,9 @@ const PostDetails = ({ showCommunityImage, post }: PostDetailsProps) => {
   );
 };
 
-/**
- * @param {Post} post - post object
- */
-type PostTitleProps = {
-  post: Post;
-};
 
-/**
- * Displays the title of a post.
- * @param {Post} post - post object
- *
- * @returns {React.FC<PostTitleProps>} - component to display the title of a post
- */
-const PostTitle = ({ post }: PostTitleProps) => {
+
+const PostTitle = ({ post }) => {
   return (
     <Text fontSize="12pt" fontWeight={600}>
       {post.title}
@@ -384,33 +224,14 @@ const PostTitle = ({ post }: PostTitleProps) => {
   );
 };
 
-/**
- * @param {Post} post - post object
- * @param {boolean} loadingImage - whether the image is loading
- * @param {function} setLoadingImage - function to set the loadingImage state
- */
-type PostBodyProps = {
-  post: Post;
-  loadingImage: boolean;
-  setLoadingImage: (value: React.SetStateAction<boolean>) => void;
-};
 
-/**
- * Body of the post containing the description and the image (if exists).
- * The description is limited to 30 words.
- * @param {Post} post - post object
- * @param {boolean} loadingImage - whether the image is loading
- * @param {function} setLoadingImage - function to set the loadingImage state
- * @returns {React.FC<PostBodyProps>} - component to display the body of a post
- */
-const PostBody = ({ post, loadingImage, setLoadingImage }: PostBodyProps) => {
+
+const PostBody = ({ post, loadingImage, setLoadingImage }) => {
   return (
     <>
       <Text fontSize="12pt">
-        {/* only displays the first 30 words for descriptions that are too long */}
         {post.body.split(" ").slice(0, 30).join(" ")}
       </Text>
-      {/* image (if exists) */}
       {post.imageURL && (
         <Flex justify="center" align="center">
           {loadingImage && (
@@ -433,65 +254,26 @@ const PostBody = ({ post, loadingImage, setLoadingImage }: PostBodyProps) => {
   );
 };
 
-/**
- * @param {function} handleDelete - function to handle the delete button
- * @param {boolean} loadingDelete - whether the post is being deleted
- */
-interface PostActionsProps {
-  handleDelete: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => Promise<void>;
-  loadingDelete: boolean;
-  userIsCreator: boolean;
-  handleShare: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  handleSave: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-}
 
-/**
- * Displays the actions the user can take on a post.
- * Contains:
- * - Share button (not implemented)
- * - Save button (not implemented)
- * - Delete button (only for the author of the post)
- * @param {function} handleDelete - function to handle the delete button
- * @param {boolean} loadingDelete - whether the post is being deleted
- * @returns {React.FC<PostActionsProps>} - component to display the actions of a post
- */
-const PostActions: React.FC<PostActionsProps> = ({
-  handleDelete,
-  loadingDelete,
-  userIsCreator,
-  handleShare,
-  handleSave,
-}) => (
-  <Stack
-    ml={1}
-    mb={1}
-    color="gray.500"
-    fontWeight={600}
-    direction="row"
-    spacing={1}
-  >
-    <Button variant="action" height="32px" onClick={handleShare}>
-      <Icon as={FiShare2} mr={2} />
-      <Text fontSize="9pt">Share</Text>
-    </Button>
-
-    <Button variant="action" height="32px" onClick={handleSave}>
-      <Icon as={BsBookmark} mr={2} />
-      <Text fontSize="9pt">Save</Text>
-    </Button>
-
-    {userIsCreator && (
-      <Button
-        variant="action"
-        height="32px"
-        onClick={handleDelete}
-        isLoading={loadingDelete}
-      >
-        <Icon as={MdOutlineDelete} mr={2} />
-        <Text fontSize="9pt">Delete</Text>
+const PostActions = ({ handleDelete, loadingDelete, userIsCreator, handleShare, handleSave }) => {
+  return (
+    <Flex ml={1} mb={1} color="gray.500" fontWeight={600} direction="row" spacing={1}>
+      <Button onClick={handleShare}>
+        <Icon as={FiShare2} mr={2} />
+        Share
       </Button>
-    )}
-  </Stack>
-);
+
+      <Button onClick={handleSave}>
+        <Icon as={BsBookmark} mr={2} />
+        Save
+      </Button>
+
+      {userIsCreator && (
+        <Button onClick={handleDelete} isLoading={loadingDelete}>
+          <Icon as={MdOutlineDelete} mr={2} />
+          Delete
+        </Button>
+      )}
+    </Flex>
+  );
+};
