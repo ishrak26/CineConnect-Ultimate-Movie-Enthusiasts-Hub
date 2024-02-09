@@ -10,11 +10,11 @@ const postController = {
                 return res.status(401).json({ message: 'Unauthorized' });
 
             const postId = req.params.postId;
-            const movieId = dbPost.fetchMovieIdByPostId(postId);
+            const movieId = await dbPost.fetchMovieIdByPostId(postId);
             if (!movieId) {
-                return res.status(404).json({ message: 'Invalid postId' });
+                return res.status(400).json({ message: 'Invalid postId' });
             }
-
+            // console.log('movieId:', movieId, 'userId:', req.user.id);
             const isJoined = await dbPost.isJoinedForum(req.user.id, movieId);
             if (!isJoined) {
                 return res
@@ -22,9 +22,25 @@ const postController = {
                     .json({ message: 'User not a member of the forum' });
             }
 
-            const post = await dbPost.fetchPostById(postId);
+            const imgLimit = req.query.imgLimit || 2;
+            const post = await dbPost.fetchSinglePostById(
+                postId,
+                parseInt(imgLimit)
+            );
             if (post) {
-                res.status(200).json(post);
+                const data = {
+                    postId: postId,
+                    content: post.content,
+                    images: post.images,
+                    created_at: post.created_at,
+                    author: {
+                        id: post.author_id,
+                        username: post.username,
+                        image_url: post.user_image_url,
+                    },
+                    totalImages: post.total_images,
+                };
+                res.status(200).json(data);
             } else {
                 res.status(404).json({ message: 'Post not found' });
             }

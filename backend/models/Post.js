@@ -3,45 +3,31 @@ const supabase = require('../config/supabaseConfig');
 /*
     returns a specific post given the postId
 */
-async function fetchPostById(postId) {
-    const { data, error } = await supabase
-        .from('post_has_version')
-        .select(
-            `
-            created_at,
-            content,
-            post:post_id (
-              author_id,
-              user_info:author_id!inner (
-                username,
-                image_url
-              )
-            )
-          `
-        )
-        .eq('post_id', postId)
-        .order('version_no', { ascending: false })
-        .limit(1)
-        .single();
+async function fetchSinglePostById(postId, imgLimit) {
+    try {
+        const { data, error } = await supabase.rpc('fetch_single_post', {
+            p_id: postId,
+            img_limit: imgLimit,
+        });
 
-    if (error) {
-        console.error('Error fetching latest post version:', error);
-        return null;
+        if (error || data.length === 0) {
+            console.error('Error fetching single post:', error.message);
+            return null;
+        }
+
+        if (data.length > 1) {
+            console.error(
+                'Error fetching single post: more than one post found'
+            );
+            return null;
+        }
+
+        // console.log('Fetched single post details:', data[0]);
+        // console.log('images:', data[0].images);
+        return data[0];
+    } catch (err) {
+        console.error('Exception fetching single post:', err.message);
     }
-
-    // Assuming the user_info table is correctly related to the post table through author_id
-    // And we're using `single()` because we're expecting only the latest (one) version of the post
-    const result = {
-        createdAt: data.created_at,
-        content: data.content,
-        author: {
-            id: data.post.author_id,
-            username: data.post.user_info.username,
-            imageUrl: data.post.user_info.user_image_url,
-        },
-    };
-
-    return result;
 }
 
 async function fetchReactionsByPostId(postId) {
@@ -178,10 +164,10 @@ async function fetchPostsByMovieId(movieId, limit, offset) {
 }
 
 module.exports = {
-    fetchPostById,
     createNewPost,
     isJoinedForum,
     fetchMovieIdByPostId,
     joinForum,
     fetchPostsByMovieId,
+    fetchSinglePostById,
 };
