@@ -87,14 +87,15 @@ async function fetchReactionsByPostId(postId) {
 
 async function createNewPost(userId, movieId, content, images) {
     // Convert images array to JSONB format expected by the PostgreSQL function
-    const imagesJsonb = JSON.stringify(images);
+    // const imagesJsonb = JSON.stringify(images);
 
     try {
         const { data, error } = await supabase.rpc('create_new_forum_post', {
             user_id: userId,
             movie_id: movieId,
             content: content,
-            images: imagesJsonb,
+            images,
+            // images: imagesJsonb,
         });
 
         if (error) {
