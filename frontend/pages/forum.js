@@ -3,7 +3,7 @@ import PersonalHome from "../components/forum/PersonalHome";
 import Recommendations from "../components/forum/Recommendations";
 import PageContent from "../components/forum/PageContent";
 import PostLoader from "../components/forum/PostLoader";
-// import PostItem from "../components/forum/PostItem";
+import PostItem from "../components/forum/PostItem";
 import { Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -18,10 +18,22 @@ export default function Home() {
 //   const showToast = useCustomToast();
 // const { setPostStateValue, postStateValue, onSelectPost, onVote, onDeletePost } = [];
 
+let posts = {
+  id: 1,
+  title: "Post Title",
+  body: "Post Body",
+  creatorId: 1,
+  communityId: 1,
+  voteStatus: 1,  
+}
+
 const postStateValue = {
-    posts: [],
-    postVotes: [],
-  };
+// create some mock data for postStateValue
+  posts: [posts],
+  postVotes: [],
+};
+
+  
 
   const buildUserHomeFeed = async () => {
     setLoading(true);

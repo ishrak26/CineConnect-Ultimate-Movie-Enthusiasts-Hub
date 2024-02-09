@@ -108,3 +108,105 @@ const NewPostForm = ({ user, communityImageURL, currentCommunity }) => {
   );
 };
 export default NewPostForm;
+
+// TabList.js
+import React from 'react';
+import { Stack } from '@chakra-ui/react';
+import TabItem from './TabItem';
+
+const TabList = ({ formTabs, selectedTab, setSelectedTab }) => {
+  return (
+    <Stack width="100%" direction="row" spacing={2} p={2}>
+      {formTabs.map((item) => (
+        <TabItem
+          key={item.title}
+          item={item}
+          selected={item.title === selectedTab}
+          setSelectedTab={setSelectedTab}
+        />
+      ))}
+    </Stack>
+  );
+};
+
+// BackToCommunityButton.js
+import React from 'react';
+import { Button, Icon } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
+import { MdOutlineArrowBackIos } from 'react-icons/md';
+
+const BackToCommunityButton = ({ communityId }) => {
+  const router = useRouter();
+  const communityLink = `/community/${communityId}`;
+
+  return (
+    <Button
+      variant="outline"
+      mt={4}
+      ml={4}
+      mr={4}
+      justifyContent="left"
+      width="fit-content"
+      onClick={() => router.push(communityLink)}
+    >
+      <Icon as={MdOutlineArrowBackIos} mr={2} />
+      {`Back to ${communityId}`}
+    </Button>
+  );
+};
+
+// PostBody.js
+import React from 'react';
+import { Flex } from '@chakra-ui/react';
+import TextInputs from './PostForm/TextInputs';
+import ImageUpload from './PostForm/ImageUpload';
+
+const PostBody = ({
+  selectedTab,
+  handleCreatePost,
+  onTextChange,
+  loading,
+  textInputs,
+  selectedFile,
+  onSelectFile,
+  setSelectedTab,
+  setSelectedFile,
+}) => {
+  return (
+    <Flex p={4}>
+      {selectedTab === "Post" ? (
+        <TextInputs
+          textInputs={textInputs}
+          handleCreatePost={handleCreatePost}
+          onChange={onTextChange}
+          loading={loading}
+        />
+      ) : (
+        <ImageUpload
+          selectedFile={selectedFile}
+          onSelectImage={onSelectFile}
+          setSelectedTab={setSelectedTab}
+          setSelectedFile={setSelectedFile}
+        />
+      )}
+    </Flex>
+  );
+};
+
+// PostCreateError.js
+import React from 'react';
+import { Alert, AlertIcon, Text } from '@chakra-ui/react';
+
+const PostCreateError = ({ error }) => {
+  return error && (
+    <Alert status="error">
+      <AlertIcon />
+      <Text mr={2} fontWeight={600} color="red.500">
+        There has been an error when creating your post
+      </Text>
+    </Alert>
+  );
+};
+
+export { TabList, BackToCommunityButton, PostBody, PostCreateError };
+

@@ -1,4 +1,4 @@
-import useCustomToast from "@/hooks/useCustomToast";
+import useCustomToast from "../../hooks/useCustomToast";
 import {
   Button,
   Flex,
