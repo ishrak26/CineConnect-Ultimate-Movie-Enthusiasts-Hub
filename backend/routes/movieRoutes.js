@@ -1,5 +1,6 @@
 const express = require('express');
 const movieController = require('../controllers/movieController');
+const postController = require('../controllers/postController');
 
 const router = express.Router();
 
@@ -83,5 +84,11 @@ router.get('/v1/genre/:genreId/movies', movieController.getMoviesByGenre);
 
 // Router to get total count of movies
 router.get('/v1/movies/count', movieController.getTotalMovieCount);
+
+// Route for creating a new post in a forum
+router.post(
+    '/v1/movie/:movieId/forum/submit',
+    postController.createNewForumPost
+); // **//
 
 module.exports = router;

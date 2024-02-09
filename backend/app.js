@@ -11,7 +11,6 @@ const auth = require('./middleware/authMiddleware.js');
 const movieRouter = require('./routes/movieRoutes.js');
 const authRouter = require('./routes/authRoutes.js');
 const postRouter = require('./routes/postRoutes.js');
-const forumRouter = require('./routes/forumRoutes.js');
 // const adminRouter = require('.routes/adminIndexRoute');
 
 // app creation
@@ -46,7 +45,6 @@ app.use(cookieParser());
 app.use(auth);
 app.use('/v1/auth/', authRouter);
 app.use('/v1/post/', postRouter);
-app.use('/v1/movie/:movieId/forum/', forumRouter);
 app.use('/', movieRouter);
 
 // error handling middleware

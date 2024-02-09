@@ -54,7 +54,7 @@ const authController = {
     login: async (req, res) => {
         try {
             const { username, password } = req.body;
-            console.log('login: ', req.body);
+            // console.log('login: ', req.body);
             // console.log('username', username);
             // console.log('password', password);
 
@@ -70,7 +70,7 @@ const authController = {
             console.log('user', user);
 
             // console.log('hashedPassword', hashedPassword);
-            console.log('user.password', user.password);
+            // console.log('user.password', user.password);
             const isPasswordCorrect = await bcrypt.compare(
                 password,
                 user.password

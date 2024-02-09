@@ -112,7 +112,7 @@ async function createNewPost(userId, movieId, content, images) {
 async function isJoinedForum(userId, movieId) {
     const { count, error } = await supabase
         .from('watched_list')
-        .select('*', { count: 'exact' })
+        .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('movie_id', movieId)
         .eq('joined_forum', true);
