@@ -232,6 +232,20 @@ async function removeVote(voteId) {
     return data;
 }
 
+async function fetchTotalMemberCountInForum(forumId) {
+    const { count, error } = await supabase
+        .from('watched_list')
+        .select('*', { count: 'exact', head: true })
+        .eq('movie_id', forumId);
+
+    if (error) {
+        console.error('Error fetching total member count:', error.message);
+        return null;
+    }
+
+    return count;
+}
+
 module.exports = {
     createNewPost,
     isJoinedForumByForumId,
@@ -243,4 +257,5 @@ module.exports = {
     submitVote,
     isJoinedForumByPostId,
     removeVote,
+    fetchTotalMemberCountInForum,
 };

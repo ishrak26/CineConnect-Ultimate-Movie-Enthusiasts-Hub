@@ -425,6 +425,58 @@ const postController = {
         }
     },
 
+    checkUserJoinedForum: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (isJoined) {
+                res.status(200).json({ joined: true });
+            } else {
+                res.status(200).json({ joined: false });
+            }
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getTotalMemberCount: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (isJoined) {
+                const memberCount = await dbPost.fetchTotalMemberCountInForum(
+                    forumId
+                );
+                if (!memberCount) {
+                    res.status(500).json({ message: 'Internal server error' });
+                }
+                res.status(200).json({ memberCount });
+            } else {
+                res.status(403).json({
+                    message: 'User not a member of the forum',
+                });
+            }
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 
