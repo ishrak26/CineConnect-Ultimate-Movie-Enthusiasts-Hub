@@ -33,6 +33,15 @@ const postStateValue = {
   postVotes: [],
 };
 
+const onSelectPost = () => {}
+
+const onVote = () => {}
+
+const onDeletePost = () => {}
+
+  const user = {
+    uid: 1,
+  }
   
 
   const buildUserHomeFeed = async () => {

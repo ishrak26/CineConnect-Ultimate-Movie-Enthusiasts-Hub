@@ -22,7 +22,7 @@ const ForumItem = ({ Forum, isJoined, onJoinOrLeaveForum }) => {
       }}
       cursor="pointer"
       onClick={() => {
-        router.push(`/Forum/${Forum.id}`);
+        router.push(`/forum/${Forum.id}`);
       }}
       shadow="md"
     >

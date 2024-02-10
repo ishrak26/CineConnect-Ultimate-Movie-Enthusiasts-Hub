@@ -22,18 +22,18 @@ export const Button = {
     variants: {
       solid: {
         // Default button
-        color: "white",
-        bg: "red.500",
+        color: "black",
+        bg: '#FBC02D',
         _hover: {
-          bg: "red.400",
+          bg: '#F9A825',
         },
       },
       outline: {
-        color: "red.500",
+        color: "black",
         border: "1px solid",
-        borderColor: "red.500",
+        borderColor: "black",
         _hover: {
-          bg: "red.50",
+          bg: '#FBC02D',
         },
       },
       oauth: {

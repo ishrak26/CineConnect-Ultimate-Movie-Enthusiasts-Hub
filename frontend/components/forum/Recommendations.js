@@ -35,9 +35,9 @@ const SuggestionsHeader = () => {
       height="70px"
       borderRadius="10px 10px 0px 0px"
       fontWeight={700}
-      bgImage="url('/images/banners/large.png')"
+      bgImage="url('/large.png')"
       backgroundSize="cover"
-      bgGradient="linear(to bottom, rgba(139, 0, 0, 0), rgba(139, 0, 0, 0.75)), url('/images/banners/large.png')"
+      bgGradient="linear(to bottom, rgba(139, 0, 0, 0), rgba(139, 0, 0, 0.75)), url('/large.png')"
     >
       Top Forums
     </Flex>
@@ -116,7 +116,7 @@ const SuggestedForumsList = () => {
                         <Icon
                           as={IoPeopleCircleOutline}
                           fontSize={34}
-                          color="red.500"
+                          color="black"
                           mr={1}
                         />
                       )}

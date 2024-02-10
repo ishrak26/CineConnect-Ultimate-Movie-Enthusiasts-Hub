@@ -15,7 +15,7 @@ const Posts = ({ ForumData }) => {
   //   onDeletePost,
   //   onSelectPost,
   // } = usePosts();
-  // const showToast = useCustomToast();
+  const showToast = useCustomToast();
 
   const postStateValue = {
     posts: [],

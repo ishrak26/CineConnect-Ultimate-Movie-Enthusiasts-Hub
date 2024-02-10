@@ -1,43 +1,10 @@
 import { Button, Flex, Input, Stack, Textarea } from "@chakra-ui/react";
 import React from "react";
 
-/**
- * @param {object} textInputs - object containing title and body of the post
- * @param {event} onChange - function to handle change in the input fields
- * @param {handleCreatePost} handleCreatePost - function to handle creating post
- * @param {boolean} loading - is the post being created
- */
-type TextInputsProps = {
-  textInputs: {
-    title: string;
-    body: string;
-  };
-  onChange: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
-  handleCreatePost: () => void;
-  loading: boolean;
-};
-
-/**
- * Sub-component of `NewPostForm` component.
- * Allows user to enter the title and body of the post.
- * @param {object} textInputs - object containing title and body of the post
- * @param {event} onChange - function to handle change in the input fields
- * @param {handleCreatePost} handleCreatePost - function to handle creating post
- * @param {boolean} loading - is the post being created
- *
- * @returns {React.FC<TextInputsProps>} - input fields for title and body of the post
- */
-const TextInputs: React.FC<TextInputsProps> = ({
-  textInputs,
-  onChange,
-  handleCreatePost,
-  loading,
-}) => {
+const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
   return (
     <Stack spacing={3} width="100%">
-      {/* Title  of the post*/}
+      {/* Title of the post */}
       <Input
         name="title"
         placeholder="Title"
@@ -85,7 +52,7 @@ const TextInputs: React.FC<TextInputsProps> = ({
         <Button
           height="34px"
           padding="0px 30px"
-          isDisabled={!textInputs.title} // if there is no text in the title field button is disabled
+          isDisabled={!textInputs.title}
           isLoading={loading}
           onClick={handleCreatePost}
           shadow="md"
@@ -96,4 +63,5 @@ const TextInputs: React.FC<TextInputsProps> = ({
     </Stack>
   );
 };
+
 export default TextInputs;

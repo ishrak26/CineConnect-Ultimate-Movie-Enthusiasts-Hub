@@ -147,10 +147,7 @@ const PostItem = ({
           handleShare={handleShare}
           handleSave={handleSave}
         />
-        <PostItemError
-          error={error}
-          message={"There was an error when loading this post"}
-        />
+     
       </Flex>
     </Flex>
   );
@@ -162,10 +159,10 @@ const VoteSection = ({ userVoteValue, onVote, post }) => {
     <>
       <Icon
         as={userVoteValue === 1 ? IoArrowUpCircleSharp : IoArrowUpCircleOutline}
-        color={userVoteValue === 1 ? "red.500" : "gray.500"}
+        color={userVoteValue === 1 ? "black" : "gray.500"}
         fontSize={22}
         cursor="pointer"
-        _hover={{ color: "red.300" }}
+        _hover={{ color: "black" }}
         onClick={(event) => onVote(event, post, 1, post.ForumId)}
       />
       <Text fontSize="12pt" color="gray.600">
@@ -173,8 +170,8 @@ const VoteSection = ({ userVoteValue, onVote, post }) => {
       </Text>
       <Icon
         as={userVoteValue === -1 ? IoArrowDownCircleSharp : IoArrowDownCircleOutline}
-        color={userVoteValue === -1 ? "red.500" : "gray.500"}
-        _hover={{ color: "red.300" }}
+        color={userVoteValue === -1 ? "black" : "gray.500"}
+        _hover={{ color: "black" }}
         fontSize={22}
         cursor="pointer"
         onClick={(event) => onVote(event, post, -1, post.ForumId)}
@@ -185,7 +182,8 @@ const VoteSection = ({ userVoteValue, onVote, post }) => {
 
 
 const PostDetails = ({ showForumImage, post }) => {
-  const topText = `By ${post.creatorUsername} ${moment(new Date(post.createTime.seconds * 1000)).fromNow()}`;
+  // const topText = `By ${post.creatorUsername} ${moment(new Date(post.createTime.seconds * 1000)).fromNow()}`;
+  const topText = [];
 
   return (
     <Stack direction="row" spacing={0.5} align="center" fontSize="9pt">
@@ -200,7 +198,7 @@ const PostDetails = ({ showForumImage, post }) => {
               alt="Forum logo"
             />
           ) : (
-            <Icon as={IoPeopleCircleOutline} mr={1} fontSize="18pt" color="red.500" />
+            <Icon as={IoPeopleCircleOutline} mr={1} fontSize="18pt" color="black" />
           )}
           <Link href={`/Forum/${post.ForumId}`} isExternal>
             <Text fontWeight={700} _hover={{ textDecoration: "underline" }} pr={2}>
@@ -258,18 +256,18 @@ const PostBody = ({ post, loadingImage, setLoadingImage }) => {
 const PostActions = ({ handleDelete, loadingDelete, userIsCreator, handleShare, handleSave }) => {
   return (
     <Flex ml={1} mb={1} color="gray.500" fontWeight={600} direction="row" spacing={1}>
-      <Button onClick={handleShare}>
+      <Button onClick={handleShare} className="mr-2">
         <Icon as={FiShare2} mr={2} />
         Share
       </Button>
 
-      <Button onClick={handleSave}>
+      <Button onClick={handleSave} className="mx-2">
         <Icon as={BsBookmark} mr={2} />
         Save
       </Button>
 
       {userIsCreator && (
-        <Button onClick={handleDelete} isLoading={loadingDelete}>
+        <Button onClick={handleDelete} isLoading={loadingDelete} className="mx-2">
           <Icon as={MdOutlineDelete} mr={2} />
           Delete
         </Button>
