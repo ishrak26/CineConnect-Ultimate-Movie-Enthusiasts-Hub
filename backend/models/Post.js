@@ -96,7 +96,7 @@ async function createNewPost(userId, movieId, content, images) {
     }
 }
 
-async function isJoinedForum(userId, movieId) {
+async function isJoinedForumByMovieId(userId, movieId) {
     const { count, error } = await supabase
         .from('watched_list')
         .select('*', { count: 'exact', head: true })
@@ -110,6 +110,26 @@ async function isJoinedForum(userId, movieId) {
     }
 
     return count === 1;
+}
+
+async function isJoinedForumByPostId(postId, userId) {
+    try {
+        const { data, error } = await supabase.rpc('check_user_joined_forum', {
+            pid: postId,
+            uid: userId,
+        });
+
+        if (error) {
+            console.error('Error:', error.message);
+            return null;
+        }
+
+        // console.log('Is user joined the forum?', data);
+        return data;
+    } catch (err) {
+        console.error('Exception:', err.message);
+        return null;
+    }
 }
 
 async function joinForum(id) {
@@ -163,11 +183,64 @@ async function fetchPostsByMovieId(movieId, limit, offset) {
     }
 }
 
+async function fetchPostVoteByUser(postId, userId) {
+    const { data, error } = await supabase
+        .from('post_has_reaction')
+        .select('id, type')
+        .eq('post_id', postId)
+        .eq('reactor_id', userId);
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    if (data.length > 1) {
+        console.error('Error: more than one vote found');
+        return null;
+    }
+
+    return data;
+}
+
+async function submitVote(postId, userId, type) {
+    const { data, error } = await supabase
+        .from('post_has_reaction')
+        .insert([{ post_id: postId, reactor_id: userId, type: type }])
+        .select();
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
+async function removeVote(voteId) {
+    const { data, error } = await supabase
+        .from('post_has_reaction')
+        .delete()
+        .eq('id', voteId)
+        .select();
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
 module.exports = {
     createNewPost,
-    isJoinedForum,
+    isJoinedForumByMovieId,
     fetchMovieIdByPostId,
     joinForum,
     fetchPostsByMovieId,
     fetchSinglePostById,
+    fetchPostVoteByUser,
+    submitVote,
+    isJoinedForumByPostId,
+    removeVote,
 };

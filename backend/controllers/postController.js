@@ -10,12 +10,15 @@ const postController = {
                 return res.status(401).json({ message: 'Unauthorized' });
 
             const postId = req.params.postId;
-            const movieId = await dbPost.fetchMovieIdByPostId(postId);
-            if (!movieId) {
-                return res.status(400).json({ message: 'Invalid postId' });
+            const isJoined = await dbPost.isJoinedForumByPostId(
+                postId,
+                req.user.id
+            );
+            if (isJoined === null) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
             }
-            // console.log('movieId:', movieId, 'userId:', req.user.id);
-            const isJoined = await dbPost.isJoinedForum(req.user.id, movieId);
             if (!isJoined) {
                 return res
                     .status(403)
@@ -73,7 +76,10 @@ const postController = {
             const userId = req.user.id;
             const movieId = req.params.movieId;
 
-            const isJoined = await dbPost.isJoinedForum(userId, movieId);
+            const isJoined = await dbPost.isJoinedForumByMovieId(
+                userId,
+                movieId
+            );
             if (!isJoined) {
                 return res
                     .status(403)
@@ -173,7 +179,10 @@ const postController = {
             const userId = req.user.id;
             const movieId = req.params.movieId;
 
-            const isJoined = await dbPost.isJoinedForum(userId, movieId);
+            const isJoined = await dbPost.isJoinedForumByMovieId(
+                userId,
+                movieId
+            );
             if (!isJoined) {
                 return res
                     .status(403)
@@ -189,6 +198,7 @@ const postController = {
             );
             if (posts) {
                 const data = [];
+                const contentLimit = parseInt(req.query.contentLimit) || 500;
                 for (let post of posts) {
                     data.push({
                         postId: post.post_id,
@@ -197,7 +207,8 @@ const postController = {
                             username: post.username,
                             image_url: post.user_image_url,
                         },
-                        content: post.content,
+                        content: post.content.substring(0, contentLimit),
+                        contentFull: post.content.length <= contentLimit,
                         totalImages: post.total_images,
                         topImage: post.top_post_image_url,
                         created_at: post.created_at,
@@ -209,6 +220,220 @@ const postController = {
             }
         } catch (error) {
             console.log(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    editPost: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            //TODO
+
+            const postId = req.params.postId;
+            const post = await dbPost.fetchSinglePostById(postId, 0);
+            if (!post) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+
+            if (post.author_id !== req.user.id) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not authorized to edit the post' });
+            }
+
+            const { content, images } = req.body;
+            if (!content) {
+                return res
+                    .status(400)
+                    .json({ message: 'Content cannot be empty' });
+            }
+
+            if (images) {
+                // sanitize images
+                if (!Array.isArray(images)) {
+                    return res
+                        .status(400)
+                        .json({ message: 'Images must be an array' });
+                }
+                for (let image of images) {
+                    if (!image.image_url) {
+                        return res
+                            .status(400)
+                            .json({ message: 'Image URL cannot be empty' });
+                    }
+                    image.caption = image.caption || '';
+                }
+            }
+
+            const updatedPost = await dbPost.updatePost(
+                postId,
+                content,
+                images
+            );
+            if (!updatedPost) {
+                return res
+                    .status(500)
+                    .json({ message: 'Failed to update the post' });
+            }
+            res.status(200).json({
+                success: true,
+            });
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    deletePost: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            //TODO
+
+            const postId = req.params.postId;
+            const post = await dbPost.fetchSinglePostById(postId, 0);
+            if (!post) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+
+            if (post.author_id !== req.user.id) {
+                return res.status(403).json({
+                    message: 'User not authorized to delete the post',
+                });
+            }
+
+            const deletedPost = await dbPost.removePost(postId);
+            if (!deletedPost) {
+                return res
+                    .status(500)
+                    .json({ message: 'Failed to delete the post' });
+            }
+            res.status(200).json({
+                success: true,
+            });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    votePost: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const { type } = req.body;
+            if (type !== 'upvote' && type !== 'downvote') {
+                return res.status(400).json({ message: 'Invalid vote type' });
+            }
+
+            const postId = req.params.postId;
+
+            const isJoined = await dbPost.isJoinedForumByPostId(
+                postId,
+                req.user.id
+            );
+            // console.log('isJoined', isJoined);
+            if (isJoined === null) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const vote = await dbPost.fetchPostVoteByUser(postId, req.user.id);
+            if (vote === null) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            if (vote.length === 0) {
+                // no previous vote found, so can vote
+                // vote the post
+                const newVote = await dbPost.submitVote(
+                    postId,
+                    req.user.id,
+                    type
+                );
+                if (!newVote) {
+                    return res
+                        .status(500)
+                        .json({ message: 'Failed to vote the post' });
+                }
+                res.status(201).json({ suceess: true });
+            } else {
+                res.status(400).json({
+                    message: 'User already voted the post',
+                });
+            }
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    unvotePost: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const { type } = req.body;
+            if (type !== 'upvote' && type !== 'downvote') {
+                return res.status(400).json({ message: 'Invalid vote type' });
+            }
+
+            const postId = req.params.postId;
+
+            const isJoined = await dbPost.isJoinedForumByPostId(
+                postId,
+                req.user.id
+            );
+            if (isJoined === null) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const vote = await dbPost.fetchPostVoteByUser(postId, req.user.id);
+            if (vote === null) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            if (vote.length === 0) {
+                res.status(400).json({
+                    message: 'User did not vote the post',
+                });
+            } else {
+                const data = vote[0];
+                if (data.type !== type) {
+                    return res
+                        .status(404)
+                        .json({ message: `no previous vote of type ${type}` });
+                }
+                // unvote the post
+                const unvote = await dbPost.removeVote(data.id);
+                if (!unvote) {
+                    return res
+                        .status(500)
+                        .json({ message: 'Failed to unvote the post' });
+                }
+                res.status(200).json({ suceess: true });
+            }
+        } catch (error) {
+            console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });
         }
     },

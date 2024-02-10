@@ -94,6 +94,9 @@ router.post(
 // Route for joining a forum
 router.post('/v1/movie/:movieId/forum/join', postController.joinNewForum); // **//
 
+// Route for leaving a forum
+// router.delete('/v1/movie/:movieId/forum/leave', postController.leaveForum); // **//
+
 // Route for all posts in a forum
 router.get('/v1/movie/:movieId/forum/posts', postController.getAllPosts); // **//
 
