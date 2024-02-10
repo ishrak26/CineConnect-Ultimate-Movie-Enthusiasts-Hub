@@ -566,6 +566,102 @@ export async function getServerSideProps(context) {
   const params = context.params
   const cookie = context.req.headers.cookie
 
+  // forum test
+
+  // join forum
+  // const forumData = await fetch(
+  //   `http://localhost:4000/v1/movie/${params.id}/forum/join`,
+  //   {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       ...(cookie ? { Cookie: cookie } : {}),
+  //     },
+  //     credentials: 'include',
+  //   }
+  // ).then((response) => response.json())
+
+  // console.log('forumData', forumData)
+
+  // const forumBody = {
+  //   content:
+  //     'Quis irure commodo ut dolor et est anim consectetur et nisi elit proident aute. Nulla reprehenderit commodo aute sit. Ut pariatur consectetur consequat incididunt cupidatat dolor consequat ea enim. Minim ad exercitation irure esse qui cupidatat ullamco pariatur velit. Exercitation aliquip occaecat ad Lorem non fugiat minim voluptate. Nostrud irure pariatur excepteur anim anim qui labore proident pariatur. Culpa cupidatat elit et in cillum.\n\nSit eu exercitation exercitation aute Lorem quis excepteur elit aliquip. Laboris et ut commodo enim mollit cupidatat ex ipsum enim anim ad velit. Sint ea quis et reprehenderit dolore. Amet non eiusmod est excepteur proident magna consequat incididunt deserunt aliquip. Fugiat occaecat veniam sit reprehenderit aliquip exercitation aliquip laboris sint consectetur sunt ullamco nisi.\n\nUt elit sint duis amet magna labore nostrud. Quis duis quis do aliqua. Veniam occaecat dolor ullamco aute. Laborum fugiat ipsum ut sint velit ex dolor velit aliquip laboris id. Velit culpa nulla et et exercitation cillum. Fugiat velit deserunt consectetur sint non nisi ut irure nisi deserunt nostrud dolore Lorem.',
+  //   images: [
+  //     {
+  //       image_url:
+  //         'https://image.tmdb.org/t/p/w500/re9VGdZlwTrzo9G5mQ0Ywtus6uU.jpg',
+  //       caption: 'Image 1 caption',
+  //     },
+  //     {
+  //       image_url:
+  //         'https://image.tmdb.org/t/p/w1280/TU9NIjwzjoKPwQHoHshkFcQUCG.jpg',
+  //     },
+  //     {
+  //       image_url:
+  //         'https://image.tmdb.org/t/p/w500/Ac68G8LkY4AJL6lXpClRP4uJMRV.jpg',
+  //       caption: 'Image 3 caption',
+  //     },
+  //   ],
+  // }
+
+  // const forumData = await fetch(
+  //   `http://localhost:4000/v1/movie/${params.id}/forum/submit`,
+  //   {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       ...(cookie ? { Cookie: cookie } : {}),
+  //     },
+  //     credentials: 'include',
+  //     body: JSON.stringify(forumBody),
+  //   }
+  // ).then((response) => response.json())
+
+  // console.log('forumData', forumData)
+
+  // const forumPosts = await fetch(
+  //   `http://localhost:4000/v1/movie/${params.id}/forum/posts?contentLimit=5000`,
+  //   {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       ...(cookie ? { Cookie: cookie } : {}),
+  //     },
+  //     credentials: 'include',
+  //   }
+  // ).then((response) => response.json())
+
+  // console.log('forumPosts', forumPosts)
+
+  // const singlePost = await fetch(
+  //   `http://localhost:4000/v1/post/0171becc-b71b-4cf5-b895-8c1b76d0d1e1?imgLimit=2`,
+  //   {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       ...(cookie ? { Cookie: cookie } : {}),
+  //     },
+  //     credentials: 'include',
+  //   }
+  // ).then((response) => response.json())
+
+  // console.log('singlePost', singlePost)
+
+  // const submitVoteRes = await fetch(
+  //   `http://localhost:4000/v1/post/0171becc-b71b-4cf5-b895-8c1b76d0d1e1/vote`,
+  //   {
+  //     method: 'DELETE',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       ...(cookie ? { Cookie: cookie } : {}),
+  //     },
+  //     credentials: 'include',
+  //     body: JSON.stringify({ type: 'upvote' }),
+  //   }
+  // ).then((response) => response.json())
+
+  // console.log('submitVoteRes', submitVoteRes)
+
   let response = ''
   let casts = ''
 
