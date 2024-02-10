@@ -2,6 +2,22 @@ const { supabase } = require("../config/supabaseConfig");
 const db_user = require("../models/User.js");
 
 const userController = {
+  
+  getProfileByUsername: async (req, res) => {
+    try {
+        const username = req.params.username;
+        const user = await db_user.getProfileByUsername(username);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        res.status(200).json({ user });
+    } catch (error) {
+        console.error('Failed to fetch user profile:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+    },
+        
+
   getCineFellows: async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });

@@ -70,6 +70,24 @@ async function checkIfEmailExists({ email }) {
     }
 }
 
+async function getProfileByUsername({ username }) {
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .select('id, username, full_name, image_url, email')
+            .eq('username', username)
+            .single();
+
+        if (error) throw error;
+
+        return data;
+
+    } catch (error) {
+        console.error('Error fetching profile:', error.message);
+        return null;
+    }
+}
+
 async function getCineFellows({ userId, limit, offset}) {
     try {
         // Fetch fellow1 details
@@ -411,11 +429,11 @@ module.exports = {
     findOne,
     checkIfUserExists,
     checkIfEmailExists,
+    getProfileByUsername,
     getCineFellows,
     getCineFellowCount,
     followCinefellow,
     unfollowCinefellow,
-    isFollowing,
     getPendingRequests,
     acceptCineFellowRequest,
     rejectCineFellowRequest,
