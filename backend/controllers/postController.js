@@ -9,16 +9,13 @@ const postController = {
             if (!req.user)
                 return res.status(401).json({ message: 'Unauthorized' });
 
+            const userId = req.user.id;
             const postId = req.params.postId;
-            const isJoined = await dbPost.isJoinedForumByPostId(
-                postId,
-                req.user.id
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
             );
-            if (isJoined === null) {
-                return res
-                    .status(500)
-                    .json({ message: 'Internal server error' });
-            }
             if (!isJoined) {
                 return res
                     .status(403)
@@ -74,11 +71,11 @@ const postController = {
                 return res.status(401).json({ message: 'Unauthorized' });
 
             const userId = req.user.id;
-            const movieId = req.params.movieId;
+            const forumId = req.params.forumId;
 
-            const isJoined = await dbPost.isJoinedForumByMovieId(
+            const isJoined = await dbPost.isJoinedForumByForumId(
                 userId,
-                movieId
+                forumId
             );
             if (!isJoined) {
                 return res
@@ -112,7 +109,7 @@ const postController = {
 
             const newPost = await dbPost.createNewPost(
                 userId,
-                movieId,
+                forumId,
                 content,
                 images
             );
@@ -136,7 +133,7 @@ const postController = {
                 return res.status(401).json({ message: 'Unauthorized' });
 
             const userId = req.user.id;
-            const movieId = req.params.movieId;
+            const movieId = req.params.forumId;
 
             const isMovieInWatchedList = await dbMovie.isMovieInWatchedlist(
                 userId,
@@ -177,11 +174,10 @@ const postController = {
                 return res.status(401).json({ message: 'Unauthorized' });
 
             const userId = req.user.id;
-            const movieId = req.params.movieId;
-
-            const isJoined = await dbPost.isJoinedForumByMovieId(
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
                 userId,
-                movieId
+                forumId
             );
             if (!isJoined) {
                 return res
@@ -331,17 +327,12 @@ const postController = {
             }
 
             const postId = req.params.postId;
-
-            const isJoined = await dbPost.isJoinedForumByPostId(
-                postId,
-                req.user.id
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
             );
-            // console.log('isJoined', isJoined);
-            if (isJoined === null) {
-                return res
-                    .status(500)
-                    .json({ message: 'Internal server error' });
-            }
             if (!isJoined) {
                 return res
                     .status(403)
@@ -390,16 +381,12 @@ const postController = {
             }
 
             const postId = req.params.postId;
-
-            const isJoined = await dbPost.isJoinedForumByPostId(
-                postId,
-                req.user.id
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
             );
-            if (isJoined === null) {
-                return res
-                    .status(500)
-                    .json({ message: 'Internal server error' });
-            }
             if (!isJoined) {
                 return res
                     .status(403)

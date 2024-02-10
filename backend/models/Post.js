@@ -96,12 +96,12 @@ async function createNewPost(userId, movieId, content, images) {
     }
 }
 
-async function isJoinedForumByMovieId(userId, movieId) {
+async function isJoinedForumByForumId(userId, forumId) {
     const { count, error } = await supabase
         .from('watched_list')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .eq('movie_id', movieId)
+        .eq('movie_id', forumId)
         .eq('joined_forum', true);
 
     if (error) {
@@ -234,7 +234,7 @@ async function removeVote(voteId) {
 
 module.exports = {
     createNewPost,
-    isJoinedForumByMovieId,
+    isJoinedForumByForumId,
     fetchMovieIdByPostId,
     joinForum,
     fetchPostsByMovieId,

@@ -85,19 +85,4 @@ router.get('/v1/genre/:genreId/movies', movieController.getMoviesByGenre);
 // Router to get total count of movies
 router.get('/v1/movies/count', movieController.getTotalMovieCount);
 
-// Route for creating a new post in a forum
-router.post(
-    '/v1/movie/:movieId/forum/submit',
-    postController.createNewForumPost
-); // **//
-
-// Route for joining a forum
-router.post('/v1/movie/:movieId/forum/join', postController.joinNewForum); // **//
-
-// Route for leaving a forum
-// router.delete('/v1/movie/:movieId/forum/leave', postController.leaveForum); // **//
-
-// Route for all posts in a forum
-router.get('/v1/movie/:movieId/forum/posts', postController.getAllPosts); // **//
-
 module.exports = router;

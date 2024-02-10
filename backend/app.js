@@ -44,7 +44,7 @@ app.use(cookieParser());
 // app.use('/', adminRouter);
 app.use(auth);
 app.use('/v1/auth/', authRouter);
-app.use('/v1/post/', postRouter);
+app.use('/v1/forum/', postRouter);
 app.use('/', movieRouter);
 
 // error handling middleware

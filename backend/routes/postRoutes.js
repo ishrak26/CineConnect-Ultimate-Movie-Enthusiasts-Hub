@@ -3,28 +3,40 @@ const postController = require('../controllers/postController');
 
 const router = express.Router();
 
+// Route for creating a new post in a forum
+router.post('/:forumId/submit', postController.createNewForumPost); // **//
+
+// Route for joining a forum
+router.post('/:forumId/join', postController.joinNewForum); // **//
+
+// Route for leaving a forum
+// router.delete('/v1/movie/:movieId/forum/leave', postController.leaveForum); // **//
+
+// Route for all posts in a forum
+router.get('/:forumId/posts', postController.getAllPosts); // **//
+
 // Route for getting a specific post/review
-router.get('/:postId', postController.getPostById); // **//
+router.get('/:forumId/post/:postId', postController.getPostById); // **//
 
 // Route for editing a specific post/review
-router.put('/:postId', postController.editPost); // **//
+router.put('/:forumId/post/:postId', postController.editPost); // **//
 
 // Route for deleting a specific post/review
-router.delete('/:postId', postController.deletePost); // **//
+router.delete('/:forumId/post/:postId', postController.deletePost); // **//
 
 // Route for voting on a specific post/review
-router.post('/:postId/vote', postController.votePost); // **//
+router.post('/:forumId/post/:postId/vote', postController.votePost); // **//
 
 // Route for unvoting a specific post/review
-router.delete('/:postId/vote', postController.unvotePost); // **//
+router.delete('/:forumId/post/:postId/vote', postController.unvotePost); // **//
 
 // Route for getting all comments of a specific post/review/comment/reply
-// router.get('/:postId/comments', postController.getPostComments); // **//
+// router.get('/:forumId/post/:postId/comments', postController.getPostComments); // **//
 
 // Route for submitting a comment/reply for a specific post/review/comment/reply
-// router.post('/:postId/comment/submit', postController.submitComment); // **//
+// router.post('/:forumId/post/:postId/comment/submit', postController.submitComment); // **//
 
 // Route for getting total reaction count of a specific post/review
-// router.get('/:postId/reactions', postController.getPostReactions); // **//
+// router.get('/:forumId/post/:postId/reactions', postController.getPostReactions); // **//
 
 module.exports = router;
