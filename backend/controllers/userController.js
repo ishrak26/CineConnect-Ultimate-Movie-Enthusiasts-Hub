@@ -5,6 +5,9 @@ const userController = {
   
   getProfileByUsername: async (req, res) => {
     try {
+      
+        if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
         const username = req.params.username;
         const user = await db_user.getProfileByUsername(username);
         if (!user) {
