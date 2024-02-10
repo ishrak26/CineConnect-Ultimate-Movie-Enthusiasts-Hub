@@ -153,20 +153,20 @@ async function getCineFellowCount({ userId }) {
 async function followCinefellow({ userId, fellowId }) {
     try {
         // First, check if there's already a pending or accepted request
-        const { data: existingRequest, error: existingError } = await supabase
-            .from('cinefellow_request')
-            .select('id')
-            .or(`from_id.eq.${userId},to_id.eq.${fellowId}`)
-            .or(`from_id.eq.${fellowId},to_id.eq.${userId}`)
-            .in('status', ['pending', 'accepted']);
+        // const { data: existingRequest, error: existingError } = await supabase
+        //     .from('cinefellow_request')
+        //     .select('id')
+        //     .or(`from_id.eq.${userId},to_id.eq.${fellowId}`)
+        //     .or(`from_id.eq.${fellowId},to_id.eq.${userId}`)
+        //     .in('status', ['pending', 'accepted']);
 
-        if (existingError) throw existingError;
+        // if (existingError) throw existingError;
 
         // If a request already exists, prevent creating a duplicate
-        if (existingRequest.length > 0) {
-            console.log('A request already exists between these users.');
-            return false; // Indicates no new request was created
-        }
+        // if (existingRequest.length > 0) {
+        //     console.log('A request already exists between these users.');
+        //     return false; // Indicates no new request was created
+        // }
 
         // Insert the new follow request into the cinefellow_request table
         const { error: insertError } = await supabase
@@ -174,7 +174,7 @@ async function followCinefellow({ userId, fellowId }) {
             .insert([{ from_id: userId, to_id: fellowId, status: 'pending' }]);
 
         if (insertError) {
-            throw insertError;
+            throw insertError;            
         }
 
         return true; // Successfully created a new follow request
@@ -188,27 +188,20 @@ async function followCinefellow({ userId, fellowId }) {
 
 async function unfollowCinefellow({ userId, fellowId }) {
     try {
-        // Check if the user is following the fellow
-        const { data, error } = await supabase
-            .from('cinefellow')
-            .select('id')
-            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
-            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
-
-        if (error) throw error;
-
-        if (data.length === 0) {
-            return false;
-        }
 
         // Delete the cinefellow relationship
-        const { error: deleteError } = await supabase
+        const { data, error: deleteError } = await supabase
             .from('cinefellow')
             .delete()
             .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
-            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
+            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`).select();
 
         if (deleteError) throw deleteError;
+
+        if(data.length === 0) {
+            console.log('No cinefellow relationship found.');
+            return false;
+        }
 
         return true;
 
@@ -218,24 +211,24 @@ async function unfollowCinefellow({ userId, fellowId }) {
     }
 }
 
-async function isFollowing({ userId, fellowId }) {
-    try {
-        // Check if the user is following the fellow
-        const { data, error } = await supabase
-            .from('cinefellow')
-            .select('id')
-            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
-            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
+// async function isFollowing({ userId, fellowId }) {
+//     try {
+//         // Check if the user is following the fellow
+//         const { data, error } = await supabase
+//             .from('cinefellow')
+//             .select('id')
+//             .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
+//             .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
 
-        if (error) throw error;
+//         if (error) throw error;
 
-        return data.length > 0;
+//         return data.length > 0;
 
-    } catch (error) {
-        console.error('Error checking if following:', error.message);
-        throw error;
-    }
-}
+//     } catch (error) {
+//         console.error('Error checking if following:', error.message);
+//         throw error;
+//     }
+// }
 
 const getPendingRequests = async ({ userId, limit, offset }) => {
     try {
@@ -249,16 +242,7 @@ const getPendingRequests = async ({ userId, limit, offset }) => {
 
         if (incomingError) throw incomingError;
 
-        // Fetch outgoing requests
-        const { data: outgoingRequests, error: outgoingError } = await supabase
-            .from('cinefellow_request')
-            .select('*')
-            .eq('from_id', userId)
-            .eq('status', 'pending');
-
-        if (outgoingError) throw outgoingError;
-
-        return { incomingRequests, outgoingRequests };
+        return { incomingRequests };
     } catch (error) {
         console.error('Error fetching pending requests:', error.message);
         throw error;
@@ -335,7 +319,7 @@ const getWatchedMovies = async ({ userId, limit, offset}) => {
 
         if (error) throw error;
 
-        return data.map(item => item.movie_id);
+        return data.map(item => item.movie);
 
     } catch (error) {
         console.error('Error fetching watched movies:', error.message);

@@ -25,9 +25,6 @@ router.delete('/v1/movie/:movieId/rate', movieController.deleteMovieRating);
 // Route for adding a movie to a user's watchlist
 router.post('/v1/movie/:movieId/watch', movieController.addToWatchlist);
 
-// Route for removing a movie from a user's watchlist
-router.delete('/v1/movie/:movieId/watch', movieController.removeFromWatchlist);
-
 // Route for marking a movie as watched
 router.post('/v1/movie/:movieId/watched', movieController.markAsWatched);
 
