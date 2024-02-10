@@ -25,7 +25,7 @@ import React, { useEffect, useState } from "react";
 import CommentInput from "./CommentInput";
 import CommentItem from "./CommentItem";
 
-const Comments = ({ user, selectedPost, communityId }) => {
+const Comments = ({ user, selectedPost, ForumId }) => {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
   const [fetchLoading, setFetchLoading] = useState(true);
@@ -45,7 +45,7 @@ const Comments = ({ user, selectedPost, communityId }) => {
         id: commentDocRef.id,
         creatorId: user.uid,
         creatorDisplayText: user.email.split("@")[0],
-        communityId,
+        ForumId,
         postId: selectedPost.id,
         postTitle: selectedPost.title,
         text: commentText,

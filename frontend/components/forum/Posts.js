@@ -5,7 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import PostItem from "./PostItem";
 import PostLoader from "./PostLoader";
 
-const Posts = ({ communityData }) => {
+const Posts = ({ ForumData }) => {
   const [user] = useAuthState(auth);
   const [loading, setLoading] = useState(false);
   // const {
@@ -32,7 +32,7 @@ const Posts = ({ communityData }) => {
       setLoading(true);
       const postsQuery = query(
         collection(firestore, "posts"),
-        where("communityId", "==", communityData.id),
+        where("ForumId", "==", ForumData.id),
         orderBy("createTime", "desc")
       );
       const postDocs = await getDocs(postsQuery);
@@ -55,7 +55,7 @@ const Posts = ({ communityData }) => {
 
   // useEffect(() => {
   //   getPosts();
-  // }, [communityData]);
+  // }, [ForumData]);
 
   return (
     <>

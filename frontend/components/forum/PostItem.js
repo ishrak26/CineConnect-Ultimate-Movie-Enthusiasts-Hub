@@ -33,7 +33,7 @@ const PostItem = ({
   onVote,
   onDeletePost,
   onSelectPost,
-  showCommunityImage,
+  showForumImage,
 }) => {
   const [loadingImage, setLoadingImage] = useState(true);
   const [error, setError] = useState(false);
@@ -61,7 +61,7 @@ const PostItem = ({
       });
 
       if (singlePostPage) {
-        router.push(`/community/${post.communityId}`);
+        router.push(`/Forum/${post.ForumId}`);
       }
     } catch (error) {
       setError(error.message);
@@ -78,7 +78,7 @@ const PostItem = ({
   const handleShare = (event) => {
     event.stopPropagation();
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
-    const postLink = `${baseUrl}/community/${post.communityId}/comments/${post.id}`;
+    const postLink = `${baseUrl}/Forum/${post.ForumId}/comments/${post.id}`;
     setValue(postLink);
     onCopy();
 
@@ -132,7 +132,7 @@ const PostItem = ({
       {/* Right Section  */}
       <Flex direction="column" width="100%">
         <Stack spacing={1} p="10px">
-          <PostDetails showCommunityImage={true} post={post} />
+          <PostDetails showForumImage={true} post={post} />
           <PostTitle post={post} />
           <PostBody
             post={post}
@@ -166,7 +166,7 @@ const VoteSection = ({ userVoteValue, onVote, post }) => {
         fontSize={22}
         cursor="pointer"
         _hover={{ color: "red.300" }}
-        onClick={(event) => onVote(event, post, 1, post.communityId)}
+        onClick={(event) => onVote(event, post, 1, post.ForumId)}
       />
       <Text fontSize="12pt" color="gray.600">
         {post.voteStatus}
@@ -177,34 +177,34 @@ const VoteSection = ({ userVoteValue, onVote, post }) => {
         _hover={{ color: "red.300" }}
         fontSize={22}
         cursor="pointer"
-        onClick={(event) => onVote(event, post, -1, post.communityId)}
+        onClick={(event) => onVote(event, post, -1, post.ForumId)}
       />
     </>
   );
 };
 
 
-const PostDetails = ({ showCommunityImage, post }) => {
+const PostDetails = ({ showForumImage, post }) => {
   const topText = `By ${post.creatorUsername} ${moment(new Date(post.createTime.seconds * 1000)).fromNow()}`;
 
   return (
     <Stack direction="row" spacing={0.5} align="center" fontSize="9pt">
-      {showCommunityImage && (
+      {showForumImage && (
         <>
-          {post.communityImageURL ? (
+          {post.ForumImageURL ? (
             <Image
               borderRadius="full"
               boxSize="18px"
-              src={post.communityImageURL}
+              src={post.ForumImageURL}
               mr={2}
-              alt="Community logo"
+              alt="Forum logo"
             />
           ) : (
             <Icon as={IoPeopleCircleOutline} mr={1} fontSize="18pt" color="red.500" />
           )}
-          <Link href={`/community/${post.communityId}`} isExternal>
+          <Link href={`/Forum/${post.ForumId}`} isExternal>
             <Text fontWeight={700} _hover={{ textDecoration: "underline" }} pr={2}>
-              {post.communityId}
+              {post.ForumId}
             </Text>
           </Link>
         </>

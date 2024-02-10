@@ -8,8 +8,8 @@ import { Alert, AlertIcon, Button, Flex, Icon, Stack, Text } from '@chakra-ui/re
 import { useRouter } from 'next/router';
 import { IoDocumentText, IoImageOutline } from 'react-icons/io5';
 import { MdOutlineArrowBackIos } from 'react-icons/md';
-import ImageUpload from './PostForm/ImageUpload';
-import TextInputs from './PostForm/TextInputs';
+import ImageUpload from './ImageUpload';
+import TextInputs from './TextInputs';
 import TabItem from './TabItem';
 
 const formTabs = [
@@ -23,7 +23,7 @@ const formTabs = [
   },
 ];
 
-const NewPostForm = ({ user, communityImageURL, currentCommunity }) => {
+const NewPostForm = ({ user, ForumImageURL, currentForum}) => {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState(formTabs[0].title);
   const [textInputs, setTextInputs] = useState({
@@ -34,13 +34,13 @@ const NewPostForm = ({ user, communityImageURL, currentCommunity }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const showToast = useCustomToast();
-  const communityLink = `/community/${currentCommunity?.id}`;
+  const ForumLink = `/Forum/${currentForum?.id}`;
 
   const handleCreatePost = async () => {
-    const { communityId } = router.query;
+    const { ForumId } = router.query;
     const newPost = {
-      communityId: communityId,
-      communityImageURL: communityImageURL || '',
+      ForumId: ForumId,
+      ForumImageURL: ForumImageURL || '',
       creatorId: user?.uid,
       creatorUsername: user.email.split('@')[0],
       title: textInputs.title,
@@ -62,7 +62,7 @@ const NewPostForm = ({ user, communityImageURL, currentCommunity }) => {
           imageURL: downloadURL,
         });
       }
-      router.push(communityLink);
+      router.push(ForumLink);
     } catch (error) {
       console.error('Error creating post: ', error);
       showToast({
@@ -91,7 +91,7 @@ const NewPostForm = ({ user, communityImageURL, currentCommunity }) => {
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}
       />
-      <BackToCommunityButton communityId={currentCommunity?.id} />
+      <BackToForumButton ForumId={currentForum?.id} />
       <PostBody
         selectedTab={selectedTab}
         handleCreatePost={handleCreatePost}
@@ -129,15 +129,15 @@ const TabList = ({ formTabs, selectedTab, setSelectedTab }) => {
   );
 };
 
-// BackToCommunityButton.js
+// BackToForumButton.js
 import React from 'react';
 import { Button, Icon } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { MdOutlineArrowBackIos } from 'react-icons/md';
 
-const BackToCommunityButton = ({ communityId }) => {
+const BackToForumButton = ({ ForumId }) => {
   const router = useRouter();
-  const communityLink = `/community/${communityId}`;
+  const ForumLink = `/Forum/${ForumId}`;
 
   return (
     <Button
@@ -147,10 +147,10 @@ const BackToCommunityButton = ({ communityId }) => {
       mr={4}
       justifyContent="left"
       width="fit-content"
-      onClick={() => router.push(communityLink)}
+      onClick={() => router.push(ForumLink)}
     >
       <Icon as={MdOutlineArrowBackIos} mr={2} />
-      {`Back to ${communityId}`}
+      {`Back to ${ForumId}`}
     </Button>
   );
 };
@@ -208,5 +208,5 @@ const PostCreateError = ({ error }) => {
   );
 };
 
-export { TabList, BackToCommunityButton, PostBody, PostCreateError };
+export { TabList, BackToForumButton, PostBody, PostCreateError };
 

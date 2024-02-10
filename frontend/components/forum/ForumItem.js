@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { IoPeopleCircleOutline } from "react-icons/io5";
 
-const CommunityItem = ({ community, isJoined, onJoinOrLeaveCommunity }) => {
+const ForumItem = ({ Forum, isJoined, onJoinOrLeaveForum }) => {
   const router = useRouter();
 
   return (
@@ -22,7 +22,7 @@ const CommunityItem = ({ community, isJoined, onJoinOrLeaveCommunity }) => {
       }}
       cursor="pointer"
       onClick={() => {
-        router.push(`/community/${community.id}`);
+        router.push(`/Forum/${Forum.id}`);
       }}
       shadow="md"
     >
@@ -31,10 +31,10 @@ const CommunityItem = ({ community, isJoined, onJoinOrLeaveCommunity }) => {
         flexGrow={1}
         align="left"
       >
-        <CommunityItemNameIconSection community={community} />
-        <CommunityItemButtonMembersSection
-          community={community}
-          onJoinOrLeaveCommunity={onJoinOrLeaveCommunity}
+        <ForumItemNameIconSection Forum={Forum} />
+        <ForumItemButtonMembersSection
+          Forum={Forum}
+          onJoinOrLeaveForum={onJoinOrLeaveForum}
           isJoined={isJoined}
         />
       </Stack>
@@ -42,19 +42,19 @@ const CommunityItem = ({ community, isJoined, onJoinOrLeaveCommunity }) => {
   );
 };
 
-export default CommunityItem;
+export default ForumItem;
 
-const CommunityItemNameIconSection = ({ community }) => {
+const ForumItemNameIconSection = ({ Forum }) => {
   return (
     <Flex align="center" width="100%">
       <Flex align="center" direction="row">
-        {community.imageURL ? (
+        {Forum.imageURL ? (
           <Image
-            src={community.imageURL}
+            src={Forum.imageURL}
             borderRadius="full"
             boxSize="35px"
             mr={4}
-            alt="Community Icon"
+            alt="Forum Icon"
           />
         ) : (
           <Icon
@@ -64,15 +64,15 @@ const CommunityItemNameIconSection = ({ community }) => {
             mr={4}
           />
         )}
-        <Text fontSize={16}>{community.id}</Text>
+        <Text fontSize={16}>{Forum.id}</Text>
       </Flex>
     </Flex>
   );
 };
 
-const CommunityItemButtonMembersSection = ({
-  community,
-  onJoinOrLeaveCommunity,
+const ForumItemButtonMembersSection = ({
+  Forum,
+  onJoinOrLeaveForum,
   isJoined,
 }) => {
   return (
@@ -85,7 +85,7 @@ const CommunityItemButtonMembersSection = ({
         mr={2}
       >
         <Icon as={BsFillPeopleFill} mr={1} />
-        {community.numberOfMembers}
+        {Forum.numberOfMembers}
       </Flex>
       <Button
         height="30px"
@@ -95,7 +95,7 @@ const CommunityItemButtonMembersSection = ({
         onClick={(event) => {
           event.preventDefault();
           event.stopPropagation(); // stop the event from bubbling up
-          onJoinOrLeaveCommunity(community, isJoined);
+          onJoinOrLeaveForum(Forum, isJoined);
         }}
       >
         {isJoined ? "Unsubscribe" : "Subscribe"}

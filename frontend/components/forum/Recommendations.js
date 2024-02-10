@@ -4,7 +4,7 @@ import { Flex, Icon, Link, Skeleton, SkeletonCircle, Stack, Image, Text, Box, Bu
 import { useRouter } from "next/router";
 import { IoPeopleCircleOutline } from "react-icons/io5";
 // import { firestore } from "./firebase/clientApp"; 
-// import useCommunityData from "./useCommunityData"; 
+// import useForumData from "./useForumData"; 
 import useCustomToast from "../../hooks/useCustomToast";
 
 const Recommendations = () => {
@@ -20,7 +20,7 @@ const Recommendations = () => {
     >
       <SuggestionsHeader />
       <Flex direction="column" mb={2}>
-        <SuggestedCommunitiesList />
+        <SuggestedForumsList />
       </Flex>
     </Flex>
   );
@@ -39,35 +39,35 @@ const SuggestionsHeader = () => {
       backgroundSize="cover"
       bgGradient="linear(to bottom, rgba(139, 0, 0, 0), rgba(139, 0, 0, 0.75)), url('/images/banners/large.png')"
     >
-      Top Communities
+      Top Forums
     </Flex>
   );
 };
 
-const SuggestedCommunitiesList = () => {
-//   const { communityStateValue, onJoinOrLeaveCommunity } = useCommunityData();
-    const { communityStateValue, onJoinOrLeaveCommunity } = [];
+const SuggestedForumsList = () => {
+//   const { ForumStateValue, onJoinOrLeaveForum } = useForumData();
+    const { ForumStateValue, onJoinOrLeaveForum } = [];
   const [loading, setLoading] = useState(false);
-  const [communities, setCommunities] = useState([]);
+  const [Forums, setForums] = useState([]);
   const router = useRouter();
   const showToast = useCustomToast();
 
-  const getCommunityRecommendations = async () => {
+  const getForumRecommendations = async () => {
     setLoading(true);
     try {
-    //   const communityQuery = query(collection(firestore, "communities"), orderBy("numberOfMembers", "desc"), limit(5));
-    //   const communityDocs = await getDocs(communityQuery);
-    //   const communities = communityDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    //   setCommunities(communities);
+    //   const ForumQuery = query(collection(firestore, "Forums"), orderBy("numberOfMembers", "desc"), limit(5));
+    //   const ForumDocs = await getDocs(ForumQuery);
+    //   const Forums = ForumDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    //   setForums(Forums);
     } catch (error) {
-      console.log("Error: getCommunityRecommendations", error);
+      console.log("Error: getForumRecommendations", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    getCommunityRecommendations();
+    getForumRecommendations();
   }, []);
 
   return (
@@ -85,12 +85,12 @@ const SuggestedCommunitiesList = () => {
         </Stack>
       ) : (
         <>
-          {communities.map((item, index) => {
-            const isJoined = !!communityStateValue.mySnippets.find(
-              (snippet) => snippet.communityId === item.id
+          {Forums.map((item, index) => {
+            const isJoined = !!ForumStateValue.mySnippets.find(
+              (snippet) => snippet.ForumId === item.id
             );
             return (
-              <Link key={item.id} href={`/community/${item.id}`}>
+              <Link key={item.id} href={`/Forum/${item.id}`}>
                 <Flex
                   key={item.id}
                   align="center"
@@ -110,7 +110,7 @@ const SuggestedCommunitiesList = () => {
                           borderRadius="full"
                           boxSize="28px"
                           mr={2}
-                          alt="Community Icon"
+                          alt="Forum Icon"
                         />
                       ) : (
                         <Icon
@@ -120,7 +120,7 @@ const SuggestedCommunitiesList = () => {
                           mr={1}
                         />
                       )}
-                      {/* show dots when community name doesnt fit */}
+                      {/* show dots when Forum name doesnt fit */}
                       <span
                         style={{
                           whiteSpace: "nowrap",
@@ -140,7 +140,7 @@ const SuggestedCommunitiesList = () => {
                       variant={isJoined ? "outline" : "solid"}
                       onClick={(event) => {
                         event.preventDefault();
-                        onJoinOrLeaveCommunity(item, isJoined);
+                        onJoinOrLeaveForum(item, isJoined);
                       }}
                     >
                       {isJoined ? "Unsubscribe" : "Subscribe"}
@@ -157,7 +157,7 @@ const SuggestedCommunitiesList = () => {
           height="30px"
           width="100%"
           onClick={() => {
-            router.push(`/communities`);
+            router.push(`/Forums`);
           }}
         >
           View All

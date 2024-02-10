@@ -5,7 +5,7 @@ import React from "react";
  * Creates a layout for the main content page.
  * The page is separated into 2 sections (array of 2):
  *  - Left: main content such as the list of posts
- *  - Right: extra content such as community descriptions, etc
+ *  - Right: extra content such as Forum descriptions, etc
  *
  * The layout is responsive which means that in mobile screen sizes,
  * the right layout will be removed.

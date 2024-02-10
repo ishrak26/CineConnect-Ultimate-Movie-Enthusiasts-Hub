@@ -1,16 +1,16 @@
 import { Button, Flex, Image, Stack, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
-// import CreateCommunityModal from "../Modal/CreateCommunity/CreateCommunityModal";
-// import { communityState } from "@/atoms/communitiesAtom";
+// import CreateForumModal from "../Modal/CreateForum/CreateForumModal";
+// import { ForumState } from "@/atoms/ForumsAtom";
 
 /**
- * Component for displaying card for creating a new community or post.
- * @returns Card for creating a new community or post.
+ * Component for displaying card for creating a new Forum or post.
+ * @returns Card for creating a new Forum or post.
  */
 const PersonalHome = () => {
   const [open, setOpen] = useState(false); // modal initially closed
-//   const mySnippets = useRecoilValue(communityState).mySnippets;   // Updates automatically when mySnippets changes
+//   const mySnippets = useRecoilValue(ForumState).mySnippets;   // Updates automatically when mySnippets changes
 const mySnippets = [];
 
 //   const { onClick } = useCallCreatePost();
@@ -18,7 +18,7 @@ const onClick = () => {};
 
   return (
     <>
-      {/* <CreateCommunityModal open={open} handleClose={() => setOpen(false)} /> */}
+      {/* <CreateForumModal open={open} handleClose={() => setOpen(false)} /> */}
       <Flex
         direction="column"
         bg="white"
@@ -52,7 +52,7 @@ const onClick = () => {};
           </Flex>
           <Stack spacing={3}>
             <Text fontSize="9pt">
-              Home page personalized based on your subscribed communities.
+              Home page personalized based on your subscribed Forums.
             </Text>
             <Button height="30px" onClick={onClick}>
               Create Post
@@ -62,7 +62,7 @@ const onClick = () => {};
               height="30px"
               onClick={() => setOpen(true)}
             >
-              Create Community
+              Create Forum
             </Button>
           </Stack>
         </Flex>

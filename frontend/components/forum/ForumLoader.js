@@ -1,7 +1,7 @@
 import { Flex, SkeletonCircle, Skeleton } from "@chakra-ui/react";
 import React from "react";
 
-const CommunityLoader = () => (
+const ForumLoader = () => (
   <Flex
     bg="white"
     justify="space-between"
@@ -15,4 +15,4 @@ const CommunityLoader = () => (
   </Flex>
 );
 
-export default CommunityLoader;
+export default ForumLoader;
