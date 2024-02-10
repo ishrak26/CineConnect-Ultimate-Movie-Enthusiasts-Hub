@@ -188,7 +188,7 @@ const postController = {
             const limit = req.query.limit || 10;
             const offset = req.query.offset || 0;
             const posts = await dbPost.fetchPostsByMovieId(
-                movieId,
+                forumId,
                 parseInt(limit),
                 parseInt(offset)
             );
@@ -477,7 +477,46 @@ const postController = {
         }
     },
 
-    // Add more methods as per your API documentation...
+    getUserId : async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            res.status(200).json({ userId: req.user.id });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    
+    getForumById: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const forumId = req.params.forumId;
+            const forum = await dbPost.fetchForumById(forumId);
+
+            if (forum) {
+                const data = {
+                    forumId: forumId,
+                    title: forum.title,
+                    description: forum.plot_summary,
+                    image_url: forum.poster_url,
+                    createdAt: forum.release_date,    
+                };
+                res.status(200).json(data);
+            } else {
+                res.status(404).json({ message: 'Forum not found' });
+            }
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    
 };
 
 module.exports = postController;

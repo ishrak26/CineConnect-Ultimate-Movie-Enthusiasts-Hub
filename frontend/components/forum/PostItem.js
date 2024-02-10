@@ -78,7 +78,7 @@ const PostItem = ({
   const handleShare = (event) => {
     event.stopPropagation();
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
-    const postLink = `${baseUrl}/Forum/${post.ForumId}/comments/${post.id}`;
+    const postLink = `${baseUrl}/forum/${post.ForumId}/comments/${post.id}`;
     setValue(postLink);
     onCopy();
 
@@ -217,7 +217,7 @@ const PostDetails = ({ showForumImage, post }) => {
 const PostTitle = ({ post }) => {
   return (
     <Text fontSize="12pt" fontWeight={600}>
-      {post.title}
+      {/* {post.title} */}
     </Text>
   );
 };
@@ -228,16 +228,16 @@ const PostBody = ({ post, loadingImage, setLoadingImage }) => {
   return (
     <>
       <Text fontSize="12pt">
-        {post.body.split(" ").slice(0, 30).join(" ")}
+        {post.content.split(" ").slice(0, 30).join(" ")}
       </Text>
-      {post.imageURL && (
+      {post.image_url && (
         <Flex justify="center" align="center">
           {loadingImage && (
             <Skeleton height="300px" width="100%" borderRadius={10} />
           )}
           <Image
             mt={4}
-            src={post.imageURL}
+            src={post.image_url}
             alt="Image for post"
             maxHeight="450px"
             maxWidth="100%"

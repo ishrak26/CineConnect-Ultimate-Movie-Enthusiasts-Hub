@@ -1,15 +1,16 @@
-import CreatePostLink from "../components/forum/CreatePostLink";
-import PersonalHome from "../components/forum/PersonalHome";
-import Recommendations from "../components/forum/Recommendations";
-import PageContent from "../components/forum/PageContent";
-import PostLoader from "../components/forum/PostLoader";
-import PostItem from "../components/forum/PostItem";
+import CreatePostLink from "@components/forum/CreatePostLink";
+import PersonalHome from "@components/forum/PersonalHome";
+import Recommendations from "@components/forum/Recommendations";
+import PageContent from "@components/forum/PageContent";
+import PostLoader from "@components/forum/PostLoader";
+import PostItem from "@components/forum/PostItem";
 import { Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ChakraProvider } from "@chakra-ui/react";
-import { theme } from "../theme/theme";
+import { theme } from "@theme/theme";
 import Navbar from "@components/navbar";
 import BaseLayout from "@components/BaseLayout";
+import Head from 'next/head'
 
 
 export default function Home() {
@@ -163,6 +164,20 @@ const onDeletePost = () => {}
   return (
     
     <ChakraProvider theme={theme}>
+     <Head>
+        <title>Forums &mdash; CineConnect</title>
+        <meta
+          name="description"
+          content="Millions of movies, TV shows and people to discover. Explore now."
+        />
+        <meta
+          name="keywords"
+          content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
+        />
+
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+      </Head>
+
       <Navbar />
      <BaseLayout> 
     <PageContent>
@@ -197,4 +212,56 @@ const onDeletePost = () => {}
     </BaseLayout>
     </ChakraProvider>
   );
+}
+
+export async function getServerSideProps({ query }) {
+
+  let response
+  const limit = 9
+  const offset = (query.page - 1) * limit || 0
+
+  if (query.with_genres) {
+    response = await fetch(
+      `http://localhost:4000/v1/genre/${query.with_genres}/movies?limit=${limit}&offset=${offset}`
+    ).then((res) => res.json())
+  } else {
+    response = await fetch(
+      `http://localhost:4000/v1/movies?limit=${limit}&offset=${offset}`
+    ).then((res) => res.json())
+  }
+
+  if (response.status === 404) {
+    return {
+      notFound: true,
+    }
+  }
+
+  if (response.success === false) {
+    return {
+      props: {
+        error: {
+          statusCode: response.status,
+          statusMessage: response.errors[0] || response.status_message,
+        },
+      },
+    }
+  }
+
+  // const { data: genresData } = await tmdb.get('/genre/movie/list')
+  const genres = await fetch(`http://localhost:4000/v1/genres`).then((res) =>
+    res.json()
+  )
+
+  const totalMovies = await fetch(`http://localhost:4000/v1/movies/count`).then(
+    (res) => res.json()
+  )
+
+  return {
+    props: {
+      data: response,
+      genres: genres,
+      query,
+      totalMovies: totalMovies.count,
+    },
+  }
 }

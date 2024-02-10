@@ -246,6 +246,22 @@ async function fetchTotalMemberCountInForum(forumId) {
     return count;
 }
 
+async function fetchForumById(forumId) {
+
+    const { data, error } = await supabase
+        .from('movie')
+        .select('id, title, poster_url, release_date, plot_summary')
+        .eq('id', forumId)
+        .single();
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
 module.exports = {
     createNewPost,
     isJoinedForumByForumId,
@@ -258,4 +274,5 @@ module.exports = {
     isJoinedForumByPostId,
     removeVote,
     fetchTotalMemberCountInForum,
+    fetchForumById,
 };

@@ -45,4 +45,11 @@ router.delete('/:forumId/post/:postId/vote', postController.unvotePost); // **//
 // Route for getting total reaction count of a specific post/review
 // router.get('/:forumId/post/:postId/reactions', postController.getPostReactions); // **//
 
+
+// Route for getting userId from request
+router.get('/user', postController.getUserId); // **//
+
+// Route for getting information about a specific forum by forumId
+router.get('/:forumId', postController.getForumById); // **//
+
 module.exports = router;
