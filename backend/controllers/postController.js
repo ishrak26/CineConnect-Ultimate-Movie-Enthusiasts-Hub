@@ -83,7 +83,8 @@ const postController = {
                     .json({ message: 'User not a member of the forum' });
             }
 
-            const { content, images } = req.body;
+            const { content } = req.body;
+            let { images } = req.body;
             if (!content) {
                 return res
                     .status(400)
@@ -105,6 +106,8 @@ const postController = {
                     }
                     image.caption = image.caption || '';
                 }
+            } else {
+                images = [];
             }
 
             const newPost = await dbPost.createNewPost(
@@ -473,6 +476,71 @@ const postController = {
             }
         } catch (error) {
             console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    submitComment: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const { content } = req.body;
+            let { images } = req.body;
+            if (!content) {
+                return res
+                    .status(400)
+                    .json({ message: 'Content cannot be empty' });
+            }
+
+            if (images) {
+                // sanitize images
+                if (!Array.isArray(images)) {
+                    return res
+                        .status(400)
+                        .json({ message: 'Images must be an array' });
+                }
+                for (let image of images) {
+                    if (!image.image_url) {
+                        return res
+                            .status(400)
+                            .json({ message: 'Image URL cannot be empty' });
+                    }
+                    image.caption = image.caption || '';
+                }
+            } else {
+                images = [];
+            }
+
+            const newPost = await dbPost.createNewComment(
+                userId,
+                req.params.postId,
+                content,
+                images
+            );
+            if (!newPost) {
+                return res
+                    .status(500)
+                    .json({ message: 'Failed to create new comment' });
+            }
+            res.status(201).json({
+                success: true,
+            });
+        } catch (error) {
+            console.log(error.message);
             res.status(500).json({ message: 'Internal server error' });
         }
     },

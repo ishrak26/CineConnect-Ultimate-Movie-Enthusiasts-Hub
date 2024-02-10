@@ -40,7 +40,10 @@ router.delete('/:forumId/post/:postId/vote', postController.unvotePost); // **//
 // router.get('/:forumId/post/:postId/comments', postController.getPostComments); // **//
 
 // Route for submitting a comment/reply for a specific post/review/comment/reply
-// router.post('/:forumId/post/:postId/comment/submit', postController.submitComment); // **//
+router.post(
+    '/:forumId/post/:postId/comment/submit',
+    postController.submitComment
+); // **//
 
 // Route for getting total reaction count of a specific post/review
 // router.get('/:forumId/post/:postId/reactions', postController.getPostReactions); // **//

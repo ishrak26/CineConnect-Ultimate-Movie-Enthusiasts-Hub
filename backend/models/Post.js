@@ -96,6 +96,31 @@ async function createNewPost(userId, movieId, content, images) {
     }
 }
 
+async function createNewComment(userId, parentId, content, images) {
+    // Convert images array to JSONB format expected by the PostgreSQL function
+    // const imagesJsonb = JSON.stringify(images);
+
+    try {
+        const { data, error } = await supabase.rpc('create_new_comment', {
+            user_id: userId,
+            parent_id: parentId,
+            content: content,
+            images,
+            // images: imagesJsonb,
+        });
+
+        if (error) {
+            console.error('Error creating new comment:', error.message);
+            return null;
+        }
+
+        // console.log('Returning from createNewCommentt: new post ID:', data);
+        return data;
+    } catch (err) {
+        console.error('Exception creating new comment:', err.message);
+    }
+}
+
 async function isJoinedForumByForumId(userId, forumId) {
     const { count, error } = await supabase
         .from('watched_list')
@@ -258,4 +283,5 @@ module.exports = {
     isJoinedForumByPostId,
     removeVote,
     fetchTotalMemberCountInForum,
+    createNewComment,
 };
