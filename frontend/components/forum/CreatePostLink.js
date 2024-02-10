@@ -35,13 +35,13 @@ const onClick = () => {};
         _hover={{
           bg: "white",
           border: "1px solid",
-          borderColor: "red.500",
+          borderColor: "black",
         }}
         _focus={{
           outline: "none",
           bg: "white",
           border: "1px solid",
-          borderColor: "red.500",
+          borderColor: "black",
         }}
         bg="gray.50"
         borderColor="gray.200"

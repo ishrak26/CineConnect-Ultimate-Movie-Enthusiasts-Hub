@@ -37,18 +37,18 @@ const onClick = () => {};
           height="34px"
           borderRadius="10px 10px 0px 0px"
           fontWeight={600}
-          bgImage="url(/images/banners/small.jpg)"
+          bgImage="url(/small.jpg)"
           backgroundSize="cover"
         ></Flex>
         <Flex direction="column" p="12px">
           <Flex align="center" mb={2}>
             <Image
-              src="/images/logo.svg"
+              src="/LogoB.png"
               height="50px"
               alt="Website logo"
               mr={2}
             />
-            <Text fontWeight={600}>Home</Text>
+            <Text fontWeight={600} className="mx-10">Home</Text>
           </Flex>
           <Stack spacing={3}>
             <Text fontSize="9pt">

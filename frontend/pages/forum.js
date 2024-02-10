@@ -8,6 +8,9 @@ import { Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "../theme/theme";
+import Navbar from "@components/navbar";
+import BaseLayout from "@components/BaseLayout";
+
 
 export default function Home() {
 
@@ -158,7 +161,10 @@ const onDeletePost = () => {}
   // }, [user, postStateValue.posts]);
 
   return (
+    
     <ChakraProvider theme={theme}>
+      <Navbar />
+     <BaseLayout> 
     <PageContent>
       <>
         <CreatePostLink />
@@ -188,6 +194,7 @@ const onDeletePost = () => {}
         <PersonalHome />
       </Stack>
     </PageContent>
+    </BaseLayout>
     </ChakraProvider>
   );
 }
