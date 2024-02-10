@@ -377,10 +377,32 @@ const searchProfilesByUsername = async ({ username , limit, offset}) => {
         if (error) throw error;
 
         return data;
-
     } catch (error) {
         console.error('Error searching profiles:', error.message);
         throw error;
+    }
+};
+
+async function fetchJoinedForums(userId, limit, offset) {
+    try {
+        console.log('Fetching joined forums:', userId, limit, offset);
+
+        const { data, error } = await supabase.rpc('get_joined_forums', {
+            uid: userId,
+            limit_val: limit,
+            offset_val: offset,
+        });
+
+        if (error) {
+            console.error('Error fetching joined forums:', error.message);
+            return null;
+        }
+
+        // console.log('Joined forums:', data);
+        return data;
+    } catch (err) {
+        console.error('Exception fetching joined forums:', err.message);
+        return null;
     }
 }
 
@@ -401,4 +423,5 @@ module.exports = {
     getWatchlist,
     removeFromWatchlist,
     searchProfilesByUsername,
+    fetchJoinedForums,
 };

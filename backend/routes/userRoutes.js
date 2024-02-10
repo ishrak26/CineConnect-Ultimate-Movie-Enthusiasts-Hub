@@ -36,4 +36,7 @@ router.delete('/:username/watchlist', userController.removeFromWatchlist);
 // Route for searching profiles by username
 router.get('/:username/search', userController.searchProfilesByUsername);
 
+// Route to get user joined forums
+router.get('/:username/forums', userController.getUserJoinedForums);
+
 module.exports = router;

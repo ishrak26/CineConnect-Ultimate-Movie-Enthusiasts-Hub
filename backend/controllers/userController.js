@@ -345,6 +345,55 @@ const userController = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
+
+
+    getUserJoinedForums: async (req, res) => {
+        try {
+            const username = req.params.username;
+            const user = await db_user.findOne({ username });
+            const userId = user ? user.id : null;
+
+            // If user not found
+            if (!userId) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
+            const forums = await db_user.fetchJoinedForums(
+                userId,
+                parseInt(limit),
+                parseInt(offset)
+            );
+
+            if (!forums) {
+                return res.status(404).json({ message: 'Forums not found.' });
+            }
+
+            /*
+            e.g. forums = [
+                {
+                    movie_id: 'abc',
+                    title: 'Movie Title',
+                    poster_url: 'https://image.tmdb.org/t/p/w500/abc.jpg',
+                    member_count: 10
+                },
+                {
+                    movie_id: 'def',
+                    title: 'Movie Title 2',
+                    poster_url: 'https://image.tmdb.org/t/p/w500/def.jpg',
+                    member_count: 20
+                }
+            ]
+            */
+
+            res.status(200).json({ forums });
+        } catch (error) {
+            console.error('Failed to fetch joined forums:', error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
 };
 
 module.exports = userController;
