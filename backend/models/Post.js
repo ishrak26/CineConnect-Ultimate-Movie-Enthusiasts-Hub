@@ -30,45 +30,23 @@ async function fetchSinglePostById(postId, imgLimit) {
     }
 }
 
-async function fetchReactionsByPostId(postId) {
-    // Count upvotes
-    const { count: upvoteCount, error: upvotesError } = await supabase
-        .from('post_has_reaction')
-        .select('*', { count: 'exact' })
-        .eq('post_id', postId)
-        .eq('type', 'upvote');
+async function fetchPostReactionCount(postId) {
+    try {
+        const { data, error } = await supabase.rpc('get_post_reaction_count', {
+            pid: postId,
+        });
 
-    // Count downvotes
-    const { count: downvotesCount, error: downvotesError } = await supabase
-        .from('post_has_reaction')
-        .select('*', { count: 'exact' })
-        .eq('post_id', postId)
-        .eq('type', 'downvote');
+        if (error || data.length !== 1) {
+            console.error('Error fetching post reaction count:', error.message);
+            return null;
+        }
 
-    // Assuming comments are stored in a way that they can be counted for a given post
-    // Replace 'comments_table' with the actual table name and 'post_id' with the actual foreign key column name if different
-    const { data: commentsData, error: commentsError } = await supabase
-        .from('comments_table') // Replace 'comments_table' with your actual table name
-        .select('*', { count: 'exact' })
-        .eq('parent_id', postId);
-
-    if (upvotesError || downvotesError || commentsError) {
-        console.error(
-            'Error fetching post statistics:',
-            upvotesError || downvotesError || commentsError
-        );
+        // console.log('Post reaction count:', data);
+        return data[0];
+    } catch (err) {
+        console.error('Exception fetching post reaction count:', err.message);
         return null;
     }
-
-    const statistics = {
-        postId: postId,
-        upvotes: upvotesData.count,
-        downvotes: downvotesData.count,
-        comments: commentsData.count, // Assuming this is the count of comments and replies together
-    };
-
-    console.log('Post statistics:', statistics);
-    return statistics;
 }
 
 async function createNewPost(userId, movieId, content, images) {
@@ -284,4 +262,5 @@ module.exports = {
     removeVote,
     fetchTotalMemberCountInForum,
     createNewComment,
+    fetchPostReactionCount,
 };

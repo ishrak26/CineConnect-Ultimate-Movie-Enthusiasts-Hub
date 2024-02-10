@@ -52,10 +52,28 @@ const postController = {
 
     getReactionsByPostId: async (req, res) => {
         try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
             const postId = req.params.postId;
-            const reactions = await dbPost.fetchReactionsByPostId(postId);
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const reactions = await dbPost.fetchPostReactionCount(postId);
             if (reactions) {
-                res.json(reactions);
+                reactions.upvotes = reactions.upvotes || 0;
+                reactions.downvotes = reactions.downvotes || 0;
+                reactions.total_comments = reactions.total_comments || 0;
+                res.status(200).json(reactions);
             } else {
                 res.status(404).json({ message: 'Reactions not found' });
             }

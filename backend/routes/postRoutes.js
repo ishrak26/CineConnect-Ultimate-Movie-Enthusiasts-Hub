@@ -46,6 +46,9 @@ router.post(
 ); // **//
 
 // Route for getting total reaction count of a specific post/review
-// router.get('/:forumId/post/:postId/reactions', postController.getPostReactions); // **//
+router.get(
+    '/:forumId/post/:postId/reactions',
+    postController.getReactionsByPostId
+); // **//
 
 module.exports = router;
