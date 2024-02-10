@@ -37,7 +37,7 @@ router.post('/:forumId/post/:postId/vote', postController.votePost); // **//
 router.delete('/:forumId/post/:postId/vote', postController.unvotePost); // **//
 
 // Route for getting all comments of a specific post/review/comment/reply
-// router.get('/:forumId/post/:postId/comments', postController.getPostComments); // **//
+router.get('/:forumId/post/:postId/comments', postController.getAllComments); // **//
 
 // Route for submitting a comment/reply for a specific post/review/comment/reply
 router.post(

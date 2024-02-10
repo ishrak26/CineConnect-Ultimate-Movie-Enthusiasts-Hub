@@ -186,6 +186,27 @@ async function fetchPostsByMovieId(movieId, limit, offset) {
     }
 }
 
+async function fetchCommentsByPostId(postId, limit, offset) {
+    try {
+        const { data, error } = await supabase.rpc('get_paginated_comments', {
+            p_id: postId,
+            post_limit: limit,
+            post_offset: offset,
+        });
+
+        if (error) {
+            console.error('Error fetching comments by postId:', error.message);
+            return null;
+        }
+
+        // console.log('Returning from fetchPostsByMovieId:', data);
+
+        return data;
+    } catch (err) {
+        console.error('Exception fetching comments by postId:', err.message);
+    }
+}
+
 async function fetchPostVoteByUser(postId, userId) {
     const { data, error } = await supabase
         .from('post_has_reaction')
@@ -263,4 +284,5 @@ module.exports = {
     fetchTotalMemberCountInForum,
     createNewComment,
     fetchPostReactionCount,
+    fetchCommentsByPostId,
 };

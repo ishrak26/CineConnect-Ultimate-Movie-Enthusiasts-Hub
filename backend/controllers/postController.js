@@ -209,7 +209,7 @@ const postController = {
             const limit = req.query.limit || 10;
             const offset = req.query.offset || 0;
             const posts = await dbPost.fetchPostsByMovieId(
-                movieId,
+                forumId,
                 parseInt(limit),
                 parseInt(offset)
             );
@@ -234,6 +234,58 @@ const postController = {
                 res.status(200).json(data);
             } else {
                 res.status(404).json({ message: 'Posts not found' });
+            }
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getAllComments: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const limit = req.query.limit || 10;
+            const offset = req.query.offset || 0;
+            const comments = await dbPost.fetchCommentsByPostId(
+                req.params.postId,
+                parseInt(limit),
+                parseInt(offset)
+            );
+            if (comments) {
+                const data = [];
+                const contentLimit = parseInt(req.query.contentLimit) || 500;
+                for (let comment of comments) {
+                    data.push({
+                        postId: comment.post_id,
+                        author: {
+                            id: comment.author_id,
+                            username: comment.username,
+                            image_url: comment.user_image_url,
+                        },
+                        content: comment.content.substring(0, contentLimit),
+                        contentFull: comment.content.length <= contentLimit,
+                        totalImages: comment.total_images,
+                        topImage: comment.top_post_image_url,
+                        created_at: comment.created_at,
+                    });
+                }
+                res.status(200).json(data);
+            } else {
+                res.status(404).json({ message: 'Comments/replies not found' });
             }
         } catch (error) {
             console.log(error.message);
