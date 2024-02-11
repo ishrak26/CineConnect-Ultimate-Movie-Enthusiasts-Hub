@@ -27,6 +27,8 @@ export default function Home({ data, type, casts, cookie }) {
   const [userRated, setUserRated] = useState(false)
   const [isWatched, setIsWatched] = useState(false)
 
+  const router = useRouter()
+
   useEffect(() => {
     const getUserRating = async () => {
       const response = await fetch(
@@ -88,7 +90,6 @@ export default function Home({ data, type, casts, cookie }) {
   const handleClickForum = () => {
     // Additional logic to handle adding/removing from watchlist
     try {
-      const router = useRouter()
       router.push(`/forum/${data.id}`)
     } catch (err) {
       console.log(err)

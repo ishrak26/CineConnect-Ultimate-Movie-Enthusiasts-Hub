@@ -1,11 +1,15 @@
 // Rating.js
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaStar } from 'react-icons/fa'
 
 const Rating = ({ onRating, defaultRating }) => {
   console.log('defaultRating', defaultRating)
   const [rating, setRating] = useState(defaultRating)
   // setRating(defaultRating)
+
+  useEffect(() => {
+    setRating(defaultRating)
+  }, [defaultRating])
 
   const handleRating = (rate) => {
     setRating(rate)

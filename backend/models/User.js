@@ -38,7 +38,8 @@ async function findOne({ username }) {
     }
 }
 
-async function findOneById(id) {  // Fetch user{id, username, password, role} by username
+async function findOneById(id) {
+    // Fetch user{id, username, password, role} by username
     const { data, error } = await supabase
         .from('user_info')
         .select('id, password, username, role')
@@ -86,7 +87,6 @@ async function checkIfEmailExists({ email }) {
     }
 }
 
-
 async function getProfileByUsername({ username }) {
     try {
         const { data, error } = await supabase
@@ -98,22 +98,23 @@ async function getProfileByUsername({ username }) {
         if (error) throw error;
 
         return data;
-
     } catch (error) {
         console.error('Error fetching profile:', error.message);
         return null;
     }
 }
 
-async function getCineFellows({ userId, limit, offset}) {
+async function getCineFellows({ userId, limit, offset }) {
     try {
         // Fetch fellow1 details
         const { data: fellowsAsFellow1, error: error1 } = await supabase
             .from('cinefellow')
-            .select(`
+            .select(
+                `
                 requestee_id,
                 user_info:requestee_id (id, username, full_name, image_url, email)
-            `)
+            `
+            )
             .eq('requestor_id', userId)
             .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
@@ -122,24 +123,25 @@ async function getCineFellows({ userId, limit, offset}) {
         // Fetch fellow2 details
         const { data: fellowsAsFellow2, error: error2 } = await supabase
             .from('cinefellow')
-            .select(`
+            .select(
+                `
                 requestor_id,
                 user_info:requestor_id (id, username, full_name, image_url, email)
-            `)
+            `
+            )
             .eq('requestee_id', userId);
 
         if (error2) throw error2;
 
         // Map and combine the results to a unified structure
         const combinedFellows = [
-            ...fellowsAsFellow1.map(item => item.user_info),
-            ...fellowsAsFellow2.map(item => item.user_info),
+            ...fellowsAsFellow1.map((item) => item.user_info),
+            ...fellowsAsFellow2.map((item) => item.user_info),
         ];
 
         console.log(combinedFellows);
 
         return combinedFellows;
-
     } catch (error) {
         console.error('Error fetching CineFellows:', error.message);
         return null;
@@ -184,7 +186,6 @@ async function getCineFellowCount({ userId }) {
     }
 }
 
-
 async function followCinefellow({ userId, fellowId }) {
     try {
         // First, check if there's already a pending or accepted request
@@ -209,37 +210,34 @@ async function followCinefellow({ userId, fellowId }) {
             .insert([{ from_id: userId, to_id: fellowId, status: 'pending' }]);
 
         if (insertError) {
-            throw insertError;            
+            throw insertError;
         }
 
         return true; // Successfully created a new follow request
-
     } catch (error) {
         console.error('Error following cinefellow:', error.message);
         throw error;
     }
 }
 
-
 async function unfollowCinefellow({ userId, fellowId }) {
     try {
-
         // Delete the cinefellow relationship
         const { data, error: deleteError } = await supabase
             .from('cinefellow')
             .delete()
             .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
-            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`).select();
+            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`)
+            .select();
 
         if (deleteError) throw deleteError;
 
-        if(data.length === 0) {
+        if (data.length === 0) {
             console.log('No cinefellow relationship found.');
             return false;
         }
 
         return true;
-
     } catch (error) {
         console.error('Error unfollowing cinefellow:', error.message);
         throw error;
@@ -282,7 +280,7 @@ const getPendingRequests = async ({ userId, limit, offset }) => {
         console.error('Error fetching pending requests:', error.message);
         throw error;
     }
-}
+};
 
 const acceptCineFellowRequest = async ({ requestId, userId }) => {
     try {
@@ -309,19 +307,20 @@ const acceptCineFellowRequest = async ({ requestId, userId }) => {
         const { error: cinefellowError } = await supabase
             .from('cinefellow')
             .insert([
-                { requestor_id: requestData.from_id, requestee_id: requestData.to_id },
+                {
+                    requestor_id: requestData.from_id,
+                    requestee_id: requestData.to_id,
+                },
             ]);
 
         if (cinefellowError) throw cinefellowError;
 
         return true;
-
     } catch (error) {
         console.error('Error accepting cinefellow request:', error.message);
         throw error;
     }
 };
-
 
 const rejectCineFellowRequest = async ({ requestId, userId }) => {
     try {
@@ -336,52 +335,57 @@ const rejectCineFellowRequest = async ({ requestId, userId }) => {
 
         return true;
     } catch (error) {
-        console.error('Error rejecting/cancelling cinefellow request:', error.message);
+        console.error(
+            'Error rejecting/cancelling cinefellow request:',
+            error.message
+        );
         throw error;
     }
-}
+};
 
-const getWatchedMovies = async ({ userId, limit, offset}) => {
+const getWatchedMovies = async ({ userId, limit, offset }) => {
     try {
         const { data, error } = await supabase
             .from('watched_list')
-            .select(`
+            .select(
+                `
             movie_id,
             movie:movie_id (id, title, release_date, poster_url)
-            `)
+            `
+            )
             .eq('user_id', userId)
             .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
         if (error) throw error;
 
-        return data.map(item => item.movie);
-
+        return data.map((item) => item.movie);
     } catch (error) {
         console.error('Error fetching watched movies:', error.message);
         throw error;
     }
-}
+};
 
 const getWatchlist = async ({ userId, limit, offset }) => {
     try {
         const { data, error } = await supabase
-        .from('watch_list')
-        .select(`
+            .from('watch_list')
+            .select(
+                `
             movie_id,
             movie:movie_id (id, title, release_date, poster_url)
-        `)
-        .eq('user_id', userId)
-        .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
-    
+        `
+            )
+            .eq('user_id', userId)
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
         if (error) throw error;
 
-        return data.map(item => item.movie);
-
+        return data.map((item) => item.movie);
     } catch (error) {
         console.error('Error fetching watchlist:', error.message);
         throw error;
     }
-}
+};
 
 const removeFromWatchlist = async ({ userId, movieId }) => {
     try {
@@ -394,14 +398,13 @@ const removeFromWatchlist = async ({ userId, movieId }) => {
         if (error) throw error;
 
         return true;
-
     } catch (error) {
         console.error('Error removing from watchlist:', error.message);
         throw error;
     }
-}
+};
 
-const searchProfilesByUsername = async ({ username , limit, offset}) => {
+const searchProfilesByUsername = async ({ username, limit, offset }) => {
     try {
         const { data, error } = await supabase
             .from('user_info')
@@ -439,6 +442,7 @@ async function fetchJoinedForums(userId, limit, offset) {
         console.error('Exception fetching joined forums:', err.message);
         return null;
     }
+}
 
 async function fetchUserById({ id }) {
     const { data, error } = await supabase
@@ -456,7 +460,6 @@ async function fetchUserById({ id }) {
     }
 
     return data[0];
-
 }
 
 module.exports = {
@@ -481,5 +484,4 @@ module.exports = {
     fetchJoinedForums,
 
     fetchUserById,
-
 };
