@@ -538,6 +538,20 @@ async function addMovieToWatchedlist(userId, movieId) {
     return data;
 }
 
+async function isMovieInWatchedlist(userId, movieId) {
+    const { data, error } = await supabase
+        .from('watched_list')
+        .select('id, joined_forum')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+    if (error || data.length !== 1) {
+        console.error('Error checking isMovieInWatchedList:', error.message);
+        return null;
+    }
+
+    return data[0];
+}
+
 // Function to remove a movie from the watched list
 async function removeMovieFromWatchedlist(userId, movieId) {
     const { data, error } = await supabase
@@ -650,4 +664,5 @@ module.exports = {
     editRating,
     deleteRating,
     fetchTotalMovieCount,
+    isMovieInWatchedlist,
 };
