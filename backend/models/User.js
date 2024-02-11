@@ -86,6 +86,7 @@ async function checkIfEmailExists({ email }) {
     }
 }
 
+
 async function getProfileByUsername({ username }) {
     try {
         const { data, error } = await supabase
@@ -438,6 +439,24 @@ async function fetchJoinedForums(userId, limit, offset) {
         console.error('Exception fetching joined forums:', err.message);
         return null;
     }
+
+async function fetchUserById({ id }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, username, role, image_url')
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data.length !== 1) {
+        return null;
+    }
+
+    return data[0];
+
 }
 
 module.exports = {
@@ -446,6 +465,7 @@ module.exports = {
     findOneById,
     checkIfUserExists,
     checkIfEmailExists,
+
     getProfileByUsername,
     getCineFellows,
     getCineFellowCount,
@@ -459,4 +479,7 @@ module.exports = {
     removeFromWatchlist,
     searchProfilesByUsername,
     fetchJoinedForums,
+
+    fetchUserById,
+
 };

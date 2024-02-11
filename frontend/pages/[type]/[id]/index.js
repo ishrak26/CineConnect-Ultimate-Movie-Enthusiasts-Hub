@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { tmdb } from '@lib/service'
 import { format, formatDuration, intervalToDuration } from 'date-fns'
 import ArrowIcon from '@components/icons/arrow.svg'
@@ -19,28 +19,97 @@ import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
 import { FaPlus, FaCheck } from 'react-icons/fa'
 import SetRating from '@components/SetRating'
+import { useRouter } from 'next/router'
 
-export default function Home({ data, type, casts }) {
+export default function Home({ data, type, casts, cookie }) {
   const [isAdded, setIsAdded] = useState(false)
+  const [userRating, setUserRating] = useState(0)
+  const [userRated, setUserRated] = useState(false)
+  const [isWatched, setIsWatched] = useState(false)
+
+  useEffect(() => {
+    const getUserRating = async () => {
+      const response = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/userInfo`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      ).then((res) => res.json())
+      // console.log('response', response)
+      if (!response.rating) {
+        setUserRated(false)
+        setUserRating(0)
+      } else {
+        setUserRated(true)
+        setUserRating(response.rating)
+      }
+      if (!response.in_watchlist) {
+        setIsAdded(false)
+      } else {
+        setIsAdded(true)
+      }
+      if (!response.in_watchedlist) {
+        setIsWatched(false)
+      } else {
+        setIsWatched(true)
+      }
+      // console.log('loggedIn', loggedIn)
+      // console.log('userInfo', userInfo)
+    }
+    getUserRating()
+    console.log('userRated', userRated, 'userRating', userRating)
+  }, [userRating, isAdded, isWatched])
 
   const handleClick = () => {
-    setIsAdded(!isAdded)
-
     // Additional logic to handle adding/removing from watchlist
     try {
       const response = fetch(
         `http://localhost:4000/v1/movie/${data.id}/watch`,
         {
-          method: 'POST',
+          method: isAdded ? 'DELETE' : 'POST',
           headers: {
             'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
           },
-          body: JSON.stringify({
-            movieId: data.id,
-            userId: 1,
-          }),
+          credentials: 'include',
         }
       ).then((res) => res.json())
+      setIsAdded(!isAdded)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const handleClickForum = () => {
+    // Additional logic to handle adding/removing from watchlist
+    try {
+      const router = useRouter()
+      router.push(`/forum/${data.id}`)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const handleClickWatched = () => {
+    // Additional logic to handle adding/removing from watchlist
+    try {
+      const response = fetch(
+        `http://localhost:4000/v1/movie/${data.id}/watched`,
+        {
+          method: isWatched ? 'DELETE' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      ).then((res) => res.json())
+      setIsWatched(!isWatched)
     } catch (err) {
       console.log(err)
     }
@@ -52,16 +121,17 @@ export default function Home({ data, type, casts }) {
 
     try {
       const response = fetch(`http://localhost:4000/v1/movie/${data.id}/rate`, {
-        method: 'POST',
+        method: userRated ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
         },
+        credentials: 'include',
         body: JSON.stringify({
-          movieId: data.id,
-          userId: 1,
-          rating: rate,
+          rating: parseInt(rate),
         }),
       }).then((res) => res.json())
+      setUserRating(rate)
     } catch (err) {
       console.log(err)
     }
@@ -91,7 +161,7 @@ export default function Home({ data, type, casts }) {
             <img
               // src={backdropData.img.src}
               src={
-                data.poster_url
+                data.backdrop_url
                 // data.backdrop_path
                 // ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`
                 // : '/placeholder.svg'
@@ -187,8 +257,22 @@ export default function Home({ data, type, casts }) {
                     </>
                   )}
                 </button>
+                <button
+                  onClick={handleClickWatched}
+                  className="flex items-center justify-center button button-primary"
+                >
+                  {isWatched ? (
+                    <>
+                      <FaCheck className="mr-2" /> Added to Watchedlist
+                    </>
+                  ) : (
+                    <>
+                      <FaPlus className="mr-2" /> Add to Watchedlist
+                    </>
+                  )}
+                </button>
 
-                <SetRating onRating={handleRating} />
+                <SetRating onRating={handleRating} defaultRating={userRating} />
 
                 {/* <Rating average={data.vote_average} /> */}
                 <Rating average={data.rating} />
@@ -234,6 +318,12 @@ export default function Home({ data, type, casts }) {
                         {data.genres.map((genre) => genre.name).join(', ')}
                       </span>
                     </p>
+                    <button
+                      className="flex items-center justify-center button button-primary"
+                      onClick={handleClickForum}
+                    >
+                      Enter Discussion Forum
+                    </button>
                   </div>
                 )}
 
@@ -607,6 +697,7 @@ export async function getServerSideProps(context) {
       type: params.type,
       data: response,
       casts: casts,
+      cookie,
     },
   }
 }
