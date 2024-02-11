@@ -38,6 +38,22 @@ async function findOne({ username }) {
     }
 }
 
+async function findOneById(id) {  // Fetch user{id, username, password, role} by username
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, password, username, role')
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data) {
+        return data[0];
+    }
+}
+
 async function checkIfUserExists({ username }) {
     const { data, error } = await supabase
         .from('user_info')
@@ -427,6 +443,7 @@ async function fetchJoinedForums(userId, limit, offset) {
 module.exports = {
     createUser,
     findOne,
+    findOneById,
     checkIfUserExists,
     checkIfEmailExists,
     getProfileByUsername,

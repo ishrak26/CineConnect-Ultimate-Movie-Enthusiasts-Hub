@@ -75,13 +75,15 @@ const userController = {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
       // If the user is trying to follow themselves
-      if (req.user.username === req.params.username) {
+      const username = await db_user.findOneById(req.user.id);
+
+      if (username === req.params.username) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
       // If the user is trying to follow someone they are already following
       const requestee = await db_user.findOne({
-        username: req.params.username,
+        username: username,
       });
       const requestorId = req.user.id;
       const requesteeId = requestee ? requestee.id : null;
@@ -113,14 +115,16 @@ const userController = {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
+      const username = await db_user.findOneById(req.user.id);
+
       // If the user is trying to unfollow themselves
-      if (req.user.username === req.params.username) {
+      if (username === req.params.username) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
       // If the user is trying to unfollow someone they are not following
       const requestee = await db_user.findOne({
-        username: req.params.username,
+        username: username,
       });
       const requestorId = req.user.id;
       const requesteeId = requestee ? requestee.id : null;
@@ -154,8 +158,10 @@ const userController = {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
+      const userName = await db_user.findOneById(req.user.id);
+
       // If the user is trying to fetch pending requests for someone else
-      if (req.user.username !== req.params.username) {
+      if (userName !== req.params.username) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
@@ -188,8 +194,10 @@ const userController = {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
+      const userName = await db_user.findOneById(req.user.id);
+
       // If the user is trying to accept a request for someone else
-      if (req.user.username !== req.params.username) {
+      if (userName !== req.params.username) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
@@ -226,8 +234,10 @@ const userController = {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
+      const userName = await db_user.findOneById(req.user.id);
+
       // If the user is trying to reject a request for someone else
-      if (req.user.username !== req.params.username) {
+      if (userName !== req.params.username) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
