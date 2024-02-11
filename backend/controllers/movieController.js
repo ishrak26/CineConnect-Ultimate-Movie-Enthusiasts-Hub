@@ -6,6 +6,7 @@ const moviesController = {
     getMovies: async (req, res) => {
         const limit = req.query.limit || 10; // Default limit to 10 if not specified
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
+        console.log('user: ', req.user);
         try {
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(
@@ -13,6 +14,7 @@ const moviesController = {
                 offset,
                 limit
             );
+            
             res.json(movies || []);
         } catch (error) {
             console.log('in catch: ', error.message);
@@ -150,9 +152,11 @@ const moviesController = {
             const rating = req.body.rating; // Extract movieId and rating from request body
 
             const result = await db_movie.submitRating(userId, movieId, rating);
+            if (!result) {
+                res.status(500).json({ message: 'Internal server error' });
+            }
             res.status(201).json({
                 message: 'Rating submitted successfully',
-                data: result,
             });
         } catch (error) {
             res.status(500).json({
@@ -277,14 +281,14 @@ const moviesController = {
         }
 
         const movieId = req.params.movieId;
-        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
+        const userId = req.user.id; 
 
         try {
             const alreadyWatched = await db_movie.isMovieInWatchedlist(
                 userId,
                 movieId
             );
-            if (alreadyWatched) {
+            if (alreadyWatched.length === 1) {
                 return res
                     .status(400)
                     .json({ message: 'Movie already marked as watched' });
@@ -293,6 +297,7 @@ const moviesController = {
                 userId,
                 movieId
             );
+            console.log('watched result', result);
             if (result) {
                 res.status(201).json({
                     message: 'Movie successfully added to watched-list',
@@ -480,6 +485,33 @@ const moviesController = {
             res.status(200).json({ count });
         } catch (error) {
             res.status(500).json({ message: error.message });
+        }
+    },
+
+    getUserInfoForMovie: async (req, res) => {
+        if (!req.user) {
+            return res.status(200).json({ message: 'No user info found' });
+        }
+
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
+
+        try {
+            const userInfo = await db_movie.fetchUserInfoForMovie(
+                userId,
+                movieId
+            );
+
+            if (userInfo) {
+                res.status(200).json(userInfo);
+            } else {
+                res.status(404).json({
+                    message: 'No movie found for the provided movieId',
+                });
+            }
+        } catch (error) {
+            console.error('Error in getUserInfoForMovie:', error);
+            res.status(500).json({ message: 'Internal server error' });
         }
     },
 

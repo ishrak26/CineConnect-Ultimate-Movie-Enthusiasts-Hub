@@ -7,11 +7,12 @@ import Search from './search'
 import SearchIcon from './icons/search.svg'
 import clsx from 'clsx'
 
-
 export default function Navbar() {
   const ref = useRef(null)
   const router = useRouter()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [userInfo, setUserInfo] = useState(null)
 
   useEffect(() => {
     if (searchOpen) {
@@ -20,6 +21,29 @@ export default function Navbar() {
       ref.current?.blur()
     }
   }, [searchOpen])
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const response = await fetch(`http://localhost:4000/v1/auth/isLoggedIn`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+      }).then((res) => res.json())
+      // console.log('response', response)
+      if (!response.loggedIn) {
+        setLoggedIn(false)
+      } else {
+        setLoggedIn(true)
+        setUserInfo(response.user)
+      }
+      // console.log('loggedIn', loggedIn)
+      // console.log('userInfo', userInfo)
+    }
+    checkLoggedIn()
+  }, [])
 
   return (
     <header className="navbar">
@@ -34,28 +58,51 @@ export default function Navbar() {
         </div>
 
         <nav className="ml-auto flex items-center">
+          {!loggedIn && (
+            <Link
+              href="/login"
+              className={clsx(
+                'nav-link',
+                router.pathname === '/login' && 'text-white-100'
+              )}
+            >
+              Login
+            </Link>
+          )}
 
-          <Link
-            href="/login"
-            className={clsx(
-              'nav-link',
-              router.pathname === '/login' && 'text-white-100'
-            )}
-          >
-            Login
-          </Link>
+          {!loggedIn && (
+            <Link
+              href="/register"
+              className={clsx(
+                'nav-link',
+                router.pathname === '/register' && 'text-white-100'
+              )}
+            >
+              Register
+            </Link>
+          )}
+          {loggedIn && <p>{userInfo.username}</p>}
+          {loggedIn && (
+            <button className="icon-button">
+              <img
+                src="/notification.png"
+                alt="Notifications"
+                className="icon"
+              />
+            </button>
+          )}
+          {loggedIn && (
+            <button className="icon-button">
+              <img src={userInfo.image_url} alt="Profile" className="icon" />
+            </button>
+          )}
+          {loggedIn && (
+            <button className="icon-button">
+              <img src="/settings.png" alt="Settings" className="icon" />
+            </button>
+          )}
 
-          <Link
-            href="/register"
-            className={clsx(
-              'nav-link',
-              router.pathname === '/register' && 'text-white-100'
-            )}
-          >
-            Register
-          </Link>
-
-           {/* <Link
+          {/* <Link
             href="/movie"
             className={clsx(
               'nav-link',
@@ -64,7 +111,7 @@ export default function Navbar() {
           >
             Movies
           </Link> */}
-{/*
+          {/*
           <Link
             href="/tv"
             className={clsx(
@@ -84,16 +131,6 @@ export default function Navbar() {
               <SearchIcon />
               <span className="sr-only">Search</span>
             </button> */}
-          <button className="icon-button">
-            <img src="/notification.png" alt="Notifications" className="icon" />
-          </button>
-          <button className="icon-button">
-            <img src="/profile.png" alt="Profile" className="icon" />
-          </button>
-          <button className="icon-button">
-            <img src="/settings.png" alt="Settings" className="icon" />
-          </button>
-
         </nav>
       </div>
     </header>

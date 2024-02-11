@@ -52,10 +52,15 @@ router.get(
 ); // **//
 
 
+
 // Route for getting userId from request
 router.get('/user', postController.getUserId); // **//
 
 // Route for getting information about a specific forum by forumId
 router.get('/:forumId', postController.getForumById); // **//
+
+// Route to check if user voted to a post
+router.get('/:forumId/post/:postId/voted', postController.checkUserVotedPost); // **//
+
 
 module.exports = router;
