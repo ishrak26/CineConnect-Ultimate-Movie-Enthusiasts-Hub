@@ -85,4 +85,7 @@ router.get('/v1/genre/:genreId/movies', movieController.getMoviesByGenre);
 // Router to get total count of movies
 router.get('/v1/movies/count', movieController.getTotalMovieCount);
 
+// Rouer to get movie related info for this user
+router.get('/v1/movie/:movieId/userInfo', movieController.getUserInfoForMovie);
+
 module.exports = router;
