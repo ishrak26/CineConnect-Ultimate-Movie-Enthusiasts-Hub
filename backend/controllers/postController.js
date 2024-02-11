@@ -52,10 +52,28 @@ const postController = {
 
     getReactionsByPostId: async (req, res) => {
         try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
             const postId = req.params.postId;
-            const reactions = await dbPost.fetchReactionsByPostId(postId);
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const reactions = await dbPost.fetchPostReactionCount(postId);
             if (reactions) {
-                res.json(reactions);
+                reactions.upvotes = reactions.upvotes || 0;
+                reactions.downvotes = reactions.downvotes || 0;
+                reactions.total_comments = reactions.total_comments || 0;
+                res.status(200).json(reactions);
             } else {
                 res.status(404).json({ message: 'Reactions not found' });
             }
@@ -83,7 +101,8 @@ const postController = {
                     .json({ message: 'User not a member of the forum' });
             }
 
-            const { content, images } = req.body;
+            const { content } = req.body;
+            let { images } = req.body;
             if (!content) {
                 return res
                     .status(400)
@@ -105,6 +124,8 @@ const postController = {
                     }
                     image.caption = image.caption || '';
                 }
+            } else {
+                images = [];
             }
 
             const newPost = await dbPost.createNewPost(
@@ -189,6 +210,7 @@ const postController = {
             const offset = req.query.offset || 0;
             const posts = await dbPost.fetchPostsByMovieId(
                 forumId,
+                forumId,
                 parseInt(limit),
                 parseInt(offset)
             );
@@ -213,6 +235,58 @@ const postController = {
                 res.status(200).json(data);
             } else {
                 res.status(404).json({ message: 'Posts not found' });
+            }
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getAllComments: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const limit = req.query.limit || 10;
+            const offset = req.query.offset || 0;
+            const comments = await dbPost.fetchCommentsByPostId(
+                req.params.postId,
+                parseInt(limit),
+                parseInt(offset)
+            );
+            if (comments) {
+                const data = [];
+                const contentLimit = parseInt(req.query.contentLimit) || 500;
+                for (let comment of comments) {
+                    data.push({
+                        postId: comment.post_id,
+                        author: {
+                            id: comment.author_id,
+                            username: comment.username,
+                            image_url: comment.user_image_url,
+                        },
+                        content: comment.content.substring(0, contentLimit),
+                        contentFull: comment.content.length <= contentLimit,
+                        totalImages: comment.total_images,
+                        topImage: comment.top_post_image_url,
+                        created_at: comment.created_at,
+                    });
+                }
+                res.status(200).json(data);
+            } else {
+                res.status(404).json({ message: 'Comments/replies not found' });
             }
         } catch (error) {
             console.log(error.message);
@@ -473,6 +547,71 @@ const postController = {
             }
         } catch (error) {
             console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    submitComment: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const { content } = req.body;
+            let { images } = req.body;
+            if (!content) {
+                return res
+                    .status(400)
+                    .json({ message: 'Content cannot be empty' });
+            }
+
+            if (images) {
+                // sanitize images
+                if (!Array.isArray(images)) {
+                    return res
+                        .status(400)
+                        .json({ message: 'Images must be an array' });
+                }
+                for (let image of images) {
+                    if (!image.image_url) {
+                        return res
+                            .status(400)
+                            .json({ message: 'Image URL cannot be empty' });
+                    }
+                    image.caption = image.caption || '';
+                }
+            } else {
+                images = [];
+            }
+
+            const newPost = await dbPost.createNewComment(
+                userId,
+                req.params.postId,
+                content,
+                images
+            );
+            if (!newPost) {
+                return res
+                    .status(500)
+                    .json({ message: 'Failed to create new comment' });
+            }
+            res.status(201).json({
+                success: true,
+            });
+        } catch (error) {
+            console.log(error.message);
             res.status(500).json({ message: 'Internal server error' });
         }
     },

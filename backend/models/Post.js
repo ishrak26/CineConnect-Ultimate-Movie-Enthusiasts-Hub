@@ -30,45 +30,23 @@ async function fetchSinglePostById(postId, imgLimit) {
     }
 }
 
-async function fetchReactionsByPostId(postId) {
-    // Count upvotes
-    const { count: upvoteCount, error: upvotesError } = await supabase
-        .from('post_has_reaction')
-        .select('*', { count: 'exact' })
-        .eq('post_id', postId)
-        .eq('type', 'upvote');
+async function fetchPostReactionCount(postId) {
+    try {
+        const { data, error } = await supabase.rpc('get_post_reaction_count', {
+            pid: postId,
+        });
 
-    // Count downvotes
-    const { count: downvotesCount, error: downvotesError } = await supabase
-        .from('post_has_reaction')
-        .select('*', { count: 'exact' })
-        .eq('post_id', postId)
-        .eq('type', 'downvote');
+        if (error || data.length !== 1) {
+            console.error('Error fetching post reaction count:', error.message);
+            return null;
+        }
 
-    // Assuming comments are stored in a way that they can be counted for a given post
-    // Replace 'comments_table' with the actual table name and 'post_id' with the actual foreign key column name if different
-    const { data: commentsData, error: commentsError } = await supabase
-        .from('comments_table') // Replace 'comments_table' with your actual table name
-        .select('*', { count: 'exact' })
-        .eq('parent_id', postId);
-
-    if (upvotesError || downvotesError || commentsError) {
-        console.error(
-            'Error fetching post statistics:',
-            upvotesError || downvotesError || commentsError
-        );
+        // console.log('Post reaction count:', data);
+        return data[0];
+    } catch (err) {
+        console.error('Exception fetching post reaction count:', err.message);
         return null;
     }
-
-    const statistics = {
-        postId: postId,
-        upvotes: upvotesData.count,
-        downvotes: downvotesData.count,
-        comments: commentsData.count, // Assuming this is the count of comments and replies together
-    };
-
-    console.log('Post statistics:', statistics);
-    return statistics;
 }
 
 async function createNewPost(userId, movieId, content, images) {
@@ -93,6 +71,31 @@ async function createNewPost(userId, movieId, content, images) {
         return data;
     } catch (err) {
         console.error('Exception creating new post:', err.message);
+    }
+}
+
+async function createNewComment(userId, parentId, content, images) {
+    // Convert images array to JSONB format expected by the PostgreSQL function
+    // const imagesJsonb = JSON.stringify(images);
+
+    try {
+        const { data, error } = await supabase.rpc('create_new_comment', {
+            user_id: userId,
+            parent_id: parentId,
+            content: content,
+            images,
+            // images: imagesJsonb,
+        });
+
+        if (error) {
+            console.error('Error creating new comment:', error.message);
+            return null;
+        }
+
+        // console.log('Returning from createNewCommentt: new post ID:', data);
+        return data;
+    } catch (err) {
+        console.error('Exception creating new comment:', err.message);
     }
 }
 
@@ -180,6 +183,27 @@ async function fetchPostsByMovieId(movieId, limit, offset) {
         return data;
     } catch (err) {
         console.error('Exception fetching posts by movieId:', err.message);
+    }
+}
+
+async function fetchCommentsByPostId(postId, limit, offset) {
+    try {
+        const { data, error } = await supabase.rpc('get_paginated_comments', {
+            p_id: postId,
+            post_limit: limit,
+            post_offset: offset,
+        });
+
+        if (error) {
+            console.error('Error fetching comments by postId:', error.message);
+            return null;
+        }
+
+        // console.log('Returning from fetchPostsByMovieId:', data);
+
+        return data;
+    } catch (err) {
+        console.error('Exception fetching comments by postId:', err.message);
     }
 }
 
@@ -274,5 +298,8 @@ module.exports = {
     isJoinedForumByPostId,
     removeVote,
     fetchTotalMemberCountInForum,
+    createNewComment,
+    fetchPostReactionCount,
+    fetchCommentsByPostId,
     fetchForumById,
 };
