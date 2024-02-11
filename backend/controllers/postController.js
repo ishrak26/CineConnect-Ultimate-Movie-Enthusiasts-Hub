@@ -196,6 +196,7 @@ const postController = {
 
             const userId = req.user.id;
             const forumId = req.params.forumId;
+            // console.log('type of forumId', typeof forumId);
             const isJoined = await dbPost.isJoinedForumByForumId(
                 userId,
                 forumId
@@ -209,7 +210,6 @@ const postController = {
             const limit = req.query.limit || 10;
             const offset = req.query.offset || 0;
             const posts = await dbPost.fetchPostsByMovieId(
-                forumId,
                 forumId,
                 parseInt(limit),
                 parseInt(offset)

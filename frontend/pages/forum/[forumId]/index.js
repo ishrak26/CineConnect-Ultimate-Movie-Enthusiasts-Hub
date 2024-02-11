@@ -12,6 +12,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '@theme/theme'
 import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
+import ForumHeader from '@components/forum/ForumHeader'
 
 const ForumPage = ({ ForumData, user, members, ForumAbout }) => {
   //   const setForumStateValue = useSetRecoilState(ForumState);
@@ -49,10 +50,11 @@ const ForumPage = ({ ForumData, user, members, ForumAbout }) => {
         
         <Navbar />
         <BaseLayout >
+        <ForumHeader ForumData={ForumAbout} />
         <PageContent>
           <>
             <CreatePostLink />
-            <Posts ForumData={ForumData} user={user} />
+            <Posts ForumData={ForumData} user={user} ForumAbout={ForumAbout}/>
           </>
           <>
             <About ForumData={ForumAbout} members={members}/>
@@ -100,6 +102,7 @@ export async function getServerSideProps(context) {
     const members = await fetchData(`http://localhost:4000/v1/forum/${forumId}/totalMembers`)
     const user = await fetchData(`http://localhost:4000/v1/forum/user`)
     const ForumAbout = await fetchData(`http://localhost:4000/v1/forum/${forumId}`)
+
 
     if (response.status === 404) {
       return {

@@ -22,26 +22,28 @@ const CommentItem = ({
         </Box>
         <Stack spacing={1}>
           <Stack direction="row" align="center" fontSize="8pt">
-            <Text fontWeight={600}>{comment.creatorDisplayText}</Text>
+            <Text fontWeight={600}>{comment.author.username}</Text>
             {/* Timestamp conversion logic to display createdAtString can be added here */}
             {loadingDelete && <Spinner size="sm" />}
           </Stack>
-          <Text fontSize="10pt">{comment.text}</Text>
+          <Text fontSize="10pt">{comment.content}</Text>
           <Stack
             direction="row"
             align="center"
             cursor="pointer"
             color="gray.500"
           >
-            {userId === comment.creatorId && (
+            {console.log("userId", userId)}
+            {console.log("comment.author.id", comment.author.id)}
+            {userId.userId === comment.author.id && (
               <>
                 {/* If Edit functionality is not implemented, this can be commented out or removed */}
-                <Text fontSize="10pt" _hover={{ color: "red.500" }}>
+                <Text fontSize="10pt" _hover={{ color: "#FBC02D" }}>
                   Edit
                 </Text>
                 <Text
                   fontSize="10pt"
-                  _hover={{ color: "red.500" }}
+                  _hover={{ color: "#FBC02D" }}
                   onClick={() => onDeleteComment(comment)}
                 >
                   Delete

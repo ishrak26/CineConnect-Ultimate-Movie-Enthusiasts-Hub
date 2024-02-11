@@ -9,23 +9,12 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-// import {
-//   collection,
-//   doc,
-//   getDocs,
-//   increment,
-//   orderBy,
-//   query,
-//   serverTimestamp,
-//   Timestamp,
-//   where,
-//   writeBatch,
-// } from "firebase/firestore";
+
 import React, { useEffect, useState } from "react";
 import CommentInput from "./CommentInput";
 import CommentItem from "./CommentItem";
 
-const Comments = ({ user, selectedPost, ForumId }) => {
+const Comments = ({ user, selectedPost, ForumId, Comments }) => {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
   const [fetchLoading, setFetchLoading] = useState(true);
@@ -133,17 +122,17 @@ const Comments = ({ user, selectedPost, ForumId }) => {
   
   const getPostComments = async () => {
     try {
-      const commentsQuery = query(
-        collection(firestore, "comments"),
-        where("postId", "==", selectedPost.id),
-        orderBy("createdAt", "desc")
-      );
-      const commentsDocs = await getDocs(commentsQuery);
-      const comments = commentsDocs.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setComments(comments);
+      // const commentsQuery = query(
+      //   collection(firestore, "comments"),
+      //   where("postId", "==", selectedPost.id),
+      //   orderBy("createdAt", "desc")
+      // );
+      // const commentsDocs = await getDocs(commentsQuery);
+      // const comments = commentsDocs.docs.map((doc) => ({
+      //   id: doc.id,
+      //   ...doc.data(),
+      // }));
+      setComments(Comments);
     } catch (error) {
       console.log("Error: getPostComments", error);
       showToast({
@@ -212,11 +201,11 @@ const Comments = ({ user, selectedPost, ForumId }) => {
               <>
                 {comments.map((comment) => (
                   <CommentItem
-                    key={comment.id}
+                    key={comment.postId}
                     comment={comment}
                     onDeleteComment={onDeleteComment}
-                    loadingDelete={loadingDelete === comment.id}
-                    userId={user?.uid}
+                    loadingDelete={loadingDelete === comment.postId}
+                    userId={user}
                   />
                 ))}
               </>

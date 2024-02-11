@@ -8,6 +8,8 @@ import Script from 'next/script'
 import ScrollTop from '@components/scroll-top'
 import { SidebarProvider } from 'context/SidebarContext'
 import { Suspense } from 'react'
+import { RecoilRoot } from 'recoil'
+
 
 function MyApp({ Component, pageProps }) {
   if (pageProps.error)
@@ -37,9 +39,11 @@ function MyApp({ Component, pageProps }) {
 
       <NextNProgress color="#f1c232" />
 
+      <RecoilRoot>
       <SidebarProvider>
         <Component {...pageProps} />
       </SidebarProvider>
+      </RecoilRoot>
 
       <ScrollTop />
     </>

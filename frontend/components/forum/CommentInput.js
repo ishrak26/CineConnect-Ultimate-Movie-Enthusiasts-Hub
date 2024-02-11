@@ -10,16 +10,16 @@ const CommentInput = ({
   createLoading,
   onCreateComment,
 }) => {
-  const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+  // const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   return (
     <Flex direction="column" position="relative">
       {user ? (
         // If the user is logged in, display the comment input box
         <>
-          <ProfileModal
+          {/* <ProfileModal
             handleClose={() => setProfileModalOpen(false)}
             open={isProfileModalOpen}
-          />
+          /> */}
           <Stack direction="row" align="center" spacing={1} mb={2}>
             <Text color="gray.600">Comment as</Text>
             <Text
@@ -30,9 +30,9 @@ const CommentInput = ({
                 textDecoration: "underline",
                 textColor: "red.500",
               }}
-              onClick={() => setProfileModalOpen(true)}
+              // onClick={() => setProfileModalOpen(true)}
             >
-              {user?.email?.split("@")[0]}
+              {/* {user?.email?.split("@")[0]} */}
             </Text>
           </Stack>
 

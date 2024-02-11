@@ -5,29 +5,31 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import PostItem from "./PostItem";
 import PostLoader from "./PostLoader";
 import useCustomToast from "../../hooks/useCustomToast";
+import usePosts from "../../hooks/usePosts";
 
-const Posts = ({ ForumData, user }) => {
+const Posts = ({ ForumData, user, ForumAbout }) => {
   // const [user] = useAuthState(auth);
 
   const [loading, setLoading] = useState(false);
-  // const {
-  //   postStateValue,
-  //   setPostStateValue,
-  //   onVote,
-  //   onDeletePost,
-  //   onSelectPost,
-  // } = usePosts();
+  const forumId = ForumAbout.forumId;
+  const {
+    // postStateValue,
+    // setPostStateValue,
+    onVote,
+    onDeletePost,
+    onSelectPost,
+  } = usePosts();
   const showToast = useCustomToast();
+
+  // setPostStateValue((prev) => ({
+  //   ...prev,
+  //   posts: ForumData,
+  // }));
 
   const postStateValue = {
     posts: ForumData,
-    postVotes: [],
   };
 
-  const onVote = () => {};
-  const onDeletePost = () => {};
-  const onSelectPost = () => {};
-  const { setPostStateValue } = [];
 
   // const getPosts = async () => {
   //   try {
@@ -68,10 +70,12 @@ const Posts = ({ ForumData, user }) => {
         <PostLoader />
       ) : (
         <Stack spacing={3}>
+          {console.log(postStateValue.posts)}
           {postStateValue.posts.map((item) => (
             <PostItem
               key={item.postId}
               post={item}
+              forumId={forumId}
               userIsCreator={user === item.author.id}
               // userVoteValue={
               //   postStateValue.postVotes.find((vote) => vote.postId === item.id)
