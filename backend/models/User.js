@@ -69,9 +69,28 @@ async function checkIfEmailExists({ email }) {
     }
 }
 
+async function fetchUserById({ id }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, username, role, image_url')
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data.length !== 1) {
+        return null;
+    }
+
+    return data[0];
+}
+
 module.exports = {
     createUser,
     findOne,
     checkIfUserExists,
     checkIfEmailExists,
+    fetchUserById,
 };

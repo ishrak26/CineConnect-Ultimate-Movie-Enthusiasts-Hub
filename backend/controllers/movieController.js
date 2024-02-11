@@ -6,6 +6,7 @@ const moviesController = {
     getMovies: async (req, res) => {
         const limit = req.query.limit || 10; // Default limit to 10 if not specified
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
+        console.log('user: ', req.user);
         try {
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(

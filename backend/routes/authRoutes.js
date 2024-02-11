@@ -9,4 +9,7 @@ router.post('/register/', registerValidator, authController.register); // /v1/au
 
 router.post('/login/', authController.login); // /v1/auth/login
 
+// Route to check if the user is logged in
+router.get('/isLoggedIn/', authController.isLoggedIn); // /v1/auth/isLoggedIn
+
 module.exports = router;
