@@ -15,7 +15,6 @@ export default function Navbar() {
   const [userInfo, setUserInfo] = useState(null)
 
   useEffect(() => {
-    console.log('Inside useEffect to check if search')
     if (searchOpen) {
       ref.current?.focus()
     } else {
@@ -24,24 +23,26 @@ export default function Navbar() {
   }, [searchOpen])
 
   useEffect(() => {
-    console.log('Inside useEffect to check if loggedIn')
     const checkLoggedIn = async () => {
-      const res = await fetch(`http://localhost:4000/v1/auth/isLoggedIn`, {
+      const response = await fetch(`http://localhost:4000/v1/auth/isLoggedIn`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
+          // ...(cookie ? { Cookie: cookie } : {}),
         },
         credentials: 'include',
       }).then((res) => res.json())
-      setLoggedIn(res.loggedIn)
+      // console.log('response', response)
+      if (!response.loggedIn) {
+        setLoggedIn(false)
+      } else {
+        setLoggedIn(true)
+        setUserInfo(response.user)
+      }
+      // console.log('loggedIn', loggedIn)
+      // console.log('userInfo', userInfo)
     }
-    if (!checkLoggedIn.loggedIn) {
-      setLoggedIn(false)
-    } else {
-      setLoggedIn(true)
-      setUserInfo(checkLoggedIn.user)
-    }
+    checkLoggedIn()
   }, [])
 
   return (
@@ -80,7 +81,7 @@ export default function Navbar() {
               Register
             </Link>
           )}
-
+          {loggedIn && <p>{userInfo.username}</p>}
           {loggedIn && (
             <button className="icon-button">
               <img
@@ -92,7 +93,7 @@ export default function Navbar() {
           )}
           {loggedIn && (
             <button className="icon-button">
-              <img src="/profile.png" alt="Profile" className="icon" />
+              <img src={userInfo.image_url} alt="Profile" className="icon" />
             </button>
           )}
           {loggedIn && (
