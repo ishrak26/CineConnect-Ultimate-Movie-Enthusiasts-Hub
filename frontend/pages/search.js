@@ -25,7 +25,7 @@ export default function Home({ data, query }) {
           name="keywords"
           content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
         />
-       
+
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </Head>
 
@@ -143,9 +143,10 @@ export async function getServerSideProps({ query }) {
   //   },
   // })
 
-
-  const response = await fetch(`http://localhost:4000/v1/movies/?title=${query.query}`).then((res) => res.json());
-
+  const limit = 10
+  const response = await fetch(
+    `http://localhost:4000/v1/movies/?title=${query.query}&limit=${limit}`
+  ).then((res) => res.json())
 
   // if (response.status === 404) {
   //   return {

@@ -6,9 +6,8 @@ const moviesController = {
     getMovies: async (req, res) => {
         const limit = req.query.limit || 10; // Default limit to 10 if not specified
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
+        console.log('user: ', req.user);
         try {
-            console.log('title: ', req.query.title);
-
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(
                 title,
@@ -38,19 +37,33 @@ const moviesController = {
         }
     },
 
+    getMovieGenres: async (req, res) => {
+        try {
+            const genres = await db_movie.fetchAllGenres();
+            res.status(200).json(genres);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
     getMoviesByGenre: async (req, res) => {
         try {
             const genreId = req.params.genreId;
 
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
             // Use the model function to fetch movies by genre
-            const movies = await db_movie.fetchMoviesByGenre(genreId);
+            const movies = await db_movie.fetchMoviesByGenre(
+                genreId,
+                limit,
+                offset
+            );
 
             if (!movies) {
-                return res
-                    .status(404)
-                    .json({
-                        message: 'Movies for the specified genre not found.',
-                    });
+                return res.status(404).json({
+                    message: 'Movies for the specified genre not found.',
+                });
             }
 
             // Send the movies as a response
@@ -269,6 +282,15 @@ const moviesController = {
         const userId = req.user.id; 
 
         try {
+            const alreadyWatched = await db_movie.isMovieInWatchedlist(
+                userId,
+                movieId
+            );
+            if (alreadyWatched) {
+                return res
+                    .status(400)
+                    .json({ message: 'Movie already marked as watched' });
+            }
             const result = await db_movie.addMovieToWatchedlist(
                 userId,
                 movieId
@@ -449,6 +471,15 @@ const moviesController = {
             } else {
                 res.status(404).json({ message: 'Movie not found' });
             }
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    getTotalMovieCount: async (req, res) => {
+        try {
+            const count = await db_movie.fetchTotalMovieCount();
+            res.status(200).json({ count });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }

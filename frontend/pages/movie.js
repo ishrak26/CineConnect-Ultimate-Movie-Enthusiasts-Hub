@@ -9,7 +9,16 @@ import Breadcrumb from '@components/breadcrumb'
 import Filters from '@components/filters'
 import Link from 'next/link'
 
-export default function MoviePage({ data, query, genres }) {
+export default function MoviePage({ data, query, genres, totalMovies }) {
+  // Calculate total pages
+  const limit = 9
+  const totalPages = Math.ceil(totalMovies / limit)
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage)
+  }
+
   return (
     <div>
       <Head>
@@ -22,7 +31,7 @@ export default function MoviePage({ data, query, genres }) {
           name="keywords"
           content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
         />
-       
+
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </Head>
 
@@ -51,7 +60,12 @@ export default function MoviePage({ data, query, genres }) {
               <Filters genres={genres} />
             </div>
           </div>
+
           <div className="w-full">
+            <div className="text-2xl font-bold w-full text-center mb-4">
+              Showing results {(query.page - 1) * limit + 1}-
+              {Math.min(query.page * limit, totalMovies)} of {totalMovies}
+            </div>
             {data?.length ? (
               <div>
                 <div className="card-list lg:grid-cols-2 xl:grid-cols-3">
@@ -67,7 +81,7 @@ export default function MoviePage({ data, query, genres }) {
                   ))}
                 </div>
                 <Pagination
-                  totalPages={data.total_pages}
+                  totalPages={totalPages}
                   currentPage={query.page}
                   className="mt-8"
                 />
@@ -102,33 +116,52 @@ export async function getServerSideProps({ query }) {
   //   },
   // })
 
-  const response = await fetch(`http://localhost:4000/v1/movies`).then((res) => res.json());
+  let response
+  const limit = 9
+  const offset = (query.page - 1) * limit || 0
 
-  // if (response.status === 404) {
-  //   return {
-  //     notFound: true,
-  //   }
-  // }
+  if (query.with_genres) {
+    response = await fetch(
+      `http://localhost:4000/v1/genre/${query.with_genres}/movies?limit=${limit}&offset=${offset}`
+    ).then((res) => res.json())
+  } else {
+    response = await fetch(
+      `http://localhost:4000/v1/movies?limit=${limit}&offset=${offset}`
+    ).then((res) => res.json())
+  }
 
-  // if (response.data.success === false) {
-  //   return {
-  //     props: {
-  //       error: {
-  //         statusCode: response.status,
-  //         statusMessage:
-  //           response.data.errors[0] || response.data.status_message,
-  //       },
-  //     },
-  //   }
-  // }
+  if (response.status === 404) {
+    return {
+      notFound: true,
+    }
+  }
 
-  const { data: genresData } = await tmdb.get('/genre/movie/list')
+  if (response.success === false) {
+    return {
+      props: {
+        error: {
+          statusCode: response.status,
+          statusMessage: response.errors[0] || response.status_message,
+        },
+      },
+    }
+  }
+
+  // const { data: genresData } = await tmdb.get('/genre/movie/list')
+  const genres = await fetch(`http://localhost:4000/v1/genres`).then((res) =>
+    res.json()
+  )
+
+  const totalMovies = await fetch(`http://localhost:4000/v1/movies/count`).then(
+    (res) => res.json()
+  )
 
   return {
     props: {
       data: response,
-      genres: genresData.genres,
+      genres: genres,
       query,
+      totalMovies: totalMovies.count,
     },
   }
 }
