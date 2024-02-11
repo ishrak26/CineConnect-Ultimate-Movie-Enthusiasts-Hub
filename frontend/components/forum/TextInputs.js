@@ -1,11 +1,11 @@
-import { Button, Flex, Input, Stack, Textarea } from "@chakra-ui/react";
-import React from "react";
+import { Button, Flex, Input, Stack, Textarea } from '@chakra-ui/react'
+import React from 'react'
 
 const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
   return (
     <Stack spacing={3} width="100%">
       {/* Title of the post */}
-      <Input
+      {/* <Input
         name="title"
         placeholder="Title"
         value={textInputs.title}
@@ -24,7 +24,7 @@ const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
           border: "1px solid",
           borderColor: "red.500",
         }}
-      />
+      /> */}
       {/* Body of the post */}
       <Textarea
         name="body"
@@ -34,17 +34,17 @@ const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
         fontSize="10pt"
         height="120px"
         borderRadius={10}
-        _placeholder={{ color: "gray.500" }}
+        _placeholder={{ color: 'gray.500' }}
         _hover={{
-          bg: "white",
-          border: "1px solid",
-          borderColor: "red.500",
+          bg: 'white',
+          border: '1px solid',
+          borderColor: 'red.500',
         }}
         _focus={{
-          outline: "none",
-          bg: "white",
-          border: "1px solid",
-          borderColor: "red.500",
+          outline: 'none',
+          bg: 'white',
+          border: '1px solid',
+          borderColor: 'red.500',
         }}
       />
       <Flex justify="flex-end">
@@ -52,7 +52,7 @@ const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
         <Button
           height="34px"
           padding="0px 30px"
-          isDisabled={!textInputs.title}
+          // isDisabled={!textInputs.title}
           isLoading={loading}
           onClick={handleCreatePost}
           shadow="md"
@@ -61,7 +61,7 @@ const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
         </Button>
       </Flex>
     </Stack>
-  );
-};
+  )
+}
 
-export default TextInputs;
+export default TextInputs

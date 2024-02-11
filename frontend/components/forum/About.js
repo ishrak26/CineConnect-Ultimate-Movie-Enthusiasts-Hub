@@ -21,10 +21,11 @@ const About = ({ ForumData, members }) => {
       >
         <Stack>
           <AboutForum ForumData={ForumData} members={members} />
+          {console.log(ForumData)}
           <Button
             width="100%"
             onClick={() => {
-              router.push(`/forum/${ForumData.id}/submit`)
+              router.push(`/forum/${ForumData.forumId}/submit`)
             }}
           >
             Create Post

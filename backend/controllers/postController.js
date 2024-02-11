@@ -128,6 +128,9 @@ const postController = {
                 images = [];
             }
 
+            console.log('images', images);
+            console.log('content', content);
+
             const newPost = await dbPost.createNewPost(
                 userId,
                 forumId,

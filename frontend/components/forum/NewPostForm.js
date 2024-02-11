@@ -23,7 +23,7 @@ const formTabs = [
   },
 ];
 
-const NewPostForm = ({ user, ForumImageURL, currentForum}) => {
+const NewPostForm = ({ user, currentForum, cookie}) => {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState(formTabs[0].title);
   const [textInputs, setTextInputs] = useState({
@@ -34,33 +34,44 @@ const NewPostForm = ({ user, ForumImageURL, currentForum}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const showToast = useCustomToast();
-  const ForumLink = `/Forum/${currentForum?.id}`;
+  const ForumLink = `/forum/${currentForum?.forumId}`;
 
   const handleCreatePost = async () => {
-    const { ForumId } = router.query;
+    const { forumId } = router.query;
     const newPost = {
-      ForumId: ForumId,
-      ForumImageURL: ForumImageURL || '',
-      creatorId: user?.uid,
-      creatorUsername: user.email.split('@')[0],
-      title: textInputs.title,
-      body: textInputs.body,
-      numberOfComments: 0,
-      voteStatus: 0,
-      createTime: serverTimestamp(),
+      // forumId: forumId,
+      // ForumImageURL: currentForum?.image_url,
+      // creatorId: user?.userId,
+      // // creatorUsername: user.email.split('@')[0],
+      // title: textInputs.title,
+      content: textInputs.body,
+      // numberOfComments: 0,
+      // voteStatus: 0,
+      // createTime: serverTimestamp(),
     };
 
     setLoading(true);
 
     try {
-      const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);
+      
+      console.log(cookie)
+      const response = await fetch(`http://localhost:4000/v1/forum/${forumId}/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+          credentials: 'include',
+        },
+        body: JSON.stringify(newPost),
+      });
+      // const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);
       if (selectedFile) {
-        const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
-        await uploadString(imageRef, selectedFile, 'data_url');
-        const downloadURL = await getDownloadURL(imageRef);
-        await updateDoc(postDocRef, {
-          imageURL: downloadURL,
-        });
+        // const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
+        // await uploadString(imageRef, selectedFile, 'data_url');
+        // const downloadURL = await getDownloadURL(imageRef);
+        // await updateDoc(postDocRef, {
+        //   imageURL: downloadURL,
+        // });
       }
       router.push(ForumLink);
     } catch (error) {
@@ -91,7 +102,7 @@ const NewPostForm = ({ user, ForumImageURL, currentForum}) => {
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}
       />
-      <BackToForumButton ForumId={currentForum?.id} />
+      <BackToForumButton ForumId={currentForum?.forumId} />
       <PostBody
         selectedTab={selectedTab}
         handleCreatePost={handleCreatePost}
@@ -101,7 +112,7 @@ const NewPostForm = ({ user, ForumImageURL, currentForum}) => {
         selectedFile={selectedFile}
         onSelectFile={onSelectFile}
         setSelectedTab={setSelectedTab}
-        setSelectedFile={setSelectedFile}
+        // setSelectedFile={setSelectedFile}
       />
       <PostCreateError error={error} />
     </Flex>
@@ -109,10 +120,6 @@ const NewPostForm = ({ user, ForumImageURL, currentForum}) => {
 };
 export default NewPostForm;
 
-// TabList.js
-import React from 'react';
-import { Stack } from '@chakra-ui/react';
-import TabItem from './TabItem';
 
 const TabList = ({ formTabs, selectedTab, setSelectedTab }) => {
   return (
@@ -129,15 +136,10 @@ const TabList = ({ formTabs, selectedTab, setSelectedTab }) => {
   );
 };
 
-// BackToForumButton.js
-import React from 'react';
-import { Button, Icon } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
-import { MdOutlineArrowBackIos } from 'react-icons/md';
 
 const BackToForumButton = ({ ForumId }) => {
   const router = useRouter();
-  const ForumLink = `/Forum/${ForumId}`;
+  const ForumLink = `/forum/${ForumId}`;
 
   return (
     <Button
@@ -150,16 +152,12 @@ const BackToForumButton = ({ ForumId }) => {
       onClick={() => router.push(ForumLink)}
     >
       <Icon as={MdOutlineArrowBackIos} mr={2} />
-      {`Back to ${ForumId}`}
+      {/* {`Back to ${ForumId}`} */}
+      {`Back to Forum`}
     </Button>
   );
 };
 
-// PostBody.js
-import React from 'react';
-import { Flex } from '@chakra-ui/react';
-import TextInputs from './PostForm/TextInputs';
-import ImageUpload from './PostForm/ImageUpload';
 
 const PostBody = ({
   selectedTab,
@@ -170,7 +168,7 @@ const PostBody = ({
   selectedFile,
   onSelectFile,
   setSelectedTab,
-  setSelectedFile,
+  // setSelectedFile,
 }) => {
   return (
     <Flex p={4}>
@@ -186,16 +184,13 @@ const PostBody = ({
           selectedFile={selectedFile}
           onSelectImage={onSelectFile}
           setSelectedTab={setSelectedTab}
-          setSelectedFile={setSelectedFile}
+          // setSelectedFile={setSelectedFile}
         />
       )}
     </Flex>
   );
 };
 
-// PostCreateError.js
-import React from 'react';
-import { Alert, AlertIcon, Text } from '@chakra-ui/react';
 
 const PostCreateError = ({ error }) => {
   return error && (
