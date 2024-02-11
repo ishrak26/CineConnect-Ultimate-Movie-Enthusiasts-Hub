@@ -12,7 +12,7 @@ export default function Filters({ genres }) {
 
   const [show, setShow] = useState(false)
 
-  const [sort, setSort] = useState(router.query.sort_by || 'popularity.desc')
+  const [sort, setSort] = useState(router.query.sort_by || 'title.asc')
 
   const [yearMin, setYearMin] = useState(
     router.query['primary_release_date.gte']
@@ -40,7 +40,7 @@ export default function Filters({ genres }) {
   )
 
   useEffect(() => {
-    setSort(router.query.sort_by || 'popularity.desc')
+    setSort(router.query.sort_by || 'title.asc')
 
     setYearMin(
       router.query['primary_release_date.gte']

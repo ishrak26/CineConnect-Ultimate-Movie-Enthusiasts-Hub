@@ -8,7 +8,6 @@ const moviesController = {
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
         console.log('user: ', req.user);
         try {
-            console.log('title: ', req.query.title);
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(
                 title,
@@ -37,12 +36,28 @@ const moviesController = {
         }
     },
 
+    getMovieGenres: async (req, res) => {
+        try {
+            const genres = await db_movie.fetchAllGenres();
+            res.status(200).json(genres);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
     getMoviesByGenre: async (req, res) => {
         try {
             const genreId = req.params.genreId;
 
+            const limit = req.query.limit || 10; // Default limit to 10 if not specified
+            const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
             // Use the model function to fetch movies by genre
-            const movies = await db_movie.fetchMoviesByGenre(genreId);
+            const movies = await db_movie.fetchMoviesByGenre(
+                genreId,
+                limit,
+                offset
+            );
 
             if (!movies) {
                 return res.status(404).json({
@@ -446,6 +461,15 @@ const moviesController = {
             } else {
                 res.status(404).json({ message: 'Movie not found' });
             }
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    getTotalMovieCount: async (req, res) => {
+        try {
+            const count = await db_movie.fetchTotalMovieCount();
+            res.status(200).json({ count });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }

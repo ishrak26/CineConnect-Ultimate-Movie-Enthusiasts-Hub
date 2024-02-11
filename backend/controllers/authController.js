@@ -17,10 +17,6 @@ const authController = {
             const { username, email, password, full_name } = req.body;
 
             console.log('req.body', req.body);
-            // console.log('username', username);
-            // console.log('email', email);
-            // console.log('password', password);
-            // console.log('full_name', full_name);
 
             // check conflicts
             // check if email exists
@@ -73,8 +69,6 @@ const authController = {
 
             console.log('user', user);
 
-            // const hashedPassword = await bcrypt.hash(password, 10);
-
             // console.log('hashedPassword', hashedPassword);
             console.log('user.password', user.password);
             const isPasswordCorrect = await bcrypt.compare(
@@ -92,12 +86,16 @@ const authController = {
             const token = jwt.sign({ id: user.id }, SECRET_KEY, {
                 expiresIn: '1d',
             });
-            // Set the JWT in an HTTP-only cookie
+
+            // Set token in an HTTP-only cookie
             res.cookie('token', token, {
-                httpOnly: true, // Makes the cookie inaccessible to client-side JS
-                secure: false, // Ensures the cookie is only sent over HTTPS
-                sameSite: 'strict', // Helps mitigate CSRF attacks
+                httpOnly: true,
+                secure: false, // no Send only over HTTPS
+                // sameSite: 'Lax', // no Strict SameSite policy
+                maxAge: 3600000 * 24, // Cookie expiry set to match token expiry // 1d
+                path: '/', // Set the path to root
             });
+
             return res.status(200).json({
                 user: { username: user.username, id: user.id, role: user.role },
                 token: token,

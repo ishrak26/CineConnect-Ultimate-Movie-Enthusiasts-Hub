@@ -2,6 +2,7 @@ import React from 'react';
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Navbar from '@components/navbar';
 
 const Layout = (props) => {
     const router = useRouter();
@@ -51,18 +52,8 @@ const Layout = (props) => {
                       integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
                       crossOrigin="anonymous"/>
             </Head>
-
-            <nav className="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-                <div className="container-fluid">
-                    <Link href="/" className="navbar-brand">
-                        Home
-                    </Link>
-
-                    <div>
-                        {menu}
-                    </div>
-                </div>
-            </nav>
+            
+            {/* <Navbar auth={props.auth} /> */}
 
             <main className="form-signin">
                 {props.children}
