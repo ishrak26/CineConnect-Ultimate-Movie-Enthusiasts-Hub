@@ -107,6 +107,29 @@ const authController = {
             return res.status(500).json({ errors: err });
         }
     },
+
+    isLoggedIn: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(200).json({ loggedIn: false });
+            }
+            const user = await userModel.fetchUserById({ id: req.user.id });
+            if (!user) {
+                return res.status(200).json({ loggedIn: false });
+            }
+            return res.status(200).json({
+                user: {
+                    username: user.username,
+                    id: user.id,
+                    role: user.role,
+                    loggedIn: true,
+                },
+            });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ errors: err });
+        }
+    },
 };
 
 module.exports = authController;

@@ -12,6 +12,7 @@ export default function Navbar() {
   const ref = useRef(null)
   const router = useRouter()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
 
   useEffect(() => {
     if (searchOpen) {
@@ -20,6 +21,20 @@ export default function Navbar() {
       ref.current?.blur()
     }
   }, [searchOpen])
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const res = await fetch('/api/auth/isLoggedIn')
+      const data = await res.json()
+      setLoggedIn(data.loggedIn)
+    }
+    if (!checkLoggedIn.loggedIn) {
+      setLoggedIn(false)
+    }
+    else {
+      setLoggedIn(true)
+    }
+  }, [loggedIn])
 
   return (
     <header className="navbar">
