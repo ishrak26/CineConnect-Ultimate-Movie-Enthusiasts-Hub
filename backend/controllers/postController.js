@@ -615,6 +615,41 @@ const postController = {
         }
     },
 
+    checkUserVotedPost: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const postId = req.params.postId;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const vote = await dbPost.fetchPostVoteByUser(postId, userId);
+            if (vote === null) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            if (vote.length === 0) {
+                res.status(200).json({ voted: false });
+            } else {
+                res.status(200).json({ voted: true, type: vote[0].type });
+            }
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 

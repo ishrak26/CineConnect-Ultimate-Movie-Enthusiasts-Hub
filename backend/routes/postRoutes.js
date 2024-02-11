@@ -51,4 +51,7 @@ router.get(
     postController.getReactionsByPostId
 ); // **//
 
+// Route to check if user voted to a post
+router.get('/:forumId/post/:postId/voted', postController.checkUserVotedPost); // **//
+
 module.exports = router;
