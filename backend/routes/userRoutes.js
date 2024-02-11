@@ -36,4 +36,12 @@ router.delete('/:username/watchlist', userController.removeFromWatchlist);
 // Route for searching profiles by username
 router.get('/:username/search', userController.searchProfilesByUsername);
 
+// Route to get the type of the profile holder (user or cinefellow or non-cinefellow) 
+router.get('/:username/identify-profile', userController.identifyProfileHolder);
+
+// Route to get the profile of a user by username
+router.get('/:username/', userController.getProfileDetails);
+
 module.exports = router;
+
+// http://localhost:4000/v1/profile/

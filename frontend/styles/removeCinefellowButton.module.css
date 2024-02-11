@@ -1,0 +1,34 @@
+/* RemoveCinefellowButton.module.css */
+.removeCinefellowButton {
+    width: 260px;
+    height: 51px;
+    background: #171616;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 24px;
+    color: #FFFFFF;
+    padding-left: 2rem; /* Adjust based on the size of your icon */
+    padding-right: 2rem; /* Adjust for padding */
+    border: none;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+  }
+  
+  .removeCinefellowIcon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    /* Add icon specific styling here if needed */
+  }
+  
+  .removeCinefellowButton:hover {
+    background: #F8B319;
+  }
+  

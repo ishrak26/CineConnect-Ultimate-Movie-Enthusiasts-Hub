@@ -22,11 +22,26 @@ async function createUser(user) {
     }
 }
 
-async function findOne({ username }) {
+async function findOne({ username }) {  // Fetch user{id, username, password, role} by username
     const { data, error } = await supabase
         .from('user_info')
         .select('id, password, username, role')
         .eq('username', username);
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data) {
+        return data[0];
+    }
+}
+
+async function findOneById(id) {  // Fetch user{id, username, password, role} by username
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, password, username, role')
+        .eq('id', id);
 
     if (error) {
         console.error(error);
@@ -101,7 +116,7 @@ async function getCineFellows({ userId, limit, offset}) {
             ...fellowsAsFellow2.map(item => item.user_info),
         ];
 
-        console.log(combinedFellows);
+        // console.log(combinedFellows);
 
         return combinedFellows;
 
@@ -148,6 +163,21 @@ async function getCineFellowCount({ userId }) {
         return null; // Or handle error as appropriate
     }
 }
+
+async function getCinefellowCount2({ userId }) {
+    const { data, error } = await supabase
+      .from('cinefellow')
+      .select('id', { count: 'exact' }) // We want to count the number of matches
+      .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`);
+  
+    if (error) {
+      console.error('Error fetching cinefellow count:', error);
+      return 0; // Return 0 if there's an error
+    }
+  
+    return data.length; // The number of cinefellow rows for the user
+  }
+  
 
 
 async function followCinefellow({ userId, fellowId }) {
@@ -224,8 +254,8 @@ async function isFollowing({ userId, fellowId }) {
         const { data, error } = await supabase
             .from('cinefellow')
             .select('id')
-            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
-            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
+            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)  // Check if user is requestor
+            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`); // Check if user is requestee
 
         if (error) throw error;
 
@@ -322,6 +352,38 @@ const rejectCineFellowRequest = async ({ requestId, userId }) => {
     }
 }
 
+async function checkIfIRequested({ userId, fellowId }) {
+    const { data, error } = await supabase
+      .from('cinefellow_request')
+      .select('id')
+      .match({ from_id: userId, to_id: fellowId })
+      .single();
+  
+    if (error) {
+      console.error('Error checking cinefellow request:', error);
+      throw error; // or handle the error as you see fit
+    }
+  
+    return data ? true : false; // If there's data, a request exists (true), otherwise not (false)
+  }
+
+  async function checkIfTheyRequested({ userId, fellowId }) {
+    const { data, error } = await supabase
+      .from('cinefellow_request')
+      .select('id')
+      .match({ from_id: fellowId, to_id: userId })
+      .single();
+  
+    if (error) {
+      console.error('Error checking if they requested:', error);
+      throw error; // or handle the error as you see fit
+    }
+  
+    return !!data; // Convert the result to boolean: true if they requested, false otherwise
+  }
+  
+  
+
 const getWatchedMovies = async ({ userId, limit, offset}) => {
     try {
         const { data, error } = await supabase
@@ -335,7 +397,7 @@ const getWatchedMovies = async ({ userId, limit, offset}) => {
 
         if (error) throw error;
 
-        return data.map(item => item.movie_id);
+        return data.map(item => item.movie);
 
     } catch (error) {
         console.error('Error fetching watched movies:', error.message);
@@ -400,21 +462,43 @@ const searchProfilesByUsername = async ({ username , limit, offset}) => {
     }
 }
 
+const getProfileDetails = async ({ username }) => {
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .select('id, username, full_name, image_url, role')
+            .eq('username', username);
+
+        if (error) throw error;
+
+        return data[0];
+
+    } catch (error) {
+        console.error('Error fetching profile details:', error.message);
+        throw error;
+    }
+}
+
 module.exports = {
     createUser,
     findOne,
+    findOneById,
     checkIfUserExists,
     checkIfEmailExists,
     getCineFellows,
     getCineFellowCount,
+    getCinefellowCount2,
     followCinefellow,
     unfollowCinefellow,
     isFollowing,
     getPendingRequests,
     acceptCineFellowRequest,
     rejectCineFellowRequest,
+    checkIfIRequested,
+    checkIfTheyRequested,
     getWatchedMovies,
     getWatchlist,
     removeFromWatchlist,
     searchProfilesByUsername,
+    getProfileDetails,
 };

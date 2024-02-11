@@ -1,24 +1,58 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import Sidebar from '@components/Sidebar';
 import BaseLayout from '@components/BaseLayout';
 import Navbar from '@components/navbar';
+import Container from "@components/Container";
 import Row from '@components/Row';
 import ReviewCard from '@components/ReviewCard';
+import CinefellowsRow from '@components/CinefellowsRow'; // Adjust the import path as necessary
+import EditButton from '@components/EditButton'; // Adjust the import path as needed
+import SendCinefellowRequestButton from '@components/SendCinefellowRequestButton'; // Adjust the import path as needed
+import RemoveCinefellowButton from '@components/RemoveCinefellowButton'; // Adjust the import path as needed
+import WithdrawCinefellowRequestButton from '@components/WithdrawCinefellowRequestButton'; // Adjust the import path as needed
+import AcceptCinefellowRequestButton from '@components/AcceptCinefellowRequestButton'; // Adjust the import path as needed
+import DeclineCinefellowRequestButton from '@components/DeclineCinefellowRequestButton'; // Adjust the import path as needed
 // import Profiles from '@components/profiles';
 import Footer from '@components/footer';
 import Recommendations from '@components/recommendations';
+import { Box, Typography } from "@mui/material"; // Import from MUI
 // import styles from '../styles/profile.module.css';
  // Adjust the path according to your file structure
+
+ const router = useRouter();
+
+ const handleUnfollow = (userId, fellowId) => {
+  console.log(`UserId and FellowID: ${userId}`)
+  // Handle the rating logic (e.g., send to API)
+
+  try {
+    const response = fetch(`http://localhost:4000/v1/movie/${data.id}/rate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        movieId: data.id,
+        userId: 1,
+        rating: rate,
+      }),
+    }).then((res) => res.json())
+  } catch (err) {
+    console.log(err)
+  }
+}
  
 // import Awards from '@components/Awards'; // Assuming you have this component
 // import Activities from '@components/Activities'; // Assuming you have this component
 
-export default function Profile({ watched, watchlist, reviews, forums, cinefellows }) {
+export default function Profile({ watchedMovies, watchlist, reviews, forums, cineFellows, userType, profileInfo, cinefellowCount }) {
+  userType = 3; // 1 for user, 2 for cinefellow, 3 for request sent, 4 for request received, 5 for non-cinefellow
   // Assuming we have the user data for now as static content
   const userData = {
-    name: 'Farhan Tahmid',
+    name: profileInfo.full_name,
     profilePic: 'https://via.placeholder.com/150', // Replace with actual image source
-    cinefellowsCount: 124,
+    cineFellowsCount: 124,
     bio: 'Anime and movie enthusiast. Love to watch and discuss movies!',
     // Other user data can be included here
   };
@@ -40,6 +74,33 @@ export default function Profile({ watched, watchlist, reviews, forums, cinefello
   ]; // Assuming we have the user's reviews as static content
 
 
+  // Function to create section headers with the same style as in Container component
+  const SectionHeader = ({ title }) => (
+    <Box sx={{
+      position: "relative",
+      paddingX: { xs: "20px", md: 0 },
+      maxWidth: "1366px",
+      width: "100%",
+      color: "#fff",
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        left: { xs: "20px", md: "0" },
+        top: "100%",
+        height: "5px",
+        width: "100px",
+        backgroundColor: "primary.main",
+      },
+      marginBottom: '2rem' // Adjust the margin as needed
+    }}>
+      <Typography variant="h5" fontWeight="700" textTransform="uppercase">
+        {title}
+      </Typography>
+    </Box>
+  );
+
+  // Spacing classes for margin
+  const sectionMargin = "mb-20 mt-16"; // Margin at the bottom of each section
 
 
   return (
@@ -48,28 +109,81 @@ export default function Profile({ watched, watchlist, reviews, forums, cinefello
       <BaseLayout>
         <div className="container">
           <main className="flex-grow p-4">
-            <div className="user-profile-details flex items-end mb-16 mt-8"> {/* mb-8 adds margin-bottom */}
-              <img src={userData.profilePic} alt={`${userData.name}'s profile`} className="rounded-full h-40 w-40 mr-8" /> 
+            <div className={`user-profile-details flex items-end ${sectionMargin}`}>
+              <img
+                src={profileInfo.image_url}
+                alt={`${profileInfo.username}'s profile`}
+                className="rounded-full h-64 w-64 mr-8 object-cover" // Adjust h-32 and w-32 to the size you desire
+              /> 
               <div className="flex-grow">
-                <h1 className="text-4xl font-bold mb-1">{userData.name}</h1>
-                <p>{userData.cinefellowsCount} CineFellows</p>
+                <h1 className="text-4xl font-bold mb-1">{profileInfo.full_name}</h1>
+                {cinefellowCount < 2 && <p>{cinefellowCount} Cinefellow</p>}
+                {cinefellowCount >= 2 && <p>{cinefellowCount} Cinefellows</p>}
                 <p className="text-gray-400 italic mt-4">{userData.bio}</p>
               </div>
-              <button className="text-sm text-blue-500 hover:text-blue-700 self-start">Edit profile</button> {/* self-start aligns to the top */}
+              {userType === 1 ? ( // If the user is the owner of the profile
+                <EditButton />
+              ) : userType === 2 ? (  // If the user is a cinefellow of the profile owner
+                // write the handler function for the remove cinefellow button
+                <RemoveCinefellowButton onClick={async () => {
+                  // Handler logic for removing a cinefellow
+                  try {
+                    // Assuming removeCinefellow is an API call function
+                    const response = fetch unfollowCinefellow(cinefellowId);
+                    if (response.success) {
+                      // Refresh the profile page to show the updated cinefellow list
+                      router.reload();
+                    }
+                  } catch (error) {
+                    console.error('Failed to remove cinefellow:', error);
+                  }
+                }} />
+              ) : userType === 3 ? (  // If the user has been sent a request by the profile owner
+                // Wrap the buttons in a div with a flex container
+                <div style={{ display: 'flex', gap: '10px' }}> 
+                  <AcceptCinefellowRequestButton />
+                  <DeclineCinefellowRequestButton />
+                </div>
+              ) : userType === 4 ? (  // If the user has sent a request to the profile owner
+                <WithdrawCinefellowRequestButton />
+              ) : userType === 5 ? (  // If profile owner is someone else
+                <SendCinefellowRequestButton />
+              ) : (
+                <></>
+              )}
             </div>
-            <div className="profile-content">
-              <Row movies={watched} title="Watched" isMain={true} />
-              <Row movies={watchlist} title="Watchlist" isMain={true} />
-              {/* <Row movies={reviews} title="Reviews" isMain={true} /> */}
-              <div className="reviews-section my-5">
-              <h2 className="text-xl font-bold mb-3">Recent Reviews</h2>
+
+            {/* Watched Section */}
+            <SectionHeader title="Watched" />
+            <div className={`${sectionMargin}`}>
+              <Row movies={watchedMovies} isMain={true} />
+            </div>
+            
+
+            {/* Watchlist Section */}
+            <SectionHeader title="Watchlist" />
+            <div className={`${sectionMargin}`}>
+              <Row movies={watchlist} isMain={true} />
+            </div>
+
+            {/* Reviews Section */}
+            <SectionHeader title="Recent Reviews" />
+            <div className={`space-y-4 ${sectionMargin}`}>
               {userReviews.map((review, index) => (
                 <ReviewCard key={index} review={review} />
               ))}
             </div>
-              <Row movies={forums} title="Discussion Forums" isMain={true} />
-              <Row movies={cinefellows} title="Cinefellows" isMain={true} />
+
+            {/* Discussion Forums Section */}
+            <SectionHeader title="Discussion Forums"/>
+            <Row movies={forums} isMain={true} />
+
+            {/* cineFellows Section */}
+            <SectionHeader title="Cinefellows"/>
+            <div className={`rounded-full h-64 w-64 mr-8 object-cover ${sectionMargin}`}>
+              <CinefellowsRow cinefellows={cineFellows} />
             </div>
+            
           </main>
           <aside className="w-1/4">
             {/* Place for Recommendations, Awards, Activities */}
@@ -87,8 +201,9 @@ export default function Profile({ watched, watchlist, reviews, forums, cinefello
 
 export async function getServerSideProps(context) {
 
-  const query = context.query;
+  const query = context.query;  // Get the query parameters
   const cookie = context.req.headers.cookie;
+  const username = context.req.params.username;
 
   // Helper function to fetch data
   async function fetchData(url, params) {
@@ -113,26 +228,34 @@ export async function getServerSideProps(context) {
 
   // Use Promise.all to fetch data for different categories concurrently
   try {
-    const [watched, watchlist, reviews, forums, cinefellows] = await Promise.all([
-      fetchData(`http://localhost:4000/v1/movies/`),  // dummy movie cards, will need to fetch actual watched movies by the user
-      fetchData(`http://localhost:4000/v1/movies/`),  // dummy movie cards, will need to fetch actual watchlist movies by the user
+    const [watchedMovies, cineFellows, watchlist, reviews, forums, userType, profileInfo, cinefellowCount ] = await Promise.all([
+      fetchData(`http://localhost:4000/v1/profile/${username}/watched/`), 
+      fetchData(`http://localhost:4000/v1/profile/${username}/cinefellows/`),
+      fetchData(`http://localhost:4000/v1/profile/${username}/watchlist/`),
       fetchData(`http://localhost:4000/v1/movies/`),  // dummy, will need to change to fetch top few reviews
       fetchData(`http://localhost:4000/v1/movies/`),  // dummy, will need to change to fetch top forums
-      fetchData(`http://localhost:4000/v1/movies/`)   // dummy, will need to change to fetch cinefellows
+      fetchData(`http://localhost:4000/v1/profile/${username}/identify-profile`),
+      fetchData(`http://localhost:4000/v1/profile/${username}/`),
+      fetchData(`http://localhost:4000/v1/profile/${username}/cinefellows/count/`), 
+
     ]);
+    console.log('cinefellow count:', cinefellowCount);
 
     // Check if any of the responses indicate 'not found'
-    if (watched.notFound || watchlist.notFound || reviews.notFound || forums.notFound || cinefellows.notFound) {
+    if (watchedMovies.notFound || watchlist.notFound || reviews.notFound || forums.notFound || cineFellows.notFound || userType.notFound || profileInfo.notFound) {
       return { notFound: true };
     }
 
     return {
       props: {
-        watched,
-        watchlist,
+        ...watchedMovies,
+        ...watchlist,
         reviews,
         forums,
-        cinefellows,
+        ...cineFellows,
+        ...userType,
+        ...profileInfo,
+        ...cinefellowCount,
         // Add other props as needed
       },
     };
