@@ -7,14 +7,15 @@ import Search from './search'
 import SearchIcon from './icons/search.svg'
 import clsx from 'clsx'
 
-
 export default function Navbar() {
   const ref = useRef(null)
   const router = useRouter()
   const [searchOpen, setSearchOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
+  const [userInfo, setUserInfo] = useState(null)
 
   useEffect(() => {
+    console.log('Inside useEffect to check if search')
     if (searchOpen) {
       ref.current?.focus()
     } else {
@@ -23,18 +24,25 @@ export default function Navbar() {
   }, [searchOpen])
 
   useEffect(() => {
+    console.log('Inside useEffect to check if loggedIn')
     const checkLoggedIn = async () => {
-      const res = await fetch('/api/auth/isLoggedIn')
-      const data = await res.json()
-      setLoggedIn(data.loggedIn)
+      const res = await fetch(`http://localhost:4000/v1/auth/isLoggedIn`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+      }).then((res) => res.json())
+      setLoggedIn(res.loggedIn)
     }
     if (!checkLoggedIn.loggedIn) {
       setLoggedIn(false)
-    }
-    else {
+    } else {
       setLoggedIn(true)
+      setUserInfo(checkLoggedIn.user)
     }
-  }, [loggedIn])
+  }, [])
 
   return (
     <header className="navbar">
@@ -49,28 +57,51 @@ export default function Navbar() {
         </div>
 
         <nav className="ml-auto flex items-center">
+          {!loggedIn && (
+            <Link
+              href="/login"
+              className={clsx(
+                'nav-link',
+                router.pathname === '/login' && 'text-white-100'
+              )}
+            >
+              Login
+            </Link>
+          )}
 
-          <Link
-            href="/login"
-            className={clsx(
-              'nav-link',
-              router.pathname === '/login' && 'text-white-100'
-            )}
-          >
-            Login
-          </Link>
+          {!loggedIn && (
+            <Link
+              href="/register"
+              className={clsx(
+                'nav-link',
+                router.pathname === '/register' && 'text-white-100'
+              )}
+            >
+              Register
+            </Link>
+          )}
 
-          <Link
-            href="/register"
-            className={clsx(
-              'nav-link',
-              router.pathname === '/register' && 'text-white-100'
-            )}
-          >
-            Register
-          </Link>
+          {loggedIn && (
+            <button className="icon-button">
+              <img
+                src="/notification.png"
+                alt="Notifications"
+                className="icon"
+              />
+            </button>
+          )}
+          {loggedIn && (
+            <button className="icon-button">
+              <img src="/profile.png" alt="Profile" className="icon" />
+            </button>
+          )}
+          {loggedIn && (
+            <button className="icon-button">
+              <img src="/settings.png" alt="Settings" className="icon" />
+            </button>
+          )}
 
-           {/* <Link
+          {/* <Link
             href="/movie"
             className={clsx(
               'nav-link',
@@ -79,7 +110,7 @@ export default function Navbar() {
           >
             Movies
           </Link> */}
-{/*
+          {/*
           <Link
             href="/tv"
             className={clsx(
@@ -99,16 +130,6 @@ export default function Navbar() {
               <SearchIcon />
               <span className="sr-only">Search</span>
             </button> */}
-          <button className="icon-button">
-            <img src="/notification.png" alt="Notifications" className="icon" />
-          </button>
-          <button className="icon-button">
-            <img src="/profile.png" alt="Profile" className="icon" />
-          </button>
-          <button className="icon-button">
-            <img src="/settings.png" alt="Settings" className="icon" />
-          </button>
-
         </nav>
       </div>
     </header>

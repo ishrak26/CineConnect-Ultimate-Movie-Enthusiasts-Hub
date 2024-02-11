@@ -111,17 +111,19 @@ const authController = {
             if (!req.user) {
                 return res.status(200).json({ loggedIn: false });
             }
-            const user = await userModel.fetchUserById({ id: req.user.id });
-            if (!user) {
+            const userInfo = await userModel.fetchUserById({ id: req.user.id });
+            console.log('userInfo', userInfo);
+            if (!userInfo) {
                 return res.status(200).json({ loggedIn: false });
             }
             return res.status(200).json({
                 user: {
-                    username: user.username,
-                    id: user.id,
-                    role: user.role,
-                    loggedIn: true,
+                    username: userInfo.username,
+                    id: userInfo.id,
+                    role: userInfo.role,
+                    image_url: userInfo.image_url,
                 },
+                loggedIn: true,
             });
         } catch (err) {
             console.error(err);
