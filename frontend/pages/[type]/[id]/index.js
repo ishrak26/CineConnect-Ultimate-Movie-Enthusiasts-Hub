@@ -17,7 +17,7 @@ import Card from '@components/card'
 import Link from 'next/link'
 import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
-import { FaPlus, FaCheck } from 'react-icons/fa'
+import { FaPlus, FaCheck, FaLock, FaArrowCircleRight } from 'react-icons/fa'
 import SetRating from '@components/SetRating'
 import { useRouter } from 'next/router'
 
@@ -26,12 +26,9 @@ export default function Home({ data, type, casts, cookie }) {
   const [userRating, setUserRating] = useState(0)
   const [isWatched, setIsWatched] = useState(false)
   const [movieRating, setMovieRating] = useState(0)
+  const [isJoined, setIsJoined] = useState(false)
 
   const router = useRouter()
-
-  useEffect(() => {
-    setMovieRating(data.rating)
-  }, [])
 
   useEffect(() => {
     const getRating = async () => {
@@ -68,10 +65,7 @@ export default function Home({ data, type, casts, cookie }) {
         // console.log('Response Body:', responseBody)
       }
     }
-    getRating()
-  }, [])
 
-  useEffect(() => {
     const getWatchData = async () => {
       const watchResponse = await fetch(
         `http://localhost:4000/v1/movie/${data.id}/watchInfo`,
@@ -112,7 +106,47 @@ export default function Home({ data, type, casts, cookie }) {
         console.log('Response Body:', responseBody)
       }
     }
+
+    const getJoinedData = async () => {
+      const joinedResponse = await fetch(
+        `http://localhost:4000/v1/forum/${data.id}/joined`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+
+      // Check the response status code before proceeding to parse the JSON
+      if (joinedResponse.ok) {
+        // If the response is successful (status in the range 200-299)
+        const joinedData = await joinedResponse.json() // Now it's safe to parse JSON
+        // Process your watchData here
+        if (!joinedData.joined) {
+          setIsJoined(false)
+        } else {
+          setIsJoined(true)
+        }
+      } else {
+        // If the response is not successful, log or handle the error
+        console.error(
+          'Error with request:',
+          joinedResponse.status,
+          joinedResponse.statusText
+        )
+        // Optionally, you can still read and log the response body
+        // const responseBody = await joinedResponse.text()
+        // console.log('Response Body:', responseBody)
+      }
+    }
+
+    setMovieRating(data.rating)
     getWatchData()
+    getRating()
+    getJoinedData()
   }, [])
 
   const handleClickWatchlist = async () => {
@@ -352,11 +386,11 @@ export default function Home({ data, type, casts, cookie }) {
                 >
                   {isWatched ? (
                     <>
-                      <FaCheck className="mr-2" /> Added to Watchedlist
+                      <FaCheck className="mr-2" /> Marked as Watched
                     </>
                   ) : (
                     <>
-                      <FaPlus className="mr-2" /> Add to Watchedlist
+                      <FaPlus className="mr-2" /> Mark as Watched
                     </>
                   )}
                 </button>
@@ -414,7 +448,16 @@ export default function Home({ data, type, casts, cookie }) {
                       className="flex items-center justify-center button button-primary"
                       onClick={handleClickForum}
                     >
-                      Enter Discussion Forum
+                      {!isJoined ? (
+                        <>
+                          <FaLock className="mr-2" /> Join Discussion Forum
+                        </>
+                      ) : (
+                        <>
+                          <FaArrowCircleRight className="mr-2" /> Go to
+                          Discussion Forum
+                        </>
+                      )}
                     </button>
                   </div>
                 )}
