@@ -22,17 +22,21 @@ import SetRating from '@components/SetRating'
 import { useRouter } from 'next/router'
 
 export default function Home({ data, type, casts, cookie }) {
-  const [isAdded, setIsAdded] = useState(false)
+  const [isWatchlisted, setIsWatchlisted] = useState(false)
   const [userRating, setUserRating] = useState(0)
-  const [userRated, setUserRated] = useState(false)
   const [isWatched, setIsWatched] = useState(false)
+  const [movieRating, setMovieRating] = useState(0)
 
   const router = useRouter()
 
   useEffect(() => {
-    const getUserRating = async () => {
-      const response = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/userInfo`,
+    setMovieRating(data.rating)
+  }, [])
+
+  useEffect(() => {
+    const getRating = async () => {
+      const ratingResponse = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/rated`,
         {
           method: 'GET',
           headers: {
@@ -41,65 +45,114 @@ export default function Home({ data, type, casts, cookie }) {
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
-      // console.log('response', response)
-      if (!response.rating) {
-        setUserRated(false)
-        setUserRating(0)
-      } else {
-        setUserRated(true)
-        setUserRating(response.rating)
-      }
-      if (!response.in_watchlist) {
-        setIsAdded(false)
-      } else {
-        setIsAdded(true)
-      }
-      if (!response.in_watchedlist) {
-        setIsWatched(false)
-      } else {
-        setIsWatched(true)
-      }
-      // console.log('loggedIn', loggedIn)
-      // console.log('userInfo', userInfo)
-    }
-    getUserRating()
-    console.log('userRated', userRated, 'userRating', userRating)
-  }, [userRating, isAdded, isWatched])
+      )
 
-  const handleClick = () => {
-    // Additional logic to handle adding/removing from watchlist
-    try {
-      const response = fetch(
-        `http://localhost:4000/v1/movie/${data.id}/watch`,
+      // Check the response status code before proceeding to parse the JSON
+      if (ratingResponse.ok) {
+        // If the response is successful (status in the range 200-299)
+        const ratingData = await ratingResponse.json() // Now it's safe to parse JSON
+        if (!ratingData.rating) {
+          setUserRating(0)
+        } else {
+          setUserRating(ratingData.rating)
+        }
+      } else {
+        // If the response is not successful, log or handle the error
+        console.error(
+          'Error with request:',
+          ratingResponse.status,
+          ratingResponse.statusText
+        )
+        // Optionally, you can still read and log the response body
+        // const responseBody = await ratingResponse.text()
+        // console.log('Response Body:', responseBody)
+      }
+    }
+    getRating()
+  }, [])
+
+  useEffect(() => {
+    const getWatchData = async () => {
+      const watchResponse = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/watchInfo`,
         {
-          method: isAdded ? 'DELETE' : 'POST',
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
-      setIsAdded(!isAdded)
+      )
+
+      // Check the response status code before proceeding to parse the JSON
+      if (watchResponse.ok) {
+        // If the response is successful (status in the range 200-299)
+        const watchData = await watchResponse.json() // Now it's safe to parse JSON
+        // Process your watchData here
+        if (!watchData.in_watchlist) {
+          setIsWatchlisted(false)
+        } else {
+          setIsWatchlisted(true)
+        }
+        if (!watchData.in_watchedlist) {
+          setIsWatched(false)
+        } else {
+          setIsWatched(true)
+        }
+      } else {
+        // If the response is not successful, log or handle the error
+        console.error(
+          'Error with request:',
+          watchResponse.status,
+          watchResponse.statusText
+        )
+        // Optionally, you can still read and log the response body
+        const responseBody = await watchResponse.text()
+        console.log('Response Body:', responseBody)
+      }
+    }
+    getWatchData()
+  }, [])
+
+  const handleClickWatchlist = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/watch`,
+        {
+          method: isWatchlisted ? 'DELETE' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      if (response.ok) {
+        setIsWatchlisted(!isWatchlisted)
+      } else {
+        console.error(
+          'Error with request:',
+          response.status,
+          response.statusText
+        )
+      }
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
-  const handleClickForum = () => {
-    // Additional logic to handle adding/removing from watchlist
+  const handleClickForum = async () => {
     try {
       router.push(`/forum/${data.id}`)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
-  const handleClickWatched = () => {
-    // Additional logic to handle adding/removing from watchlist
+  const handleClickWatched = async () => {
     try {
-      const response = fetch(
+      const response = await fetch(
         `http://localhost:4000/v1/movie/${data.id}/watched`,
         {
           method: isWatched ? 'DELETE' : 'POST',
@@ -109,32 +162,67 @@ export default function Home({ data, type, casts, cookie }) {
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
-      setIsWatched(!isWatched)
+      )
+      if (response.ok) {
+        setIsWatched(!isWatched)
+      } else {
+        console.error(
+          'Error with request:',
+          response.status,
+          response.statusText
+        )
+      }
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
-  const handleRating = (rate) => {
-    console.log(`Rated with: ${rate}`)
-    // Handle the rating logic (e.g., send to API)
-
+  const handleClickRating = async (rate) => {
     try {
-      const response = fetch(`http://localhost:4000/v1/movie/${data.id}/rate`, {
-        method: userRated ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          rating: parseInt(rate),
-        }),
-      }).then((res) => res.json())
-      setUserRating(rate)
+      const response = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/rate`,
+        {
+          method: userRating ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            rating: parseInt(rate),
+          }),
+        }
+      )
+      if (response.ok) {
+        setUserRating(rate)
+        const response2 = await fetch(
+          `http://localhost:4000/v1/movie/${data.id}/rating`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+        if (response2.ok) {
+          const ratingData = await response2.json()
+          setMovieRating(ratingData.rating)
+        } else {
+          console.error(
+            'Error with request:',
+            response2.status,
+            response2.statusText
+          )
+        }
+      } else {
+        console.error(
+          'Error with request:',
+          response.status,
+          response.statusText
+        )
+      }
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
@@ -245,10 +333,10 @@ export default function Home({ data, type, casts, cookie }) {
                   Watch
                 </Link> */}
                 <button
-                  onClick={handleClick}
+                  onClick={handleClickWatchlist}
                   className="flex items-center justify-center button button-primary"
                 >
-                  {isAdded ? (
+                  {isWatchlisted ? (
                     <>
                       <FaCheck className="mr-2" /> Added to Watchlist
                     </>
@@ -273,10 +361,13 @@ export default function Home({ data, type, casts, cookie }) {
                   )}
                 </button>
 
-                <SetRating onRating={handleRating} defaultRating={userRating} />
+                <SetRating
+                  onRating={handleClickRating}
+                  defaultRating={userRating}
+                />
 
                 {/* <Rating average={data.vote_average} /> */}
-                <Rating average={data.rating} />
+                <Rating average={movieRating} />
 
                 {type === 'movie' && (
                   <div className="space-y-6">

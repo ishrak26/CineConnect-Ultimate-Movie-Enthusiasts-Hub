@@ -9,14 +9,11 @@ async function fetchMovieRatingById(movieId) {
         .select('rating', { avg: 'rating' })
         .eq('movie_id', movieId);
 
-    if (error) {
+    if (error || data.length !== 1) {
         console.error('Error fetching movie rating by id', error);
         return null;
     }
-    if (data) {
-        // console.log(data);
-        return data[0].rating;
-    }
+    return data[0].rating;
 }
 
 /*
@@ -648,20 +645,8 @@ const fetchTotalMovieCount = async () => {
     return count;
 };
 
-const fetchUserInfoForMovie = async (userId, movieId) => {
+const fetchUserWatchInfoForMovie = async (userId, movieId) => {
     const ret = {};
-    const { data, error } = await supabase
-        .from('movie_has_user_rating')
-        .select('rating')
-        .eq('user_id', userId)
-        .eq('movie_id', movieId);
-
-    if (error || data.length > 1) {
-        console.error('Error fetching user rating for movie', error);
-        return null;
-    }
-
-    ret.rating = data.length === 1 ? data[0].rating : 0;
 
     const { data: watchlistData, error: watchlistError } = await supabase
         .from('watch_list')
@@ -692,6 +677,21 @@ const fetchUserInfoForMovie = async (userId, movieId) => {
     return ret;
 };
 
+const fetchMovieRatingByUser = async (userId, movieId) => {
+    const { data, error } = await supabase
+        .from('movie_has_user_rating')
+        .select('rating')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+
+    if (error || data.length > 1) {
+        console.error('Error fetching movie rating by user id', error);
+        return null;
+    }
+
+    return data;
+};
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -709,5 +709,7 @@ module.exports = {
     deleteRating,
     fetchTotalMovieCount,
     isMovieInWatchedlist,
-    fetchUserInfoForMovie,
+    fetchUserWatchInfoForMovie,
+    fetchMovieRatingById,
+    fetchMovieRatingByUser,
 };

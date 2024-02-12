@@ -14,7 +14,7 @@ const moviesController = {
                 offset,
                 limit
             );
-            
+
             res.json(movies || []);
         } catch (error) {
             console.log('in catch: ', error.message);
@@ -281,7 +281,7 @@ const moviesController = {
         }
 
         const movieId = req.params.movieId;
-        const userId = req.user.id; 
+        const userId = req.user.id;
 
         try {
             const alreadyWatched = await db_movie.isMovieInWatchedlist(
@@ -297,7 +297,7 @@ const moviesController = {
                 userId,
                 movieId
             );
-            console.log('watched result', result);
+            // console.log('watched result', result);
             if (result) {
                 res.status(201).json({
                     message: 'Movie successfully added to watched-list',
@@ -488,7 +488,7 @@ const moviesController = {
         }
     },
 
-    getUserInfoForMovie: async (req, res) => {
+    getUserWatchInfoForMovie: async (req, res) => {
         if (!req.user) {
             return res.status(200).json({ message: 'No user info found' });
         }
@@ -497,7 +497,7 @@ const moviesController = {
         const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
 
         try {
-            const userInfo = await db_movie.fetchUserInfoForMovie(
+            const userInfo = await db_movie.fetchUserWatchInfoForMovie(
                 userId,
                 movieId
             );
@@ -511,6 +511,56 @@ const moviesController = {
             }
         } catch (error) {
             console.error('Error in getUserInfoForMovie:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getUserRatingForMovie: async (req, res) => {
+        if (!req.user) {
+            return res.status(200).json({ rated: false });
+        }
+
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
+
+        try {
+            const rating = await db_movie.fetchMovieRatingByUser(
+                userId,
+                movieId
+            );
+            if (rating === null) {
+                return res.status(500).json({
+                    message: 'Internal server error',
+                });
+            }
+
+            if (rating.length > 0) {
+                res.status(200).json({ rated: true, rating: rating[0].rating });
+            } else {
+                res.status(200).json({
+                    rated: false,
+                });
+            }
+        } catch (error) {
+            console.error('Error in getMovieRatingByUser:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getMovieRating: async (req, res) => {
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+
+        try {
+            const rating = await db_movie.fetchMovieRatingById(movieId);
+            if (!rating) {
+                return res.status(500).json({
+                    message: 'Internal server error',
+                });
+            }
+
+            res.status(200).json({ rating });
+        } catch (error) {
+            console.error('Error in getMovieRating:', error);
             res.status(500).json({ message: 'Internal server error' });
         }
     },
