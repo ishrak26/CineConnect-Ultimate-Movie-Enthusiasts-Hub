@@ -53,6 +53,22 @@ async function findOneById(id) {  // Fetch user{id, username, password, role} by
     }
 }
 
+async function findOneById(id) {  // Fetch user{id, username, password, role} by username
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, password, username, role')
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data) {
+        return data[0];
+    }
+}
+
 async function checkIfUserExists({ username }) {
     const { data, error } = await supabase
         .from('user_info')
@@ -82,6 +98,25 @@ async function checkIfEmailExists({ email }) {
 
     if (data) {
         return data[0];
+    }
+}
+
+
+async function getProfileByUsername({ username }) {
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .select('id, username, full_name, image_url, email')
+            .eq('username', username)
+            .single();
+
+        if (error) throw error;
+
+        return data;
+
+    } catch (error) {
+        console.error('Error fetching profile:', error.message);
+        return null;
     }
 }
 
@@ -183,20 +218,20 @@ async function getCinefellowCount2({ userId }) {
 async function followCinefellow({ userId, fellowId }) {
     try {
         // First, check if there's already a pending or accepted request
-        const { data: existingRequest, error: existingError } = await supabase
-            .from('cinefellow_request')
-            .select('id')
-            .or(`from_id.eq.${userId},to_id.eq.${fellowId}`)
-            .or(`from_id.eq.${fellowId},to_id.eq.${userId}`)
-            .in('status', ['pending', 'accepted']);
+        // const { data: existingRequest, error: existingError } = await supabase
+        //     .from('cinefellow_request')
+        //     .select('id')
+        //     .or(`from_id.eq.${userId},to_id.eq.${fellowId}`)
+        //     .or(`from_id.eq.${fellowId},to_id.eq.${userId}`)
+        //     .in('status', ['pending', 'accepted']);
 
-        if (existingError) throw existingError;
+        // if (existingError) throw existingError;
 
         // If a request already exists, prevent creating a duplicate
-        if (existingRequest.length > 0) {
-            console.log('A request already exists between these users.');
-            return false; // Indicates no new request was created
-        }
+        // if (existingRequest.length > 0) {
+        //     console.log('A request already exists between these users.');
+        //     return false; // Indicates no new request was created
+        // }
 
         // Insert the new follow request into the cinefellow_request table
         const { error: insertError } = await supabase
@@ -204,7 +239,7 @@ async function followCinefellow({ userId, fellowId }) {
             .insert([{ from_id: userId, to_id: fellowId, status: 'pending' }]);
 
         if (insertError) {
-            throw insertError;
+            throw insertError;            
         }
 
         return true; // Successfully created a new follow request
@@ -218,36 +253,21 @@ async function followCinefellow({ userId, fellowId }) {
 
 async function unfollowCinefellow({ userId, fellowId }) {
     try {
-        // Check if the user is following the fellow
-        // console.log('Inside model function unfollowCinefellow UserId : ', userId, 'FellowId : ', fellowId);
-        const { data, error } = await supabase
-            .from('cinefellow')
-            .select('id')
-            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
-            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
-
-        if (error) throw error;
-
-        if (data.length === 0) {
-            return false;
-        }
 
         // Delete the cinefellow relationship
-        const { data: deleteData, error: deleteError } = await supabase
-        .from('cinefellow')
-        .delete()
-        // Match the specific relationship where one is the requestor and the other is the requestee
-        .match({ requestor_id: userId, requestee_id: fellowId })
-        // You might also need to consider the inverse relationship
-        .or(`requestor_id.eq.${fellowId},requestee_id.eq.${userId}`).select();
+        const { data, error: deleteError } = await supabase
+            .from('cinefellow')
+            .delete()
+            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
+            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`).select();
 
         if (deleteError) throw deleteError;
 
-        console.log('deleteData', deleteData);
+        if(data.length === 0) {
+            console.log('No cinefellow relationship found.');
+            return false;
+        }
 
-        // console.log('Model function unfollowCinefellow: Unfollowed cinefellow.');
-
-        
         return true;
 
     } catch (error) {
@@ -293,16 +313,7 @@ const getPendingRequests = async ({ userId, limit, offset }) => {
 
         if (incomingError) throw incomingError;
 
-        // Fetch outgoing requests
-        const { data: outgoingRequests, error: outgoingError } = await supabase
-            .from('cinefellow_request')
-            .select('*')
-            .eq('from_id', userId)
-            .eq('status', 'pending');
-
-        if (outgoingError) throw outgoingError;
-
-        return { incomingRequests, outgoingRequests };
+        return { incomingRequests };
     } catch (error) {
         console.error('Error fetching pending requests:', error.message);
         throw error;
@@ -469,11 +480,34 @@ const searchProfilesByUsername = async ({ username , limit, offset}) => {
         if (error) throw error;
 
         return data;
-
     } catch (error) {
         console.error('Error searching profiles:', error.message);
         throw error;
     }
+};
+
+async function fetchJoinedForums(userId, limit, offset) {
+    try {
+        console.log('Fetching joined forums:', userId, limit, offset);
+
+        const { data, error } = await supabase.rpc('get_joined_forums', {
+            uid: userId,
+            limit_val: limit,
+            offset_val: offset,
+        });
+
+        if (error) {
+            console.error('Error fetching joined forums:', error.message);
+            return null;
+        }
+
+        // console.log('Joined forums:', data);
+        return data;
+    } catch (err) {
+        console.error('Exception fetching joined forums:', err.message);
+        return null;
+    }
+
 }
 
 const getProfileDetails = async ({ username }) => {
@@ -509,6 +543,7 @@ async function fetchUserById({ id }) {
     }
 
     return data[0];
+
 }
 
 module.exports = {
@@ -517,12 +552,13 @@ module.exports = {
     findOneById,
     checkIfUserExists,
     checkIfEmailExists,
+
+    getProfileByUsername,
     getCineFellows,
     getCineFellowCount,
     getCinefellowCount2,
     followCinefellow,
     unfollowCinefellow,
-    isFollowing,
     getPendingRequests,
     acceptCineFellowRequest,
     rejectCineFellowRequest,
@@ -532,6 +568,9 @@ module.exports = {
     getWatchlist,
     removeFromWatchlist,
     searchProfilesByUsername,
+    fetchJoinedForums,
+
     getProfileDetails,
     fetchUserById,
+
 };

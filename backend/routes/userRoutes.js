@@ -4,6 +4,9 @@ const userController = require('../controllers/userController');
 
 const router = express.Router();
 
+// Route to get user by username
+router.get('/:username', userController.getProfileByUsername);
+
 router.get('/:username/cinefellows/', userController.getCineFellows);
 
 // Route to get cinefellows count 
@@ -30,11 +33,11 @@ router.get('/:username/watched', userController.getWatchedMovies);
 // Route to get watchlist by username
 router.get('/:username/watchlist', userController.getWatchlist);
 
-// Route to delete a movie from watchlist by username and movieId
-router.delete('/:username/watchlist', userController.removeFromWatchlist);
-
 // Route for searching profiles by username
 router.get('/:username/search', userController.searchProfilesByUsername);
+
+// Route to get user joined forums
+router.get('/:username/forums', userController.getUserJoinedForums);
 
 // Route to get the type of the profile holder (user or cinefellow or non-cinefellow) 
 router.get('/:username/identify-profile', userController.identifyProfileHolder);

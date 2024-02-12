@@ -544,12 +544,12 @@ async function isMovieInWatchedlist(userId, movieId) {
         .select('id, joined_forum')
         .eq('user_id', userId)
         .eq('movie_id', movieId);
-    if (error || data.length !== 1) {
+    if (error || data.length > 1) {
         console.error('Error checking isMovieInWatchedList:', error.message);
         return null;
     }
 
-    return data[0];
+    return data;
 }
 
 // Function to remove a movie from the watched list
@@ -574,12 +574,12 @@ async function submitRating(userId, movieId, rating) {
         .insert([{ user_id: userId, movie_id: movieId, rating: rating }])
         .select('id');
 
-    if (error) {
+    if (error || data.length !== 1) {
         console.error('Error rating movie as current user', error);
         throw error;
     }
 
-    return data;
+    return data[0];
 }
 
 async function editRating(userId, movieId, rating) {
@@ -648,6 +648,50 @@ const fetchTotalMovieCount = async () => {
     return count;
 };
 
+const fetchUserInfoForMovie = async (userId, movieId) => {
+    const ret = {};
+    const { data, error } = await supabase
+        .from('movie_has_user_rating')
+        .select('rating')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+
+    if (error || data.length > 1) {
+        console.error('Error fetching user rating for movie', error);
+        return null;
+    }
+
+    ret.rating = data.length === 1 ? data[0].rating : 0;
+
+    const { data: watchlistData, error: watchlistError } = await supabase
+        .from('watch_list')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+
+    if (watchlistError || watchlistData.length > 1) {
+        console.error('Error fetching watchlist for movie', watchlistError);
+        return null;
+    }
+
+    ret.in_watchlist = watchlistData.length === 1;
+
+    const { data: watchedlistData, error: watchedlistError } = await supabase
+        .from('watched_list')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+
+    if (watchedlistError || watchedlistData.length > 1) {
+        console.error('Error fetching watchedlist for movie', watchedlistError);
+        return null;
+    }
+
+    ret.in_watchedlist = watchedlistData.length === 1;
+
+    return ret;
+};
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -665,4 +709,5 @@ module.exports = {
     deleteRating,
     fetchTotalMovieCount,
     isMovieInWatchedlist,
+    fetchUserInfoForMovie,
 };

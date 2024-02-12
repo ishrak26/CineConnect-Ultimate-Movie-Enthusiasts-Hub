@@ -10,8 +10,11 @@ const auth = require('./middleware/authMiddleware.js');
 // router
 const movieRouter = require('./routes/movieRoutes.js');
 const authRouter = require('./routes/authRoutes.js');
-const postRouter = require('./routes/postRoutes.js');
+
 const userRouter = require('./routes/userRoutes.js');
+
+const postRouter = require('./routes/postRoutes.js');
+
 // const adminRouter = require('.routes/adminIndexRoute');
 
 // app creation
@@ -45,8 +48,11 @@ app.use(cookieParser());
 // app.use('/', adminRouter);
 app.use(auth);
 app.use('/v1/auth/', authRouter);
+
 app.use('/v1/profile/', userRouter);
+
 app.use('/v1/forum/', postRouter);
+
 app.use('/', movieRouter);
 
 
