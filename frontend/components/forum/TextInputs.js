@@ -36,13 +36,13 @@ const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
         borderRadius={10}
         _placeholder={{ color: 'gray.500' }}
         _hover={{
-          bg: 'white',
+          bg: 'black',
           border: '1px solid',
           borderColor: 'red.500',
         }}
         _focus={{
           outline: 'none',
-          bg: 'white',
+          bg: '#1a1a1b',
           border: '1px solid',
           borderColor: 'red.500',
         }}

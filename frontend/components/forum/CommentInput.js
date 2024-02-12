@@ -1,7 +1,7 @@
 // import ProfileModal from "@/components/Modal/Profile/ProfileModal";
 // import AuthButtons from "@/components/Navbar/RightContent/AuthButtons";
-import { Flex, Textarea, Button, Text, Stack } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Flex, Textarea, Button, Text, Stack } from '@chakra-ui/react'
+import React, { useState } from 'react'
 
 const CommentInput = ({
   commentText,
@@ -21,14 +21,14 @@ const CommentInput = ({
             open={isProfileModalOpen}
           /> */}
           <Stack direction="row" align="center" spacing={1} mb={2}>
-            <Text color="gray.600">Comment as</Text>
+            <Text color="gray.50">Comment as</Text>
             <Text
-              color="gray.600"
+              color="gray.50"
               fontSize="10pt"
               _hover={{
-                cursor: "pointer",
-                textDecoration: "underline",
-                textColor: "red.500",
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                textColor: 'white',
               }}
               // onClick={() => setProfileModalOpen(true)}
             >
@@ -45,11 +45,11 @@ const CommentInput = ({
             minHeight="140px"
             padding={4}
             pb={10}
-            _placeholder={{ color: "gray.500" }}
+            _placeholder={{ color: 'gray.500' }}
             _focus={{
-              outline: "none",
-              bg: "white",
-              border: "1px solid red",
+              outline: 'none',
+              bg: '#1a1a1b',
+              border: '1px solid black',
             }}
           />
 
@@ -59,7 +59,7 @@ const CommentInput = ({
             right={0.1}
             bottom="1px"
             justify="flex-end"
-            bg="gray.100"
+            bg="black"
             p="6px 8px"
             borderRadius="0px 0px 10px 10px"
             zIndex="997"
@@ -90,7 +90,7 @@ const CommentInput = ({
         </Flex>
       )}
     </Flex>
-  );
-};
+  )
+}
 
-export default CommentInput;
+export default CommentInput

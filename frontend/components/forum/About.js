@@ -10,18 +10,25 @@ const About = ({ ForumData, members }) => {
   const router = useRouter()
 
   return (
-    <Box position="sticky" top="60px" borderRadius={10} shadow="md">
+    <Box
+      position="sticky"
+      top="60px"
+      border="1px solid"
+      borderColor="gray.300"
+      borderRadius={10}
+      shadow="md"
+    >
       <AboutHeaderBar ForumName={ForumData.title} />
 
       <Flex
         direction="column"
         p={3}
-        bg="white"
+        bg="#1a1a1b"
         borderRadius="0px 0px 10px 10px"
       >
         <Stack>
           <AboutForum ForumData={ForumData} members={members} />
-          {console.log(ForumData)}
+
           <Button
             width="100%"
             onClick={() => {
@@ -56,15 +63,18 @@ const AboutHeaderBar = ({ ForumName }) => (
 )
 
 const AboutForum = ({ ForumData, members }) => (
-  
   <Flex width="100%" p={2} fontSize="10pt">
     <Flex direction="column" flexGrow={1}>
-      <Text fontWeight={700}>Subscribers</Text>
-      <Text>{members.memberCount.toLocaleString()}</Text>
+      <Text fontWeight={700} color="gray.50">
+        Subscribers
+      </Text>
+      <Text color="gray.50">{members.memberCount.toLocaleString()}</Text>
     </Flex>
     <Flex direction="column" flexGrow={1}>
-      <Text fontWeight={700}>Created</Text>
-      <Text>{ForumData.createdAt}</Text>
+      <Text color="gray.50" fontWeight={700}>
+        Created
+      </Text>
+      <Text color="gray.50">{ForumData.createdAt}</Text>
     </Flex>
   </Flex>
 )

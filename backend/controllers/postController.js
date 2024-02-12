@@ -73,6 +73,8 @@ const postController = {
                 reactions.upvotes = reactions.upvotes || 0;
                 reactions.downvotes = reactions.downvotes || 0;
                 reactions.total_comments = reactions.total_comments || 0;
+
+                // console.log("Reactions : ", reactions);
                 res.status(200).json(reactions);
             } else {
                 res.status(404).json({ message: 'Reactions not found' });
@@ -437,6 +439,7 @@ const postController = {
                 }
                 res.status(201).json({ suceess: true });
             } else {
+                console.log('Already voted');
                 res.status(400).json({
                     message: 'User already voted the post',
                 });
