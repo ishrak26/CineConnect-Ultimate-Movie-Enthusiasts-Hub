@@ -46,7 +46,7 @@ const userController = {
             const user = await db_user.findOne({ username });
             const userId = user ? user.id : null;
             const cinefellowCount = await db_user.getCinefellowCount2({ userId });
-            console.log('Inside controller, cinefellowCount', cinefellowCount);
+            // console.log('Inside controller, cinefellowCount', cinefellowCount);
             res.json({ cinefellowCount });
 
         } catch (error) {
@@ -103,38 +103,42 @@ const userController = {
 
     unfollowCineFellow: async (req, res) => {
         try {
-            
+            // console.log('Inside controller function unfollowCineFellow -> obtained req: ', req);
             if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
             const ogUser = await db_user.findOneById(req.user.id);
             // If the user is trying to unfollow themselves
             if (ogUser.username === req.params.username) {
-                return res.status(400).json({ message: 'Unauthorized' });
+                return res.status(400).json({ message: 'Bad request' });
             }
 
             // If the user is trying to unfollow someone they are not following
             const requestee = await db_user.findOne({ username: req.params.username });
             const requestorId = req.user.id;
             const requesteeId = requestee ? requestee.id : null;
-
+            console.log('Inside controller function unfollowCineFellow: resquesteeId is', requesteeId, 'requestorId is', requestorId);
+            
             // If any of the users are not found
             if (!requestorId || !requesteeId) {
                 return res.status(404).json({ message: 'User not found.' });
             }
 
-            const isFollowing = await db_user.isFollowing({ requestorId, requesteeId });
+            const isFollowing = await db_user.isFollowing({ userId: requestorId, fellowId: requesteeId });
+            // console.log('Inside controller function unfollowCineFellow: isFollowing is', isFollowing);
 
             if (!isFollowing) {
                 return res.status(400).json({ message: 'You are not following this user.' });
             }
 
-            const { fellowId } = req.body;
+            // const { fellowId } = req.body;
+            // console.log('Inside controller function unfollowCineFellow: fellowId is', fellowId, requesteeId);
             const username = req.params.username;
             const user = await db_user.findOne({ username });
             const userId = user.id;
 
-            const result = await db_user.unfollowCinefellow({ userId, fellowId });
+            const result = await db_user.unfollowCinefellow({ userId, fellowId: requesteeId });
 
             if (result) {
+                // console.log('Cinefellow should be removed successfully now')
                 res.status(200).json({ message: 'CineFellow unfollowed successfully.' });
             } else {
                 res.status(404).json({ message: 'CineFellow not found.' });
@@ -265,6 +269,7 @@ const userController = {
 
     getWatchedMovies: async (req, res) => {
         try {
+            // console.log('Inside getWatchedMovies');
             const username = req.params.username;
             const user = await db_user.findOne({ username });
             const userId = user ? user.id : null;
@@ -369,13 +374,21 @@ const userController = {
         // userType 1: self, 2: cinefellow, 3: (Profile)Requested, 4: (Profile)Requestee, 5: Non-Cinefellow, 6: Non-User
         let userType = 6;
         try {
+            // console.log('dhuklam')
             if(!req.user) return res.status(401).json({ userType, message: 'unauthenticated' });
             const user = await db_user.findOneById(req.user.id);
+            // console.log('Pouchaisi',user)
             const username = req.params.username;
+            // console.log(username)
             const user2 = await db_user.findOne({ username });
+            // console.log(user2)
             if(user.id === user2.id) userType = 1;
             else {
-                const fellow = await db_user.isFollowing({ requestorId: user.id, requesteeId: user2.id });
+                const user1Id = user.id
+                const user2Id = user2.id
+                // console.log('Inside identifyProfileHolder: ',user.id, user2.id)
+                const fellow = await db_user.isFollowing({ userId: user1Id, fellowId: user2Id });
+                // console.log("DEBUGGING")
                 if(fellow) userType = 2;
                 else {
                     const hasRequested = await db_user.checkIfTheyRequested({ userId: user.id, fellowId: user2.id });

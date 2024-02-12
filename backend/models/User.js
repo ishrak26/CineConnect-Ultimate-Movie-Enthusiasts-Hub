@@ -219,6 +219,7 @@ async function followCinefellow({ userId, fellowId }) {
 async function unfollowCinefellow({ userId, fellowId }) {
     try {
         // Check if the user is following the fellow
+        // console.log('Inside model function unfollowCinefellow UserId : ', userId, 'FellowId : ', fellowId);
         const { data, error } = await supabase
             .from('cinefellow')
             .select('id')
@@ -232,14 +233,21 @@ async function unfollowCinefellow({ userId, fellowId }) {
         }
 
         // Delete the cinefellow relationship
-        const { error: deleteError } = await supabase
-            .from('cinefellow')
-            .delete()
-            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
-            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`);
+        const { data: deleteData, error: deleteError } = await supabase
+        .from('cinefellow')
+        .delete()
+        // Match the specific relationship where one is the requestor and the other is the requestee
+        .match({ requestor_id: userId, requestee_id: fellowId })
+        // You might also need to consider the inverse relationship
+        .or(`requestor_id.eq.${fellowId},requestee_id.eq.${userId}`).select();
 
         if (deleteError) throw deleteError;
 
+        console.log('deleteData', deleteData);
+
+        // console.log('Model function unfollowCinefellow: Unfollowed cinefellow.');
+
+        
         return true;
 
     } catch (error) {
@@ -251,15 +259,21 @@ async function unfollowCinefellow({ userId, fellowId }) {
 async function isFollowing({ userId, fellowId }) {
     try {
         // Check if the user is following the fellow
+        // console.log('Inside model function isFollowing UserId : ', userId, 'FellowId : ', fellowId);
         const { data, error } = await supabase
             .from('cinefellow')
             .select('id')
             .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)  // Check if user is requestor
             .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`); // Check if user is requestee
 
-        if (error) throw error;
+        // console.log('in isfollowing function', data, error);
+            if (error || data.length > 1) throw error;
 
-        return data.length > 0;
+        if (data.length === 0) {
+            return null;
+        }
+        
+            return data[0];
 
     } catch (error) {
         console.error('Error checking if following:', error.message);
