@@ -692,6 +692,21 @@ const fetchMovieRatingByUser = async (userId, movieId) => {
     return data;
 };
 
+const fetchMovieImages = async (movieId, limit, offset) => {
+    const { data, error } = await supabase
+        .from('movie_has_images')
+        .select('image_url, image_type')
+        .eq('movie_id', movieId)
+        .range(offset, offset + limit - 1);
+
+    if (error) {
+        console.error('Error fetching movie images by movie id', error);
+        return null;
+    }
+
+    return data;
+};
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -712,4 +727,5 @@ module.exports = {
     fetchUserWatchInfoForMovie,
     fetchMovieRatingById,
     fetchMovieRatingByUser,
+    fetchMovieImages,
 };

@@ -94,4 +94,7 @@ router.get('/v1/movie/:movieId/rated', movieController.getUserRatingForMovie);
 // Router to get movie rating
 router.get('/v1/movie/:movieId/rating', movieController.getMovieRating);
 
+// Router to get movie images
+router.get('/v1/movie/:movieId/images', movieController.getMovieImages);
+
 module.exports = router;

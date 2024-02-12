@@ -21,12 +21,13 @@ import { FaPlus, FaCheck, FaLock, FaArrowCircleRight } from 'react-icons/fa'
 import SetRating from '@components/SetRating'
 import { useRouter } from 'next/router'
 
-export default function Home({ data, type, casts, cookie }) {
+export default function Home({ data, type, casts }) {
   const [isWatchlisted, setIsWatchlisted] = useState(false)
   const [userRating, setUserRating] = useState(0)
   const [isWatched, setIsWatched] = useState(false)
   const [movieRating, setMovieRating] = useState(0)
   const [isJoined, setIsJoined] = useState(false)
+  const [movieImages, setMovieImages] = useState(null)
 
   const router = useRouter()
 
@@ -38,7 +39,7 @@ export default function Home({ data, type, casts, cookie }) {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
@@ -73,7 +74,7 @@ export default function Home({ data, type, casts, cookie }) {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
@@ -114,7 +115,7 @@ export default function Home({ data, type, casts, cookie }) {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
@@ -143,10 +144,42 @@ export default function Home({ data, type, casts, cookie }) {
       }
     }
 
+    const getMovieImages = async () => {
+      const imageResponse = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/images`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      // Check the response status code before proceeding to parse the JSON
+      if (imageResponse.ok) {
+        // If the response is successful (status in the range 200-299)
+        const imageData = await imageResponse.json() // Now it's safe to parse JSON
+        // Process your watchData here
+        console.log('imageData', imageData)
+        setMovieImages(imageData.images)
+      } else {
+        // If the response is not successful, log or handle the error
+        console.error(
+          'Error with request:',
+          imageResponse.status,
+          imageResponse.statusText
+        )
+        // Optionally, you can still read and log the response body
+        // const responseBody = await joinedResponse.text()
+        // console.log('Response Body:', responseBody)
+      }
+    }
+
     setMovieRating(data.rating)
     getWatchData()
     getRating()
     getJoinedData()
+    getMovieImages()
   }, [])
 
   const handleClickWatchlist = async () => {
@@ -157,7 +190,7 @@ export default function Home({ data, type, casts, cookie }) {
           method: isWatchlisted ? 'DELETE' : 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
@@ -192,7 +225,7 @@ export default function Home({ data, type, casts, cookie }) {
           method: isWatched ? 'DELETE' : 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
@@ -219,7 +252,7 @@ export default function Home({ data, type, casts, cookie }) {
           method: userRating ? 'PUT' : 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
           body: JSON.stringify({
@@ -561,11 +594,11 @@ export default function Home({ data, type, casts, cookie }) {
               </div>
             </div>
 
-            {(data.videos || data.images) && (
+            {(data.videos || movieImages) && (
               <Media
                 videos={data.videos?.results}
-                posters={data.images?.posters}
-                backdrops={data.images?.backdrops}
+                posters={movieImages?.posters}
+                backdrops={movieImages?.backdrops}
               />
             )}
 
@@ -832,7 +865,6 @@ export async function getServerSideProps(context) {
       type: params.type,
       data: response,
       casts: casts,
-      cookie,
     },
   }
 }
