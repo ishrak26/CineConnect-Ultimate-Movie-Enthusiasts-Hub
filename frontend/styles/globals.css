@@ -283,6 +283,48 @@ body {
   font-size: 1.5rem;
 }
 
+.shop .carousel .control-dots {
+  top: 0px !important;
+  text-align: left;
+  padding-left: 10px !important;
+}
+
+.dot {
+  box-shadow: none !important;
+  background: gray !important;
+}
+
+.dot:hover {
+  background: black !important;
+}
+
+.selected {
+  background: black !important;
+}
+
+/* width
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+/* Track */
+/* ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+} */
+
+/* Handle */
+/* ::-webkit-scrollbar-thumb {
+  background: #888;
+  border: 4px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+} */
+
+/* Handle on hover */
+/* ::-webkit-scrollbar-thumb:hover {
+  background: #888;
+} */ 
+
 @import './input';
 @import './navbar';
 @import './card';

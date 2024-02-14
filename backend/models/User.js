@@ -439,6 +439,7 @@ async function fetchJoinedForums(userId, limit, offset) {
         console.error('Exception fetching joined forums:', err.message);
         return null;
     }
+}
 
 async function fetchUserById({ id }) {
     const { data, error } = await supabase
