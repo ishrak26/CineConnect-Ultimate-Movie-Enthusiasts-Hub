@@ -14,7 +14,7 @@ import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
 import ForumHeader from '@components/forum/ForumHeader'
 
-const ForumPage = ({ ForumData, user, members, ForumAbout }) => {
+const ForumPage = ({ ForumData, user, members, ForumAbout, cookie }) => {
   //   const setForumStateValue = useSetRecoilState(ForumState);
   const setForumStateValue = []
 
@@ -54,7 +54,7 @@ const ForumPage = ({ ForumData, user, members, ForumAbout }) => {
         <PageContent>
           <>
             <CreatePostLink />
-            <Posts ForumData={ForumData} user={user} ForumAbout={ForumAbout}/>
+            <Posts ForumData={ForumData} user={user} ForumAbout={ForumAbout} cookie={cookie}/>
           </>
           <>
             <About ForumData={ForumAbout} members={members}/>
@@ -127,6 +127,7 @@ export async function getServerSideProps(context) {
         user : user,
         members: members,
         ForumAbout: ForumAbout,
+        cookie: cookie, 
         //   query,
       },
     }
