@@ -38,47 +38,6 @@ const PostPage = ({ postData, postComments, votes, user , ForumAbout , forumId, 
     selectedPost: postData,
   }
 
-//   const fetchPost = async (postId) => {
-//     setPostLoading(true)
-//     try {
-//       setHasFetched(false)
-//       const postDocRef = doc(firestore, 'posts', postId)
-//       const postDoc = await getDoc(postDocRef)
-
-//       if (postDoc.exists()) {
-//         setPostStateValue((prev) => ({
-//           ...prev,
-//           selectedPost: { id: postDoc.id, ...postDoc.data() },
-//         }))
-//         setPostExists(true)
-//       } else {
-//         setPostExists(false)
-//       }
-//     } catch (error) {
-//       console.log('Error: fetchPost', error)
-//       showToast({
-//         title: 'Could not Find Posts',
-//         description: 'There was an error finding posts',
-//         status: 'error',
-//       })
-//       setPostExists(false)
-//     } finally {
-//       setHasFetched(true)
-//       setPostLoading(false)
-//     }
-//   }
-
-//   useEffect(() => {
-//     const { pid } = router.query
-
-//     if (pid && !postStateValue.selectedPost) {
-//       fetchPost(pid)
-//     }
-
-//     if (hasFetched && !postExists) {
-//       router.push('/404')
-//     }
-//   }, [postStateValue.selectedPost, router.query, hasFetched, postExists])
 
   return (
     <ChakraProvider theme={theme}>
@@ -107,6 +66,7 @@ const PostPage = ({ postData, postComments, votes, user , ForumAbout , forumId, 
                   {postStateValue.selectedPost && (
                     <PostItem
                       post={postStateValue.selectedPost}
+                      forumId={forumId}
                       onVote={onVote}
                       onDeletePost={onDeletePost}
                       userVoteValue={

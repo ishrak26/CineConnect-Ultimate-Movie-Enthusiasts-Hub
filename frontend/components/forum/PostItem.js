@@ -40,11 +40,33 @@ const PostItem = ({
   const [loadingImage, setLoadingImage] = useState(true)
   const [error, setError] = useState(false)
   const [loadingDelete, setLoadingDelete] = useState(false)
+  const [commentCount, setCommentCount] = useState(0)
   const router = useRouter()
   const showToast = useCustomToast()
   const { onCopy, value, setValue, hasCopied } = useClipboard('')
 
   const singlePostPage = !onSelectPost
+
+  useEffect(() => {
+    const getCommentCount = async (forumId, postId) => {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      const data = await response.json() // Convert the response to JSON
+
+      setCommentCount(data.total_comments)
+    }
+
+    getCommentCount(forumId, post.postId)
+  }, [forumId, post.postId])
 
   const handleDelete = async (event) => {
     event.stopPropagation()
@@ -150,6 +172,7 @@ const PostItem = ({
           userIsCreator={userIsCreator}
           handleShare={handleShare}
           handleSave={handleSave}
+          commentCount={commentCount}
         />
       </Flex>
     </Flex>
@@ -158,7 +181,8 @@ const PostItem = ({
 export default PostItem
 
 const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
-  const [voteCount, setVoteCount] = useState('')
+  let [voteCount, setVoteCount] = useState('')
+  let [downvoteCount, setDownvoteCount] = useState('')
 
   useEffect(() => {
     const getVoteCount = async (forumId, postId) => {
@@ -176,10 +200,25 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
       const data = await response.json() // Convert the response to JSON
 
       setVoteCount(data.upvotes)
+      setDownvoteCount(data.downvotes)
     }
 
     getVoteCount(forumId, post.postId)
-  }, [forumId, post.postId])
+  }, [voteCount, downvoteCount, forumId, post.postId])
+
+  const handleClick = (event, value) => {
+    event.stopPropagation()
+
+    if (value === 1) {
+      voteCount += 1
+      console.log('voteCount', voteCount)
+    } else {
+      downvoteCount += 1
+      console.log('downvoteCount', downvoteCount)
+    }
+
+    onVote(event, post.postId, value, forumId)
+  }
 
   return (
     <>
@@ -189,7 +228,7 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
         fontSize={26}
         cursor="pointer"
         _hover={{ color: '#FBC02D' }}
-        onClick={(event) => onVote(event, post.postId, 1, forumId)}
+        onClick={(event) => handleClick(event, 1)}
       />
       <Text fontSize="12pt" color="white">
         {voteCount}
@@ -204,8 +243,11 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
         _hover={{ color: '#FBC02D' }}
         fontSize={26}
         cursor="pointer"
-        onClick={(event) => onVote(event, post.postId, -1, forumId)}
+        onClick={(event) => handleClick(event, -1)}
       />
+      <Text fontSize="12pt" color="white">
+        {downvoteCount}
+      </Text>
     </>
   )
 }
@@ -296,6 +338,7 @@ const PostActions = ({
   userIsCreator,
   handleShare,
   handleSave,
+  commentCount,
 }) => {
   return (
     <Flex
@@ -304,28 +347,35 @@ const PostActions = ({
       color="gray.500"
       fontWeight={600}
       direction="row"
-      spacing={1}
+      justify="space-between" // Use space-between to distribute space
+      align="center" // Align items vertically
+      width="100%" // Ensure the Flex container takes full width
     >
-      <Button onClick={handleShare} className="mr-2">
-        <Icon as={FiShare2} mr={2} />
-        Share
-      </Button>
-
-      <Button onClick={handleSave} className="mx-2">
-        <Icon as={BsBookmark} mr={2} />
-        Save
-      </Button>
-
-      {userIsCreator && (
-        <Button
-          onClick={handleDelete}
-          isLoading={loadingDelete}
-          className="mx-2"
-        >
-          <Icon as={MdOutlineDelete} mr={2} />
-          Delete
+      <Flex direction="row">
+        <Button onClick={handleShare} className="mr-2">
+          <Icon as={FiShare2} mr={2} />
+          Share
         </Button>
-      )}
+
+        <Button onClick={handleSave} className="mx-2">
+          <Icon as={BsBookmark} mr={2} />
+          Save
+        </Button>
+
+        {userIsCreator && (
+          <Button
+            onClick={handleDelete}
+            isLoading={loadingDelete}
+            className="mx-2"
+          >
+            <Icon as={MdOutlineDelete} mr={2} />
+            Delete
+          </Button>
+        )}
+      </Flex>
+
+      {/* This Text component is moved outside of the first Flex container and will be pushed to the right */}
+      <Text mr={10} fontSize="sm">{`${commentCount - 1} Comments`}</Text>
     </Flex>
   )
 }

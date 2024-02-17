@@ -13,6 +13,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import CommentInput from './CommentInput'
 import CommentItem from './CommentItem'
+import router from 'next/router'
 
 const Comments = ({ user, selectedPost, ForumId, Comments }) => {
   const [commentText, setCommentText] = useState('')
@@ -23,43 +24,75 @@ const Comments = ({ user, selectedPost, ForumId, Comments }) => {
   // const setPostState = useSetRecoilState(postState); // If you were using Recoil state management, replace this with your state management logic
   const showToast = useCustomToast()
 
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${ForumId}/post/${selectedPost.postId}/comments`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      const data = await response.json()
+      setComments(data)
+    } catch (error) {
+      console.log('Error: fetchComments', error)
+      showToast({
+        title: 'Comments not Fetched',
+        description: 'There was an error fetching comments',
+        status: 'error',
+      })
+    } finally {
+      setFetchLoading(false)
+    }
+  }
+
   const onCreateComment = async () => {
     setCreateLoading(true)
     try {
-      const batch = writeBatch(firestore)
-
-      const commentDocRef = doc(collection(firestore, 'comments')) // create new comment document
-
       const newComment = {
-        id: commentDocRef.id,
-        creatorId: user.uid,
-        creatorDisplayText: user.email.split('@')[0],
-        ForumId,
-        postId: selectedPost.id,
-        postTitle: selectedPost.title,
-        text: commentText,
-        createdAt: serverTimestamp(),
+        // id: commentDocRef.id,
+        // creatorId: user.uid,
+        // creatorDisplayText: user.email.split('@')[0],
+        // ForumId,
+        // postId: selectedPost.id,
+        // postTitle: selectedPost.title,
+        content: commentText,
+        images: [],
+        // createdAt: serverTimestamp(),
       } // create new comment object with data to be stored in firestore
-
-      batch.set(commentDocRef, newComment) // add new comment to batch
-
-      const postDocRef = doc(firestore, 'posts', selectedPost.id) // get post document
-      batch.update(postDocRef, {
-        numberOfComments: increment(1),
-      }) // update number of comments in post document
-      await batch.commit()
 
       setCommentText('') // once comment is submitted clear comment box
       setComments((prev) => [newComment, ...prev]) // display new comment along with old comments after it
 
-      // Assuming setPostState is your state update function
-      setPostState((prev) => ({
-        ...prev,
-        selectedPost: {
-          ...prev.selectedPost,
-          numberOfComments: prev.selectedPost.numberOfComments + 1,
-        },
-      })) // update number of comments in post state
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${ForumId}/post/${selectedPost.postId}/comment/submit`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify(newComment),
+        }
+      )
+
+      // const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);
+      // if (selectedFile) {
+      //   const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
+      //   await uploadString(imageRef, selectedFile, 'data_url');
+      //   const downloadURL = await getDownloadURL(imageRef);
+      //   await updateDoc(postDocRef, {
+      //     imageURL: downloadURL,
+      //   });
+      // }
+
+      fetchComments()
 
       showToast({
         title: 'Comment Created',
@@ -122,16 +155,6 @@ const Comments = ({ user, selectedPost, ForumId, Comments }) => {
 
   const getPostComments = async () => {
     try {
-      // const commentsQuery = query(
-      //   collection(firestore, "comments"),
-      //   where("postId", "==", selectedPost.id),
-      //   orderBy("createdAt", "desc")
-      // );
-      // const commentsDocs = await getDocs(commentsQuery);
-      // const comments = commentsDocs.docs.map((doc) => ({
-      //   id: doc.id,
-      //   ...doc.data(),
-      // }));
       setComments(Comments)
     } catch (error) {
       console.log('Error: getPostComments', error)

@@ -35,7 +35,7 @@ const usePosts = (cookie) => {
 
     const type = vote;
 
-    const response = await fetch(
+   const response = await fetch(
       `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
       {
         method: 'POST',
@@ -47,9 +47,27 @@ const usePosts = (cookie) => {
         body: JSON.stringify({ type }),
       }
     )
+
+    if(response.status === 400){
+      const response2 = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify({ type }),
+        }
+      )
+
+    }
+
     if (!response.ok) {
       throw new Error('Failed to update vote')
     }
+
     return await response.json()
   }
 
@@ -106,18 +124,6 @@ const usePosts = (cookie) => {
         prevPosts.map((post) => (post.postId === postId ? updatedPost : post))
       )
 
-      // setPostStateValue((prev) => ({
-      //   ...prev,
-      //   posts: updatedPosts,
-      //   postVotes: updatedPostVotes,
-      // })) // update posts and post votes state on the ui
-
-      // // allow voting when a post is currently selected
-      // if (postStateValue.selectedPost) {
-      //   setPostStateValue((prev) => ({
-      //     ...prev,
-      //     selectedPost: updatedPost,
-      //   })) // update selected post
       }
      catch (error) {
       showToast({
