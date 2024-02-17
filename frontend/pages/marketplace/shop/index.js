@@ -14,7 +14,16 @@ export async function getStaticProps() {
   //   const resTypes = await fetch(process.env.NEXT_PUBLIC_APIURL + "/types");
   const resTypes = []
   //   const dataTypes = await resTypes.json()
-  const dataTypes = []
+  const dataTypes = [
+    {
+      "name": "Action",
+      "slug": "action",
+    },
+    {
+      "name": "Adventure",
+      "slug": "adventure",
+    } 
+  ]
   //   const resItems = await fetch(
   //     process.env.NEXT_PUBLIC_APIURL + `/items?_sort=published_at:DESC`
   //   );

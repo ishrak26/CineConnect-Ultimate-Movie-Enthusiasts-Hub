@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import Skeleton from "react-loading-skeleton";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+import React, { useEffect, useState } from 'react'
+import Skeleton from 'react-loading-skeleton'
+import { Carousel } from 'react-responsive-carousel'
+import 'react-responsive-carousel/lib/styles/carousel.min.css'
 
 function ShopCarousel() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
+    setTimeout(() => setLoading(false), 1000)
+  }, [])
 
-  if (loading) return <Skeleton className="h-24 md:h-64" />;
+  if (loading) return <Skeleton className="h-24 md:h-64" />
   return (
     <div className="">
       <Carousel
@@ -28,26 +28,26 @@ function ShopCarousel() {
           <img
             className=" bg-white h-24 object-cover md:h-64 w-full pointer-events-none"
             loading="lazy"
-            src="https://i.ibb.co/TYNgNgp/Homepage-Banner-AF1-React-170120.jpg"
+            src="https://theknackinitiative.files.wordpress.com/2014/03/bane-batman-standoff-the-dark-knight-rises-wall-poster1.jpg"
           />
         </div>
         <div>
           <img
             className=" bg-white h-24 object-cover md:h-64 w-full"
             loading="lazy"
-            src="https://i.ibb.co/kHhhbbG/adidas-banner-grpn-US.jpg"
+            src="https://images.squarespace-cdn.com/content/v1/63bb3e8a824d7e2f7eedf0d3/1689034557973-HC4X5JFW3GJVWA8XPDUF/Oppenheimer+Horizontal.jpeg"
           />
         </div>
         <div>
           <img
             className=" bg-white h-24 object-cover md:h-64 w-full"
             loading="lazy"
-            src="https://i.ibb.co/WvN6bC5/PLPBanner-Converse-1920x700.png"
+            src="https://wallpaperset.com/w/full/e/e/6/366155.jpg"
           />
         </div>
       </Carousel>
     </div>
-  );
+  )
 }
 
-export default ShopCarousel;
+export default ShopCarousel

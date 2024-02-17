@@ -26,9 +26,9 @@ function SideCategory({ typesData }) {
           <li key={type.slug}>
             <button
               className={`${
-                recent == type.name ? `font-semibold text-cusblack` : ``
+                recent == type.name ? `font-semibold text-grey-200` : ``
               } cursor-pointer`}
-            //   onClick={() => dispatch(selectCategory(type.name))}
+              //   onClick={() => dispatch(selectCategory(type.name))}
             >
               {type.name}
             </button>

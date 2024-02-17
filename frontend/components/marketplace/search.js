@@ -1,23 +1,26 @@
-import React from "react";
-import { useState } from "react";
-import Router from "next/router";
+import React from 'react'
+import { useState } from 'react'
+import Router from 'next/router'
 
 function Search() {
-  const [input, setInput] = useState("");
-  const [data, setData] = useState([]);
+  const [input, setInput] = useState('')
+  const [data, setData] = useState([])
+
   const handleChange = async (e) => {
-    setInput(e.target.value);
+    setInput(e.target.value)
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_APIURL}/items?name_contains=${input}`
-    );
-    const data = await res.json();
-    setData(data);
-  };
+    )
+    const data = await res.json()
+    setData(data)
+  }
+
   return (
     <div className="flex relative group md:ml-auto justify-between pr-4 place-items-center flex-grow h-full rounded-3xl bg-white">
+      <div className="flex-grow"></div>
       <input
         onChange={handleChange}
-        className="text-xs group pl-4 rounded-3xl p-2.5 focus:outline-none w-full text-cusblack"
+        className="text-sm group pl-12 rounded-3xl p-2.5 focus:outline-none text-cusblack"
         type="text"
         placeholder="Search product"
       />
@@ -26,7 +29,7 @@ function Search() {
           data
             .filter((i, idx) => idx < 4)
             .map((item, idx) => (
-              <div onClick={() => Router.push("/product/" + item.slug)}>
+              <div onClick={() => Router.push('/product/' + item.slug)}>
                 <div
                   key={idx}
                   className="p-2 flex place-items-center cursor-pointer text-xs font-light text-cusblack hover:bg-gray-100 active:bg-gray-200"
@@ -59,7 +62,7 @@ function Search() {
         />
       </svg>
     </div>
-  );
+  )
 }
 
-export default Search;
+export default Search

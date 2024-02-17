@@ -3,6 +3,7 @@ import Header from './header'
 import ShopCarousel from './shopcarousel'
 import SideCategory from './sidecategory'
 import TopCategory from './topcategory'
+import Search from './search'
 
 function Layout({ children, categories, types, setSort }) {
   const [open, setOpen] = useState(false)
@@ -11,7 +12,7 @@ function Layout({ children, categories, types, setSort }) {
   return (
     <div className="w-full min-h-screen bg-cusgray pb-10">
       <Header />
-      <button
+      {/* <button
         onClick={() => setOpen(!open)}
         className="w-12 h-12 rounded-full bg-white fixed z-30 drop-shadow-2xl lg:hidden flex justify-center place-items-center bottom-0 left-0 m-5"
       >
@@ -29,15 +30,16 @@ function Layout({ children, categories, types, setSort }) {
             d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
           />
         </svg>
-      </button>
+      </button> */}
       <div className="max-w-6xl mx-auto pt-14 md:px-0">
-        <TopCategory categories={categories} />
+        {/* <TopCategory categories={categories} /> */}
+        <Search />
         <div className="grid grid-cols-4 gap-x-6">
           <div
             onClick={() => setOpen(!open)}
             className={`${
               open ? `fixed` : `hidden`
-            } lg:static lg:inline bg-gray-400 lg:bg-cusgray h-screen bg-opacity-30 z-20 flex w-full justify-center place-items-center top-0 lg:p-4`}
+            } rounded-2xl lg:static lg:inline bg-grey-400 lg:bg-black bg-opacity-30 z-20 flex w-full justify-center place-items-center top-0 lg:p-4`}
           >
             <SideCategory typesData={types} />
           </div>
