@@ -7,11 +7,11 @@ import PostLoader from "./PostLoader";
 import useCustomToast from "../../hooks/useCustomToast";
 import usePosts from "../../hooks/usePosts";
 
-const Posts = ({ ForumData, user, ForumAbout }) => {
+const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
   // const [user] = useAuthState(auth);
 
   const [loading, setLoading] = useState(false);
-  const forumId = ForumAbout.forumId;
+
   const {
     // postStateValue,
     // setPostStateValue,
@@ -29,7 +29,6 @@ const Posts = ({ ForumData, user, ForumAbout }) => {
   const postStateValue = {
     posts: ForumData,
   };
-
 
   // const getPosts = async () => {
   //   try {
@@ -57,9 +56,6 @@ const Posts = ({ ForumData, user, ForumAbout }) => {
   //   }
   // };
 
-  const getVotes = async () => {
-  };
-
   // useEffect(() => {
   //   getPosts();
   // }, [ForumData]);
@@ -70,20 +66,16 @@ const Posts = ({ ForumData, user, ForumAbout }) => {
         <PostLoader />
       ) : (
         <Stack spacing={3}>
-          {console.log(postStateValue.posts)}
           {postStateValue.posts.map((item) => (
             <PostItem
               key={item.postId}
               post={item}
-              forumId={forumId}
+              forumId={ForumAbout.forumId}
               userIsCreator={user === item.author.id}
-              // userVoteValue={
-              //   postStateValue.postVotes.find((vote) => vote.postId === item.id)
-              //     ?.voteValue
-              // }
               onVote={onVote}
               onSelectPost={onSelectPost}
               onDeletePost={onDeletePost}
+              // cookie={cookie}
             />
           ))}
         </Stack>

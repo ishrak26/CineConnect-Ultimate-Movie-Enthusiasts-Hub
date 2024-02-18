@@ -480,7 +480,5 @@ module.exports = {
     removeFromWatchlist,
     searchProfilesByUsername,
     fetchJoinedForums,
-
     fetchUserById,
-
 };
