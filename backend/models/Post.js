@@ -1,3 +1,4 @@
+const e = require('express');
 const supabase = require('../config/supabaseConfig');
 
 /*
@@ -136,10 +137,29 @@ async function isJoinedForumByPostId(postId, userId) {
 }
 
 async function joinForum(id) {
+    
+    console.log('id:', id);
+
     const { data, error } = await supabase
         .from('watched_list')
         .update({ joined_forum: true })
         .eq('id', id)
+        .select();
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+    
+    return data;
+}
+
+async function leaveForum(userId, forumId) {
+    const { data, error } = await supabase
+        .from('watched_list')
+        .update({ joined_forum: false })
+        .eq('user_id', userId)
+        .eq('movie_id', forumId)
         .select();
 
     if (error) {
@@ -291,6 +311,7 @@ module.exports = {
     isJoinedForumByForumId,
     fetchMovieIdByPostId,
     joinForum,
+    leaveForum,
     fetchPostsByMovieId,
     fetchSinglePostById,
     fetchPostVoteByUser,

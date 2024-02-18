@@ -11,6 +11,7 @@ import {
   useClipboard,
   useToast,
 } from '@chakra-ui/react'
+import { set } from 'date-fns'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from 'react'
@@ -181,8 +182,33 @@ const PostItem = ({
 export default PostItem
 
 const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
-  let [voteCount, setVoteCount] = useState('')
-  let [downvoteCount, setDownvoteCount] = useState('')
+  let [voteCount, setVoteCount] = useState(0)
+  let [downvoteCount, setDownvoteCount] = useState(0)
+  const [isVoted, setIsVoted] = useState(false)
+  const [voteType, setVoteType] = useState('')
+
+  useEffect(() => {
+    const checkIfVoted = async (forumId, postId) => {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/voted`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      const data = await response.json() // Convert the response to JSON
+
+      // console.log('data', data)
+      setIsVoted(data.voted)
+      setVoteType(data.type)
+    }
+
+    checkIfVoted(forumId, post.postId)
+  }, [isVoted, forumId, post.postId])
 
   useEffect(() => {
     const getVoteCount = async (forumId, postId) => {
@@ -206,44 +232,58 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
     getVoteCount(forumId, post.postId)
   }, [voteCount, downvoteCount, forumId, post.postId])
 
-  const handleClick = (event, value) => {
+  const handleClick = async (event, value, isVoted) => {
     event.stopPropagation()
 
-    if (value === 1) {
-      voteCount += 1
-      console.log('voteCount', voteCount)
-    } else {
-      downvoteCount += 1
-      console.log('downvoteCount', downvoteCount)
+    onVote(event, post.postId, value, forumId, isVoted)
+
+    if (value === 1 && !isVoted) {
+      setVoteCount(voteCount + 1)
+      setIsVoted(true)
+      // console.log('voteCount', voteCount)
+    } else if(value === -1 && !isVoted) {
+      setDownvoteCount(downvoteCount + 1)
+      setIsVoted(true)
+      // console.log('downvoteCount', downvoteCount)
+    }
+    else if(value === 1 && isVoted) {
+      setVoteCount(voteCount - 1)
+      setIsVoted(false)
+      // console.log('voteCount', voteCount)
+    } else if(value === -1 && isVoted) {
+      setDownvoteCount(downvoteCount - 1)
+      setIsVoted(false)
+      // console.log('downvoteCount', downvoteCount)
     }
 
-    onVote(event, post.postId, value, forumId)
   }
 
   return (
     <>
       <Icon
-        as={userVoteValue === 1 ? IoArrowUpCircleSharp : IoArrowUpCircleOutline}
-        color={userVoteValue === 1 ? 'black' : 'gray.500'}
+        as={
+          voteType === 'upvote' ? IoArrowUpCircleSharp : IoArrowUpCircleOutline
+        }
+        color={voteType === 'upvote' ? '#FDD835' : 'gray.500'}
         fontSize={26}
         cursor="pointer"
         _hover={{ color: '#FBC02D' }}
-        onClick={(event) => handleClick(event, 1)}
+        onClick={(event) => handleClick(event, 1, isVoted)}
       />
       <Text fontSize="12pt" color="white">
         {voteCount}
       </Text>
       <Icon
         as={
-          userVoteValue === -1
+          voteType === 'downvote'
             ? IoArrowDownCircleSharp
             : IoArrowDownCircleOutline
         }
-        color={userVoteValue === -1 ? 'black' : 'gray.500'}
+        color={voteType === 'downvote' ? '#FDD835' : 'gray.500'}
         _hover={{ color: '#FBC02D' }}
         fontSize={26}
         cursor="pointer"
-        onClick={(event) => handleClick(event, -1)}
+        onClick={(event) => handleClick(event, -1, isVoted)}
       />
       <Text fontSize="12pt" color="white">
         {downvoteCount}
