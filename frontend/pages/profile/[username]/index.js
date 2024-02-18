@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
 import Sidebar from '@components/Sidebar';
 import BaseLayout from '@components/BaseLayout';
@@ -7,13 +8,8 @@ import Container from "@components/Container";
 import Row from '@components/Row';
 import ReviewCard from '@components/ReviewCard';
 import CinefellowsRow from '@components/CinefellowsRow'; // Adjust the import path as necessary
-import EditButton from '@components/EditButton'; // Adjust the import path as needed
-import SendCinefellowRequestButton from '@components/SendCinefellowRequestButton'; // Adjust the import path as needed
-import RemoveCinefellowButton from '@components/RemoveCinefellowButton'; // Adjust the import path as needed
-import WithdrawCinefellowRequestButton from '@components/WithdrawCinefellowRequestButton'; // Adjust the import path as needed
-import AcceptCinefellowRequestButton from '@components/AcceptCinefellowRequestButton'; // Adjust the import path as needed
-import DeclineCinefellowRequestButton from '@components/DeclineCinefellowRequestButton'; // Adjust the import path as needed
-// import Profiles from '@components/profiles';
+import { EditButton, AcceptCinefellowRequestButton, DeclineCinefellowRequestButton, SendCinefellowRequestButton, 
+  RemoveCinefellowButton, WithdrawCinefellowRequestButton } from '@components/cinefellowProfileButtons';
 import Footer from '@components/footer';
 import Recommendations from '@components/recommendations';
 import { Box, Typography } from "@mui/material"; // Import from MUI
@@ -24,9 +20,20 @@ import { Box, Typography } from "@mui/material"; // Import from MUI
 // import Awards from '@components/Awards'; // Assuming you have this component
 // import Activities from '@components/Activities'; // Assuming you have this component
 
-export default function Profile({ watchedMovies, watchlist, reviews, forums, cineFellows, userType, profileInfo, cinefellowCount, user }) {
-//   userType = 3; // 1 for user, 2 for cinefellow, 3 for request sent, 4 for request received, 5 for non-cinefellow
+export default function Profile({ watchedMovies, watchlist, reviews, forums, cineFellows, userType, profileInfo, cinefellowCount, user, cookie }) {
+  // 1 - user's own profile, 2 - cinefellow, 3 - request sent by profileholder, 
+  // 4 - request received from profileholder, 5 - non-cinefellow, 6 - unauthenticated
   // Assuming we have the user data for now as static content
+  const [profileOwnerState, setProfileOwnerState] = useState(userType);
+  useEffect(() => {
+    // Function to fetch updated profile information based on new state
+    const fetchUpdatedProfileInfo = async () => {
+      console.log('Fetching updated profile information');
+    };
+
+    fetchUpdatedProfileInfo();
+  }, [profileOwnerState]);
+
   const router = useRouter();
   const userData = {
     bio: 'Anime and movie enthusiast. Love to watch and discuss movies!',
@@ -77,32 +84,142 @@ export default function Profile({ watchedMovies, watchlist, reviews, forums, cin
 
   const handleUnfollow = async (user, fellow) => {
     console.log("Inside handleUnfollow, user:", user, "fellow:", fellow);
-    await fetch(`http://localhost:4000/v1/profile/${fellow.username}/cinefellows/unfollow`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        userId: user.id, // Assuming you need to send both user and fellow IDs
-        fellowId: fellow.id,
-      }),
-    })
-    .then((res) => {
-      if (!res.ok) {
+    try {
+      const response = await fetch(`http://localhost:4000/v1/profile/${fellow.username}/cinefellows/unfollow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: user.id, // Assuming you need to send both user and fellow IDs
+          fellowId: fellow.id,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
         throw new Error('Failed to unfollow');
       }
-      return res.json();
-    })
-    .then((data) => {
-
-      console.log('Should have unfollowed')
+      console.log('Should have unfollowed');
       console.log(data.message); // Handle success
-    })
-    .catch((err) => {
+      setProfileOwnerState(5); // Update state to reflect the new profile owner state
+    } catch (err) {
       console.error(err); // Handle errors
-    });
+    }
   };
+  
+
+  const handleFollow = async (user, fellow) => {
+    console.log("Inside handleFollow, user:", user, "fellow:", fellow);
+    try {
+      const response = await fetch(`http://localhost:4000/v1/profile/${fellow.username}/cinefellows/follow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: user.id, // Assuming you need to send both user and fellow IDs
+          fellowId: fellow.id,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error('Failed to send follow request');
+      }
+      console.log('Follow request should have been sent');
+      console.log(data.message); // Handle success
+      setProfileOwnerState(4); // Update state to reflect the new profile owner state
+    } catch (err) {
+      console.error(err); // Handle errors
+    }
+  };
+
+  const handleAcceptRequest = async (user, fellow) => {
+    console.log("Inside handleAcceptRequest, user:", user, "fellow:", fellow);
+    try {
+      const response = await fetch(`http://localhost:4000/v1/profile/${fellow.username}/cinefellows/accept`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: user.id, // Assuming you need to send both user and fellow IDs
+          fellowId: fellow.id,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error('Failed to accept follow request');
+      }
+      console.log('Follow request should have been accepted');
+      console.log(data.message); // Handle success
+      setProfileOwnerState(2); // Update state to reflect the new profile owner state
+    } catch (err) {
+      console.error(err); // Handle errors
+    }
+  };
+  
+
+  const handleRejectRequest = async (user, fellow) => {
+    console.log("Inside handleRejectRequest, user:", user, "fellow:", fellow);
+    try {
+        const response = await fetch(`http://localhost:4000/v1/profile/${fellow.username}/cinefellows/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                userId: user.id, // Assuming you need to send both user and fellow IDs
+                fellowId: fellow.id,
+            }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error('Failed to reject follow request');
+        }
+        console.log('Follow request should have been rejected');
+        console.log(data.message); // Handle success
+        setProfileOwnerState(5); // Update the profileOwnerState to reflect the change
+    } catch (err) {
+        console.error(err); // Handle errors
+    }
+};
+
+
+const handleWithdrawRequest = async (user, fellow) => {
+  console.log("Inside handleWithdrawRequest, user:", user, "fellow:", fellow);
+  try {
+      const response = await fetch(`http://localhost:4000/v1/profile/${fellow.username}/cinefellows/withdraw-request`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          // Ensure you're passing necessary information if required by your backend API
+          body: JSON.stringify({
+              userId: user.id,
+              fellowId: fellow.id,
+          }),
+      });
+      console.log('response: ', response);
+      if (!response.ok) {
+          throw new Error('Failed to withdraw the already sent follow request');
+      }
+      const data = await response.json();
+      console.log('Follow request should have been withdrawn');
+      console.log(data.message); // Handle success
+      setProfileOwnerState(5); // or another appropriate state based on your app's logic
+      console.log('Inside handlerWithdraw function, state : ', profileOwnerState);
+  } catch (err) {
+      console.error(err); // Handle errors
+  }
+};
+
+
+
 
   // Spacing classes for margin
   const sectionMargin = "mb-20 mt-16"; // Margin at the bottom of each section
@@ -126,21 +243,19 @@ export default function Profile({ watchedMovies, watchlist, reviews, forums, cin
                 {cinefellowCount >= 2 && <p>{cinefellowCount} Cinefellows</p>}
                 <p className="text-gray-400 italic mt-4">{userData.bio}</p>
               </div>
-              {userType === 1 ? ( // If the user is the owner of the profile
+              {profileOwnerState === 1 ? ( // If the user is the owner of the profile
                 <EditButton />
-              ) : userType === 2 ? (  // If the user is a cinefellow of the profile owner
-                // write the handler function for the remove cinefellow button
+              ) : profileOwnerState === 2 ? (  // If the user is a cinefellow of the profile owner
                 <RemoveCinefellowButton onClick={() => handleUnfollow(user, profileInfo)} />
-              ) : userType === 3 ? (  // If the user has been sent a request by the profile owner
-                // Wrap the buttons in a div with a flex container
+              ) : profileOwnerState === 3 ? (  // If the user has been sent a request by the profile owner
                 <div style={{ display: 'flex', gap: '10px' }}> 
-                  <AcceptCinefellowRequestButton />
-                  <DeclineCinefellowRequestButton />
+                  <AcceptCinefellowRequestButton onClick={() => handleAcceptRequest(user, profileInfo)}/>
+                  <DeclineCinefellowRequestButton onClick={() => handleRejectRequest(user, profileInfo)}/>  
                 </div>
-              ) : userType === 4 ? (  // If the user has sent a request to the profile owner
-                <WithdrawCinefellowRequestButton />
-              ) : userType === 5 ? (  // If profile owner is someone else
-                <SendCinefellowRequestButton />
+              ) : profileOwnerState === 4 ? (  // If the user has sent a request to the profile owner
+                <WithdrawCinefellowRequestButton onClick={() => handleWithdrawRequest(user, profileInfo)} />
+              ) : profileOwnerState === 5 ? (  // If profile owner is someone else
+                <SendCinefellowRequestButton onClick={() => handleFollow(user, profileInfo)} />
               ) : (
                 <></>
               )}
@@ -198,6 +313,7 @@ export async function getServerSideProps(context) {
 //   const { username } = params; // Now you can access username directly from params
   const query = context.query;  // Get the query parameters
   const cookie = context.req.headers.cookie;
+  // console.log("Current sesisons user id: ", context.req)
 
   // Helper function to fetch data
   async function fetchData(url, params) {
@@ -234,9 +350,10 @@ export async function getServerSideProps(context) {
       fetchData(`http://localhost:4000/v1/profile/${username}/cinefellows/count/`), 
       fetchData(`http://localhost:4000/v1/auth/isLoggedIn`)
     ]);
-    // console.log('user', user)
+    
+    console.log('user', user)
     // console.log('fellow', profileInfo)
-    // console.log('usertype', userType)
+    console.log('usertype', userType)
     // console.log('watchedMovies', watchedMovies)
     // console.log('cineFellows', cineFellows)
     // console.log('watchlist', watchlist)
@@ -265,6 +382,7 @@ export async function getServerSideProps(context) {
         ...profileInfo,
         ...cinefellowCount,
         ...user,
+        cookie,
         // Add other props as needed
       },
     };

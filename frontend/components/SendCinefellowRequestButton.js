@@ -1,6 +1,6 @@
 // SendCinefellowRequestButton.js
 import React from 'react';
-import styles from '../styles/sendCinefellowRequestButton.module.css'; // Adjust the path as needed
+import styles from '../styles/cinefellowProfileButtons.module.css'; // Adjust the path as needed
 import { BiMailSend } from "react-icons/bi"; // Example icon from react-icons
 
 const SendCinefellowRequestButton = ({ onClick }) => {

@@ -1,6 +1,6 @@
 // RemoveCinefellowButton.js
 import React from 'react';
-import styles from '../styles/removeCinefellowButton.module.css'; // Adjust the path as needed
+import styles from '../styles/cinefellowProfileButtons.module.css'; // Adjust the path as needed
 import { BiUserX } from "react-icons/bi"; // An example icon that might represent removing a friend/connection
 
 const RemoveCinefellowButton = ({ onClick }) => {

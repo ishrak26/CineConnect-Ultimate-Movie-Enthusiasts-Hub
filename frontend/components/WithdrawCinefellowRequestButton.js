@@ -1,6 +1,6 @@
 // WithdrawCinefellowRequestButton.js
 import React from 'react';
-import styles from '../styles/withdrawCinefellowRequestButton.module.css'; // Adjust the path as needed
+import styles from '../styles/cinefellowProfileButtons.module.css'; // Adjust the path as needed
 import { BiUndo } from "react-icons/bi"; // An example icon that might represent withdrawing a request
 
 const WithdrawCinefellowRequestButton = ({ onClick }) => {

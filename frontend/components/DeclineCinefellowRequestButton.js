@@ -1,6 +1,6 @@
 // DeclineCinefellowRequestButton.js
 import React from 'react';
-import styles from '../styles/declineCinefellowRequestButton.module.css'; // Adjust the path as needed
+import styles from '../styles/cinefellowProfileButtons.module.css'; // Adjust the path as needed
 import { BiX } from "react-icons/bi"; // An example icon for decline
 
 const DeclineCinefellowRequestButton = ({ onClick }) => {

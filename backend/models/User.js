@@ -107,8 +107,7 @@ async function getProfileByUsername({ username }) {
         const { data, error } = await supabase
             .from('user_info')
             .select('id, username, full_name, image_url, email')
-            .eq('username', username)
-            .single();
+            .eq('username', username);
 
         if (error) throw error;
 
@@ -166,9 +165,8 @@ async function getCineFellowCount({ userId }) {
         // Count where the user is fellow1
         const { count: count1, error: error1 } = await supabase
             .from('cinefellow')
-            .select('requestee_id', { count: 'exact' }) // Use count feature
-            .eq('requestor_id', userId)
-            .single(); // Assuming count returns a single object
+            .select('*', { count: 'exact' }) // Use count feature
+            .eq('requestor_id', userId);
 
         if (error1) {
             console.error('Error counting where user is fellow1:', error1);
@@ -178,9 +176,8 @@ async function getCineFellowCount({ userId }) {
         // Count where the user is fellow2
         const { count: count2, error: error2 } = await supabase
             .from('cinefellow')
-            .select('requestor_id', { count: 'exact' }) // Use count feature
-            .eq('requestee_id', userId)
-            .single(); // Assuming count returns a single object
+            .select('*', { count: 'exact' }) // Use count feature
+            .eq('requestee_id', userId);
 
         if (error2) {
             console.error('Error counting where user is fellow2:', error2);
@@ -276,6 +273,46 @@ async function unfollowCinefellow({ userId, fellowId }) {
     }
 }
 
+async function withdrawCineFellowRequest({ requestorId, requesteeId }) {
+    try {
+        // Fetch the most recent pending request
+        const { data: requests, error: fetchError } = await supabase
+            .from('cinefellow_request')
+            .select('*')
+            .match({ from_id: requestorId, to_id: requesteeId, status: 'pending' })
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        if (fetchError) {
+            throw fetchError;
+        }
+
+        // If no pending request is found
+        if (requests.length === 0) {
+            console.log('No pending request found to withdraw.');
+            return { success: false, message: "No pending request found." };
+        }
+
+        // Withdraw the most recent request
+        const recentRequest = requests[0];
+        const { error: deleteError } = await supabase
+            .from('cinefellow_request')
+            .delete()
+            .match({ id: recentRequest.id });
+
+        if (deleteError) {
+            throw deleteError;
+        }
+
+        console.log('CineFellow request withdrawn successfully.');
+        return { success: true, message: "Request withdrawn successfully." };
+    } catch (error) {
+        console.error('Error withdrawing cinefellow request:', error);
+        return { success: false, message: "Failed to withdraw request." };
+    }
+}
+
+
 async function isFollowing({ userId, fellowId }) {
     try {
         // Check if the user is following the fellow
@@ -320,32 +357,35 @@ const getPendingRequests = async ({ userId, limit, offset }) => {
     }
 }
 
-const acceptCineFellowRequest = async ({ requestId, userId }) => {
+const acceptCineFellowRequest = async ({ userId, requestorId }) => {
     try {
+        // console.log('DHUKLAM Inside acceptCineFellowRequest model function : ', userId, requestorId);
         // First, retrieve the request to get from_id and to_id
         const { data: requestData, error: requestError } = await supabase
             .from('cinefellow_request')
             .select('*')
-            .eq('id', requestId)
+            .eq('from_id', requestorId)
             .eq('to_id', userId)
-            .single();
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
+            .limit(1); // Limit to only the most recent request
 
         if (requestError) throw requestError;
         if (!requestData) throw new Error('Request not found.');
-
+        // console.log('Inside acceptCineFellowRequest model function, the fetched requestData: ', requestData[0]);
         // Update request status to 'accepted'
         const { error: updateError } = await supabase
             .from('cinefellow_request')
             .update({ status: 'accepted' })
-            .eq('id', requestId);
+            .eq('id', requestData[0].id);
 
         if (updateError) throw updateError;
-
+        // console.log('Inside acceptCineFellowRequest model function, the updateError message : ', updateError);
         // Add to the cinefellow table
         const { error: cinefellowError } = await supabase
             .from('cinefellow')
             .insert([
-                { requestor_id: requestData.from_id, requestee_id: requestData.to_id },
+                { requestor_id: requestData[0].from_id, requestee_id: requestData[0].to_id },
             ]);
 
         if (cinefellowError) throw cinefellowError;
@@ -359,52 +399,75 @@ const acceptCineFellowRequest = async ({ requestId, userId }) => {
 };
 
 
-const rejectCineFellowRequest = async ({ requestId, userId }) => {
+const rejectCineFellowRequest = async ({ userId, requestorId }) => {
     try {
-        // Update request status to 'rejected' or 'cancelled'
-        // Ensure to check both from_id and to_id to correctly identify the request for the user
-        const { error: rejectError } = await supabase
+        console.log('DHUKLAM Inside rejectCineFellowRequest model function : ', userId, requestorId);
+        // First, retrieve the request to get from_id and to_id
+        const { data: requestData, error: requestError } = await supabase
             .from('cinefellow_request')
-            .update({ status: 'rejected' }) // Use 'cancelled' if appropriate for your logic
-            .or(`id.eq.${requestId},from_id.eq.${userId},to_id.eq.${userId}`);
+            .select('*')
+            .eq('from_id', requestorId)
+            .eq('to_id', userId)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
+            .limit(1); // Limit to only the most recent one
 
-        if (rejectError) throw rejectError;
+        console.log('Inside rejectCineFellowRequest model function, the fetched requestData: ', requestData[0]);
+
+        if (requestError) throw requestError;
+        if (!requestData) throw new Error('Request not found.');
+        // console.log('Inside rejectCineFellowRequest model function, the fetched requestData: ', requestData[0]);
+        // Update request status to 'rejected'
+        const { error: updateError } = await supabase
+            .from('cinefellow_request')
+            .update({ status: 'rejected' })
+            .eq('id', requestData[0].id);
+
+        if (updateError) throw updateError;
+        // console.log('Inside rejectCineFellowRequest model function, the updateError message : ', updateError);
 
         return true;
+
     } catch (error) {
-        console.error('Error rejecting/cancelling cinefellow request:', error.message);
+        console.error('Error rejecting cinefellow request:', error.message);
         throw error;
     }
 }
 
+// function to see if the user requested to follow the fellow, and the request is still pending
 async function checkIfIRequested({ userId, fellowId }) {
     const { data, error } = await supabase
       .from('cinefellow_request')
-      .select('id')
-      .match({ from_id: userId, to_id: fellowId })
-      .single();
+      .select('id, created_at') // Include 'created_at' in the selection
+      .match({ from_id: userId, to_id: fellowId, status: 'pending'})
+      .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
+      .limit(1); // Limit to only the most recent request
   
     if (error) {
       console.error('Error checking cinefellow request:', error);
-      throw error; // or handle the error as you see fit
+      throw error; // Handle the error as needed
     }
   
-    return data ? true : false; // If there's data, a request exists (true), otherwise not (false)
-  }
+    // Since we limit the result to 1, checking if the array has any elements directly indicates if a pending request exists.
+    return data.length > 0;  // True if a recent pending request exists, false otherwise
+}
 
+  // function to see if the fellow requested to follow the user, and the request is still pending
   async function checkIfTheyRequested({ userId, fellowId }) {
     const { data, error } = await supabase
       .from('cinefellow_request')
       .select('id')
-      .match({ from_id: fellowId, to_id: userId })
-      .single();
+      .match({ from_id: fellowId, to_id: userId, status: 'pending'})
+      .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
+      .limit(1); // Limit to only the most recent request
+    //   .single();
   
     if (error) {
       console.error('Error checking if they requested:', error);
       throw error; // or handle the error as you see fit
     }
   
-    return !!data; // Convert the result to boolean: true if they requested, false otherwise
+    return data.length > 0; 
   }
   
   
@@ -517,6 +580,8 @@ const getProfileDetails = async ({ username }) => {
             .select('id, username, full_name, image_url, role')
             .eq('username', username);
 
+        console.log('In getProfileDetails', data);
+
         if (error) throw error;
 
         return data[0];
@@ -552,13 +617,14 @@ module.exports = {
     findOneById,
     checkIfUserExists,
     checkIfEmailExists,
-
+    isFollowing,
     getProfileByUsername,
     getCineFellows,
     getCineFellowCount,
     getCinefellowCount2,
     followCinefellow,
     unfollowCinefellow,
+    withdrawCineFellowRequest,
     getPendingRequests,
     acceptCineFellowRequest,
     rejectCineFellowRequest,
