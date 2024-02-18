@@ -1,18 +1,20 @@
-import React from "react";
-import Image from "next/image";
-import NumberFormat from "react-number-format";
-import { motion } from "framer-motion";
-import Router from "next/router";
-import { useDispatch } from "react-redux";
+import React from 'react'
+import Image from 'next/image'
+import NumberFormat from 'react-number-format'
+import { motion } from 'framer-motion'
+import Router from 'next/router'
+import { useDispatch } from 'react-redux'
+import Link from 'next/link'
 // import { addToWishlist } from "../slices/wishlistSlice";
 
 function ProductCard({ item }) {
-  const { size, image } = item.prop[0];
-  const dispatch = useDispatch();
+  console.log(item)
+  // const { size, image } = item.prop[0];
+  // const dispatch = useDispatch();
 
   return (
     <div className="rounded-xl cursor-pointer">
-      <div className="overflow-hidden cursor-default rounded-xl relative group">
+      <div className="w-45 h-64 overflow-hidden cursor-default rounded-xl relative group">
         <motion.div
           initial={{ scale: 1.3, x: 50, opacity: 0 }}
           animate={{ scale: 1, x: 0, opacity: 1 }}
@@ -23,15 +25,15 @@ function ProductCard({ item }) {
             width={700}
             objectFit="cover"
             loading="lazy"
-            src={image[0]}
+            src={item.image}
             alt=""
-            className="rounded-xl w-full h-full bg-cusgray"
+            className="rounded-xl w-45 h-62 bg-cusgray"
           />
         </motion.div>
         <div className="hidden absolute rounded-xl h-full w-full bg-gray-500 backdrop-filter backdrop-blur-sm bg-opacity-30 top-0 group group-hover:flex justify-center place-items-center z-10">
           <div className="flex overflow-hidden cursor-pointer">
             <button
-            //   onClick={() => dispatch(addToWishlist(item))}
+              //   onClick={() => dispatch(addToWishlist(item))}
               className="p-2 bg-white hover:bg-gray-100 active:bg-gray-200 rounded-lg"
             >
               <svg
@@ -52,28 +54,29 @@ function ProductCard({ item }) {
           </div>
         </div>
       </div>
-      <div
-        onClick={() => Router.push("/product/" + item.slug)}
-        className="px-2 py-2"
-      >
-        <p className="text-sm line-clamp-1">{item.name}</p>
-        <p className="text-xs my-2 text-gray-400">{item.color}</p>
-        {/* <p className="text-sm font-semibold">Rp {price}</p> */}
-        <NumberFormat
+      <div className="px-2 py-2">
+        <Link href={`/marketplace/product/${item.slug}`} passHref>
+          <div className="cursor-pointer">
+            <p className="text-sm line-clamp-1">{item.name}</p>
+            <p className="text-xs my-2 text-gray-400">{item.color}</p>
+            <p className="text-sm font-semibold">Tk {item.price}</p>
+          </div>
+        </Link>
+      </div>
+      {/* <NumberFormat
           value={item.price}
           className="text-sm font-semibold text-cusblack"
-          displayType={"text"}
+          displayType={'text'}
           thousandSeparator={true}
-          prefix={"Rp"}
+          prefix={'Rp'}
           renderText={(value, props) => (
             <p className="text-sm font-semibold" {...props}>
               {value}
             </p>
           )}
-        />
-      </div>
+        /> */}
     </div>
-  );
+  )
 }
 
-export default ProductCard;
+export default ProductCard

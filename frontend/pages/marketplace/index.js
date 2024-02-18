@@ -64,7 +64,7 @@ export default function Home() {
                   );
                 })}
               </div>
-              <Link href="/shop/">
+              <Link href="/marketplace/shop/">
                 <motion.p
                   variants={letter}
                   className="flex justify-center w-full place-items-center text-white underline mt-5 text-sm font-normal cursor-pointer"

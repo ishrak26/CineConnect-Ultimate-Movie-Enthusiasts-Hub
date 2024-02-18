@@ -1,33 +1,33 @@
-import React, { useEffect, useState } from "react";
-import Header from "../../components/header";
-import NumberFormat from "react-number-format";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { useDispatch } from "react-redux";
-import { addToBasket } from "../../slices/basketSlice";
-import NotFound from "../404";
-import { addToWishlist } from "../../slices/wishlistSlice";
-import ProductCard from "../../components/productcard";
-import Head from "next/head";
+import React, { useEffect, useState } from 'react'
+import Header from '@components/marketplace/header'
+import NumberFormat from 'react-number-format'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { useDispatch } from 'react-redux'
+// import { addToBasket } from "../../slices/basketSlice";
+// import NotFound from "../404";
+// import { addToWishlist } from "../../slices/wishlistSlice";
+import ProductCard from '@components/marketplace/productcard'
+import Head from 'next/head'
 
-function Product({ dataItem, dataAlso }) {
-  const [selectedSize, setSelectedSize] = useState(0);
-  const dispatch = useDispatch();
-  const [imgSelected, setImgSelected] = useState(0);
+export default function Product({ dataItem }) {
+  const [selectedSize, setSelectedSize] = useState(0)
+  // const dispatch = useDispatch();
+  const [imgSelected, setImgSelected] = useState(0)
 
-  if (!dataItem || !dataAlso) return <NotFound />;
+  // if (!dataItem) return <NotFound />
 
   return (
     <>
       <Head>
-        <title>{dataItem.name}</title>
+        <title>{dataItem?.name}</title>
       </Head>
       <div className="bg-cusgray min-h-screen pb-10">
         <Header />
         <div className="max-w-4xl mx-auto min-h-screen pt-16">
           <div className="flex justify-between place-items-center py-4 px-1 mb-4">
-            <Link href="/shop">
-              <div className="w-9 h-9 shadow-lg bg-white text-cusblack hover:bg-cusblack hover:text-white duration-200 cursor-pointer rounded-full flex justify-center place-items-center">
+            <Link href="/marketplace/shop">
+              <div className="w-9 h-9 shadow-lg bg-white text-cusblack hover:bg-primary-600 hover:text-white duration-200 cursor-pointer rounded-full flex justify-center place-items-center">
                 <svg
                   className="w-4 h-4 "
                   fill="none"
@@ -48,11 +48,11 @@ function Product({ dataItem, dataAlso }) {
             <div className="w-8"></div>
           </div>
 
-          <div className="w-full bg-white md:rounded-2xl shadow-lg md:py-8 md:px-10 md:flex overflow-hidden">
+          <div className="w-full bg-black md:rounded-2xl shadow-lg md:py-8 md:px-10 md:flex overflow-hidden">
             <div className="photo md:w-1/3">
               <div>
                 <img
-                  className=" h-60 object-cover w-full md:rounded-2xl"
+                  className=" h-90 object-cover w-full md:rounded-2xl"
                   src={dataItem.prop[0].image[imgSelected]}
                   alt=""
                 />
@@ -75,7 +75,7 @@ function Product({ dataItem, dataAlso }) {
             </div>
             <div className="detail px-2 md:px-0 mt-3 md:mt-0 md:ml-6 py-2 md:w-2/3">
               <p className="flex place-items-center text-sm text-gray-400">
-                {dataItem.type.name}
+                {dataItem?.type.name}
                 <span className="mx-1">
                   <svg
                     className="w-4 h-4"
@@ -90,24 +90,16 @@ function Product({ dataItem, dataAlso }) {
                     />
                   </svg>
                 </span>
-                {dataItem.category.name}
+                {dataItem?.category.name}
               </p>
               <h1 className="text-3xl text-cusblack font-medium my-3">
-                {dataItem.name}
+                {dataItem?.name}
               </h1>
-              <p className="text-sm text-gray-400">{dataItem.color}</p>
-              <NumberFormat
-                value={dataItem.price}
-                className="my-3 font-semibold text-lg text-cusblack"
-                displayType={"text"}
-                thousandSeparator={true}
-                prefix={"Rp"}
-                renderText={(value, props) => (
-                  <p className="text-sm font-semibold" {...props}>
-                    {value}
-                  </p>
-                )}
-              />
+              <p className="text-sm text-gray-400">{dataItem?.color}</p>
+
+              <p className="my-3 font-semibold text-lg text-cusblack">
+                Tk {dataItem?.price}
+              </p>
               <div className="sizes text-sm text-gray-400">
                 <p className="mb-2">Select size</p>
                 <div className="flex">
@@ -129,21 +121,21 @@ function Product({ dataItem, dataAlso }) {
               <div className="buttoncart flex mt-5 w-full">
                 <button
                   onClick={() => {
-                    dispatch(
-                      addToBasket({
-                        ...dataItem,
-                        selectedSizeProp: dataItem.prop[0].size[selectedSize],
-                      })
-                    );
+                    // dispatch(
+                    //   addToBasket({
+                    //     ...dataItem,
+                    //     selectedSizeProp: dataItem.prop[0].size[selectedSize],
+                    //   })
+                    // )
                   }}
-                  className="w-4/5 md:w-3/5 bg-cusblack overflow-hidden py-4 text-white rounded-lg text-sm active:bg-gray-800 duration-100"
+                  className="w-4/5 md:w-3/5 bg-primary-600 overflow-hidden py-4 text-black-100 rounded-lg text-sm active:bg-primary-900 duration-100 hover:bg-primary-700"
                 >
                   <motion.span
                     initial={{ y: -100 }}
                     animate={{ y: 0 }}
                     className="flex justify-center place-items-center overflow-hidden"
                   >
-                    Add to basket
+                    Add to Wishlist
                     <span>
                       <svg
                         className="ml-2 w-5 h-5"
@@ -156,7 +148,7 @@ function Product({ dataItem, dataAlso }) {
                     </span>
                   </motion.span>
                 </button>
-                <button
+                {/* <button
                   onClick={() => dispatch(addToWishlist(item))}
                   className="w-1/5 ml-2 bg-white border border-cusblack py-4 text-cusblack rounded-lg text-sm"
                 >
@@ -174,12 +166,12 @@ function Product({ dataItem, dataAlso }) {
                       d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                     />
                   </svg>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
 
-          <div className="text-cusblack p-2 md:px-10 md:py-6 mt-14 bg-white md:rounded-2xl shadow-lg">
+          {/* <div className="text-cusblack p-2 md:px-10 md:py-6 mt-14 bg-white md:rounded-2xl shadow-lg">
             <p className="mb-4 font-medium text-lg">You may also like:</p>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-x-4 gap-y-6">
               {dataAlso
@@ -189,56 +181,104 @@ function Product({ dataItem, dataAlso }) {
                     return <ProductCard key={data.slug} item={data} />;
                 })}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </>
-  );
+  )
 }
 
-export async function getStaticPaths() {
-  const res = await fetch(process.env.NEXT_PUBLIC_APIURL + "/items");
-  const data = await res.json();
+// export async function getStaticPaths() {
+//   // const res = await fetch(process.env.NEXT_PUBLIC_APIURL + "/items");
+//   // const data = await res.json();
 
-  const paths = data.map((cat) => ({
-    params: { slug: cat.slug },
-  }));
+//   const res = []
+//   const data = []
 
-  return {
-    paths,
-    fallback: true,
-  };
-}
+//   const paths = data.map((cat) => ({
+//     params: { slug: cat.slug },
+//   }))
 
-export async function getStaticProps({ params }) {
-  const { slug } = params;
-  const res = await fetch(
-    process.env.NEXT_PUBLIC_APIURL + `/items?slug=${slug}`
-  );
-  const data = await res.json();
-  const dataItem = data[0];
-  const resAlso = await fetch(
-    process.env.NEXT_PUBLIC_APIURL +
-      `/items?category.slug=${dataItem?.category.slug}`
-  );
-  const dataAlso = await resAlso.json();
+//   return {
+//     paths,
+//     fallback: true,
+//   }
+// }
 
-  if (!data.length) {
-    return {
-      redirect: {
-        destination: "/shop",
-        permanent: false,
+// export async function getStaticProps({ params }) {
+//   const { slug } = params
+//   // const res = await fetch(
+//   //   process.env.NEXT_PUBLIC_APIURL + `/items?slug=${slug}`
+//   // );
+//   // const data = await res.json();
+//   // const dataItem = data[0];
+//   // const resAlso = await fetch(
+//   //   process.env.NEXT_PUBLIC_APIURL +
+//   //     `/items?category.slug=${dataItem?.category.slug}`
+//   // );
+//   // const dataAlso = await resAlso.json();
+
+//   // if (!data.length) {
+//   //   return {
+//   //     redirect: {
+//   //       destination: "/shop",
+//   //       permanent: false,
+//   //     },
+//   //   };
+//   // }
+
+//   const dataItem = {
+//     name: 'Interstellar Notebook',
+//     price: '200',
+//     color: 'White',
+//     type: { name: 'Notebook' },
+//     category: { name: 'Stationary' },
+//     prop: [
+//       {
+//         size: ['S', 'M', 'L'],
+//         image: [
+//           'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+//           'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+//           'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+//         ],
+//       },
+//     ],
+//   }
+
+//   return {
+//     props: {
+//       dataItem,
+//       // dataAlso,
+//     },
+//     revalidate: 5,
+//   }
+// }
+
+export async function getServerSideProps(context) {
+  const { slug } = context.params
+
+  const dataItem = {
+    name: 'Interstellar Notebook',
+    price: '200',
+    color: 'White',
+    type: { name: 'Notebook' },
+    category: { name: 'Stationary' },
+    prop: [
+      {
+        size: ['S', 'M', 'L'],
+        image: [
+          'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+          'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+          'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+        ],
       },
-    };
+    ],
   }
 
   return {
     props: {
       dataItem,
-      dataAlso,
+      // dataAlso,
     },
-    revalidate: 5,
-  };
+  }
 }
-
-export default Product;
