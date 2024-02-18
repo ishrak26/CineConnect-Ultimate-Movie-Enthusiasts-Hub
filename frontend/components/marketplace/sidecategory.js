@@ -7,7 +7,9 @@ function SideCategory({ typesData }) {
   //   const data = useSelector(recentCategory);
   const data = []
   const [recent, setRecent] = useState()
-  useEffect(() => setRecent(data))
+
+  // useEffect(() => setRecent(data))
+
   return (
     <div className="bg-white rounded-3xl px-5 py-6 shadow-lg w-2/3 md:w-1/2 lg:w-auto">
       <h3 className="font-semibold mb-3 text-lg text-cusblack">Categories</h3>
