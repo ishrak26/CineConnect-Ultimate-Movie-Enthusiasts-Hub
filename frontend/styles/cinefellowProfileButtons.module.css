@@ -1,0 +1,252 @@
+/* SendCinefellowRequestButton.module.css */
+.cinefellowRequestButton {
+  width: 257px;
+  height: 51px;
+  background: #171616;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  color: #FFFFFF;
+  padding-left: 3rem; /* Adjust based on the size of your icon */
+  padding-right: 2rem; /* Adjust for padding */
+  border: none;
+  cursor: pointer;
+  outline: none;
+  position: relative; /* Use relative for icon positioning */
+  transition: background-color 0.3s;
+}
+
+/* Adjust the icon size and position as needed */
+.cinefellowRequestIcon {
+  position: absolute;
+  left: 15px; /* Adjust this value to match the design */
+  top: 50%;
+  transform: translateY(-50%);
+  /* Add icon specific styling here */
+}
+
+.cinefellowRequestButton:hover {
+  background: #4CAF50; /* On hover, change the background color */
+  transition: 200ms; /* Smooth transition */
+}
+
+/* isCinefellow */
+.isCinefellowButton {
+  width: 260px;
+  height: 51px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  color: #FFFFFF;
+  padding-left: 3rem; /* Adjust based on the size of your icon */
+  padding-right: 2rem; /* Adjust for padding */
+  border: none;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  transition: text-decoration 0.3s;
+}
+
+.isCinefellowIcon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  /* Add icon specific styling here if needed */
+}
+
+
+/* RemoveCinefellowButton.module.css */
+.removeCinefellowButton {
+  width: 260px;
+  height: 51px;
+  background: #171616;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  color: #FFFFFF;
+  padding-left: 3rem; /* Adjust based on the size of your icon */
+  padding-right: 2rem; /* Adjust for padding */
+  border: none;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  transition: background-color 0.3s;
+  transition: text-decoration 0.3s;
+}
+
+.removeCinefellowIcon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  /* Add icon specific styling here if needed */
+}
+
+.removeCinefellowButton:hover {
+  background: #F44336;
+  transition: 200ms;
+}
+
+
+/* WithdrawCinefellowRequestButton.module.css */
+.withdrawCinefellowRequestButton {
+  width: 248px;
+  height: 51px;
+  background: #171616;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  color: #FFFFFF;
+  padding-left: 3rem; /* Adjust based on the size of your icon */
+  padding-right: 2rem; /* Adjust for padding */
+  border: none;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.withdrawCinefellowRequestIcon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  /* Add icon specific styling here if needed */
+}
+
+.withdrawCinefellowRequestButton:hover {
+  background: #F44336;
+  transition: 200ms;
+}
+
+
+
+.acceptCinefellowRequestButton {
+  width: 140px;
+  height: 51px;
+  background: #171616;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  color: #FFFFFF;
+  padding-left: 3rem; /* Adjust based on the size of your icon */
+  padding-right: 2rem; /* Adjust for padding */
+  border: none;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.acceptCinefellowRequestIcon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.acceptCinefellowRequestButton:hover {
+  background: #4CAF50; /* A shade of green for the hover state */
+  transition: 200ms;
+}
+
+
+.declineCinefellowRequestButton {
+    width: 140px;
+    height: 51px;
+    background: #171616;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 24px;
+    color: #FFFFFF;
+    padding-left: 3rem; /* Adjust based on the size of your icon */
+    padding-right: 2rem; /* Adjust for padding */
+    border: none;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    transition: background-color 0.3s;
+  }
+  
+  .declineCinefellowRequestIcon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .declineCinefellowRequestButton:hover {
+    background: #F44336; /* A shade of red for the hover state */
+    transition: 200ms;
+  }
+  
+
+
+  /* EditButton.module.css */
+.editButton {
+  position: relative;
+  width: 175px;
+  height: 51px;
+  background: #171616;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;  /* Center the text */
+  justify-content: right;  /* Center the text */
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding-left: 2rem; /* Adjust based on the size of your icon */
+  padding-right: 2rem; /* Adjust for padding */
+  box-sizing: border-box;
+  transition: background-color 0.3s;
+}
+
+.editButton:hover {
+  background: #F8B319;
+  transition: 200ms;
+}
+
+.editButtonIcon {
+  position: absolute;
+  left: 1rem; /* Adjust based on your layout */
+  
+  top: 50%;
+  transform: translateY(-50%);
+  /* Add styles for the edit icon here */
+}

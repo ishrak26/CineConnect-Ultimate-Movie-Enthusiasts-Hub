@@ -91,9 +91,11 @@ async function fetchCastsByMovieId(movieId) {
 async function fetchDirectorsByMovieId(movieId) {
     const { data, error } = await supabase
         .from('movie_has_director')
-        .select(`
+        .select(
+            `
             movie_person:movie_person_id (id, name)
-        `)
+        `
+        )
         .eq('movie_id', movieId);
 
     if (error) {
@@ -102,15 +104,15 @@ async function fetchDirectorsByMovieId(movieId) {
     }
 
     // Map over the data to restructure the objects to a non-nested format
-    const reformattedData = data.map(director => {
+    const reformattedData = data.map((director) => {
         return {
-            id: director.movie_person.id, 
-            name: director.movie_person.name
+            id: director.movie_person.id,
+            name: director.movie_person.name,
         };
     });
 
     if (reformattedData.length > 0) {
-        console.log('Returning from fetchDirectorsByMovieId:', reformattedData);
+        // console.log('Returning from fetchDirectorsByMovieId:', reformattedData);
         return reformattedData;
     }
 
@@ -125,12 +127,14 @@ async function fetchDirectorsByMovieId(movieId) {
 async function fetchTopCastsByMovieId(movieId, offset, limit) {
     const { data, error } = await supabase
         .from('movie_has_cast')
-        .select(`
+        .select(
+            `
             role_name,
             movie_person:movie_person_id (id, name, image_url)
-        `)
+        `
+        )
         .eq('movie_id', movieId)
-        .range(offset, offset + limit - 1);
+        .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
     if (error) {
         console.error('Error fetching top casts by movie id', error);
@@ -138,17 +142,17 @@ async function fetchTopCastsByMovieId(movieId, offset, limit) {
     }
 
     // Map over the data to restructure the objects to a non-nested format
-    const reformattedData = data.map(cast => {
+    const reformattedData = data.map((cast) => {
         return {
             role_name: cast.role_name,
-            id: cast.movie_person.id, 
-            name: cast.movie_person.name, 
-            image_url: cast.movie_person.image_url
+            id: cast.movie_person.id,
+            name: cast.movie_person.name,
+            image_url: cast.movie_person.image_url,
         };
     });
 
     if (reformattedData.length > 0) {
-        console.log('Returning from fetchTopCastsByMovieId:', reformattedData);
+        // console.log('Returning from fetchTopCastsByMovieId:', reformattedData);
         return reformattedData;
     }
 
@@ -231,7 +235,8 @@ async function fetchMoviesByTitle(title, offset, limit) {
         .from('movie')
         .select('id, title, release_date, poster_url')
         .ilike('title', title) // ilike is case-insensitive. like is case-sensitive.
-        .range(offset, offset + limit - 1);
+        .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1)
+        .order('title', { ascending: true });
 
     if (error) {
         console.error('Error fetching movies by title', error);
@@ -251,7 +256,7 @@ async function fetchMoviesByTitle(title, offset, limit) {
             }
             // console.log('movie', movie);
         }
-        console.log('Returning from fetchMoviesByTitle:', data);
+        // console.log('Returning from fetchMoviesByTitle:', data);
         // console.log(data[0].genres);
         return data;
     }
@@ -269,7 +274,7 @@ async function fetchMoviesById(id, user) {
     const { data, error } = await supabase
         .from('movie')
         .select(
-            'id, title, release_date, plot_summary, poster_url, trailer_url, duration_in_mins, language, country_of_first_release, certification'
+            'id, title, release_date, plot_summary, poster_url, trailer_url, duration_in_mins, language, country_of_first_release, certification, backdrop_url'
         )
         .eq('id', id);
 
@@ -341,7 +346,7 @@ async function fetchMoviesById(id, user) {
             }
         }
 
-        console.log('Returning from fetchMoviesById:', data);
+        // console.log('Returning from fetchMoviesById:', data);
         // console.log(data[0].casts);
         // console.log(data[0].directors);
         return data;
@@ -385,14 +390,26 @@ async function getGenreIdByName(genreName) {
     should return an array 
 */
 
-async function fetchMoviesByGenre(genreName) {
+async function fetchAllGenres() {
+    const { data, error } = await supabase.from('genre').select('id, name');
+
+    if (error) {
+        console.error('Error fetching all genres', error);
+        return null;
+    }
+
+    return data; // Returns an array of genre objects with id and name properties
+}
+
+async function fetchMoviesByGenre(genreId, limit, offset) {
     try {
         // Fetch the movie IDs associated with the given genre ID
-        const genreId = await getGenreIdByName(genreName);
+        // const genreId = await getGenreIdByName(genreName);
         const { data: movieGenreData, error: movieGenreError } = await supabase
             .from('movie_has_genre')
             .select('movie_id')
-            .eq('genre_id', genreId);
+            .eq('genre_id', genreId)
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1); // Adjust the range for pagination
 
         if (movieGenreError) throw movieGenreError;
 
@@ -452,7 +469,7 @@ async function fetchMoviePersonsById(moviePersonId) {
             }
         }
 
-        console.log('Returning from fetchMoviePersonsById:', data);
+        // console.log('Returning from fetchMoviePersonsById:', data);
         // console.log(data[0].movies);
         return data;
     }
@@ -521,6 +538,20 @@ async function addMovieToWatchedlist(userId, movieId) {
     return data;
 }
 
+async function isMovieInWatchedlist(userId, movieId) {
+    const { data, error } = await supabase
+        .from('watched_list')
+        .select('id, joined_forum')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+    if (error || data.length > 1) {
+        console.error('Error checking isMovieInWatchedList:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
 // Function to remove a movie from the watched list
 async function removeMovieFromWatchedlist(userId, movieId) {
     const { data, error } = await supabase
@@ -543,12 +574,12 @@ async function submitRating(userId, movieId, rating) {
         .insert([{ user_id: userId, movie_id: movieId, rating: rating }])
         .select('id');
 
-    if (error) {
+    if (error || data.length !== 1) {
         console.error('Error rating movie as current user', error);
         throw error;
     }
 
-    return data;
+    return data[0];
 }
 
 async function editRating(userId, movieId, rating) {
@@ -585,25 +616,86 @@ const fetchTopCastsIdsByMovieId = async (movieId, offset = 0, limit = 5) => {
             .from('movie_has_cast')
             .select('movie_person_id')
             .eq('movie_id', movieId)
-            .range(offset, offset + limit - 1); // Adjust the range for pagination
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1); // Adjust the range for pagination
 
         if (error) {
             throw error;
         }
 
         // Extract just the movie_person_id values from the data
-        const castIds = data.map(entry => entry.movie_person_id);
+        const castIds = data.map((entry) => entry.movie_person_id);
 
         return castIds;
     } catch (error) {
-        console.error('Error fetching top cast IDs by movie ID with pagination', error);
+        console.error(
+            'Error fetching top cast IDs by movie ID with pagination',
+            error
+        );
         return null;
     }
+};
+
+const fetchTotalMovieCount = async () => {
+    const { error, count } = await supabase
+        .from('movie')
+        .select('*', { count: 'exact', head: true });
+
+    if (error) {
+        console.error('Error fetching total movie count', error);
+        return null;
+    }
+
+    return count;
+};
+
+const fetchUserInfoForMovie = async (userId, movieId) => {
+    const ret = {};
+    const { data, error } = await supabase
+        .from('movie_has_user_rating')
+        .select('rating')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+
+    if (error || data.length > 1) {
+        console.error('Error fetching user rating for movie', error);
+        return null;
+    }
+
+    ret.rating = data.length === 1 ? data[0].rating : 0;
+
+    const { data: watchlistData, error: watchlistError } = await supabase
+        .from('watch_list')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+
+    if (watchlistError || watchlistData.length > 1) {
+        console.error('Error fetching watchlist for movie', watchlistError);
+        return null;
+    }
+
+    ret.in_watchlist = watchlistData.length === 1;
+
+    const { data: watchedlistData, error: watchedlistError } = await supabase
+        .from('watched_list')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('movie_id', movieId);
+
+    if (watchedlistError || watchedlistData.length > 1) {
+        console.error('Error fetching watchedlist for movie', watchedlistError);
+        return null;
+    }
+
+    ret.in_watchedlist = watchedlistData.length === 1;
+
+    return ret;
 };
 
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
+    fetchAllGenres,
     fetchMoviesByGenre,
     fetchMoviePersonsById,
     fetchTopCastsByMovieId,
@@ -615,4 +707,7 @@ module.exports = {
     submitRating,
     editRating,
     deleteRating,
+    fetchTotalMovieCount,
+    isMovieInWatchedlist,
+    fetchUserInfoForMovie,
 };
