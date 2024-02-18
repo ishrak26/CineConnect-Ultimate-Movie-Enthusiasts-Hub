@@ -9,7 +9,7 @@ import ScrollTop from '@components/scroll-top'
 import { SidebarProvider } from 'context/SidebarContext'
 import { Suspense } from 'react'
 import { RecoilRoot } from 'recoil'
-
+import { AnimatePresence } from 'framer-motion'
 
 function MyApp({ Component, pageProps }) {
   if (pageProps.error)
@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
-     {/* Google Analytics implementation  */}
+      {/* Google Analytics implementation  */}
       {/* <Script
         strategy="afterInteractive"
         src="https://www.googletagmanager.com/gtag/js?id=G-YRMKVQ13FX"
@@ -39,11 +39,14 @@ function MyApp({ Component, pageProps }) {
 
       <NextNProgress color="#f1c232" />
 
+      <AnimatePresence>
       <RecoilRoot>
-      <SidebarProvider>
-        <Component {...pageProps} />
-      </SidebarProvider>
+        <SidebarProvider>
+          <Component {...pageProps} />
+        </SidebarProvider>
       </RecoilRoot>
+      </AnimatePresence>
+      
 
       <ScrollTop />
     </>
