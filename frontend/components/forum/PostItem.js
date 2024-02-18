@@ -375,7 +375,7 @@ const PostActions = ({
       </Flex>
 
       {/* This Text component is moved outside of the first Flex container and will be pushed to the right */}
-      <Text mr={10} fontSize="sm">{`${commentCount - 1} Comments`}</Text>
+      <Text mr={10} fontSize="sm">{`${commentCount} Comments`}</Text>
     </Flex>
   )
 }

@@ -70,10 +70,7 @@ const PostPage = ({ postData, postComments, votes, user , ForumAbout , forumId, 
                       onVote={onVote}
                       onDeletePost={onDeletePost}
                       userVoteValue={
-                        // postStateValue.postVotes.find(
-                        //   (vote) =>
-                        //     vote.postId === postStateValue.selectedPost?.id
-                        // )?.voteValue
+
                         votes
                       }
                       userIsCreator={
