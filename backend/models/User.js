@@ -572,7 +572,7 @@ async function fetchJoinedForums(userId, limit, offset) {
     }
 }
 
-}
+
 
 const getProfileDetails = async ({ username }) => {
     try {
