@@ -570,6 +570,7 @@ async function fetchJoinedForums(userId, limit, offset) {
         console.error('Exception fetching joined forums:', err.message);
         return null;
     }
+}
 
 }
 
@@ -638,5 +639,4 @@ module.exports = {
 
     getProfileDetails,
     fetchUserById,
-
 };

@@ -6,14 +6,8 @@ import { authModalState } from '@/context/authModalContext'
 import { postState } from '@/context/postContext'
 import { useState, useEffect } from 'react'
 
-// function for getting user
 
-const getUser = async () => {
-  const userId = await fetch(`http://localhost:4000/v1/forum/user`)
-  return userId
-}
-
-const usePosts = () => {
+const usePosts = (cookie) => {
  
   const [postStateValue, setPostStateValue] = useRecoilState(postState) // get and set single post
   //   const currentCommunity = useRecoilValue(communityState).currentCommunity;  // get current community
@@ -23,20 +17,57 @@ const usePosts = () => {
   const [loading, setLoading] = useState(false)
   const [posts, setPosts] = useState([])
 
-  const updateVote = async (postId, vote) => {
-    const response = await fetch(
+  // function for getting user
+
+ const getUser = async () => {
+  const userId = await fetch(`http://localhost:4000/v1/forum/user`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(cookie ? { Cookie: cookie } : {}),
+    },
+    credentials: 'include',
+  })
+  return userId
+}
+
+  const updateVote = async (postId, vote, forumId) => {
+
+    const type = vote;
+
+   const response = await fetch(
       `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
         },
-        body: JSON.stringify({ vote }),
+        credentials: 'include',
+        body: JSON.stringify({ type }),
       }
     )
+
+    if(response.status === 400){
+      const response2 = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify({ type }),
+        }
+      )
+
+    }
+
     if (!response.ok) {
       throw new Error('Failed to update vote')
     }
+
     return await response.json()
   }
 
@@ -44,8 +75,15 @@ const usePosts = () => {
     setLoading(true)
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/posts`
-      )
+        `http://localhost:4000/v1/forum/${forumId}/posts`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+      }
+     )
       if (!response.ok) {
         throw new Error('Failed to fetch posts')
       }
@@ -65,6 +103,7 @@ const usePosts = () => {
   const onVote = async (event, postId, vote, forumId) => {
     event.stopPropagation()
 
+
     const user = getUser()
     if (!user) {
       setAuthModalState({ open: true, view: 'login' })
@@ -74,10 +113,10 @@ const usePosts = () => {
     try {
       if (vote === 1) {
         const voteType = 'upvote'
-        const upvote = await updateVote(postId, voteType)
+        const upvote = await updateVote(postId, voteType, forumId)
       } else if (vote === -1) {
         const voteType = 'downvote'
-        const downvote = await updateVote(postId, voteType)
+        const downvote = await updateVote(postId, voteType, forumId)
       }
       // Optionally, refetch all posts to update the UI
       const updatedPost = await fetchPosts(forumId)
@@ -85,18 +124,6 @@ const usePosts = () => {
         prevPosts.map((post) => (post.postId === postId ? updatedPost : post))
       )
 
-      // setPostStateValue((prev) => ({
-      //   ...prev,
-      //   posts: updatedPosts,
-      //   postVotes: updatedPostVotes,
-      // })) // update posts and post votes state on the ui
-
-      // // allow voting when a post is currently selected
-      // if (postStateValue.selectedPost) {
-      //   setPostStateValue((prev) => ({
-      //     ...prev,
-      //     selectedPost: updatedPost,
-      //   })) // update selected post
       }
      catch (error) {
       showToast({
@@ -193,6 +220,18 @@ const usePosts = () => {
     onSelectPost,
     onVote,
     onDeletePost,
+  }
+}
+
+export async function getServerSideProps(context) {
+
+  const cookie = context.req.headers.cookie
+  console.log(cookie)
+
+  return {
+    props: {
+      cookie: cookie || '',
+    },
   }
 }
 
