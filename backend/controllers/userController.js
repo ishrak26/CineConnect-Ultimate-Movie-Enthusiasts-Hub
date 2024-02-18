@@ -9,7 +9,7 @@ const userController = {
         if(!req.user) return res.status(401).json({ message: 'Unauthorized' });
 
         const username = req.params.username;
-        const user = await db_user.getProfileByUsername(username);
+        const user = await db_user.getProfileByUsername({username});
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
@@ -74,71 +74,114 @@ const userController = {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-      // If the user is trying to follow themselves
-      const username = await db_user.findOneById(req.user.id);
+      const data = await db_user.findOneById(req.user.id);
+      if(!data) {
+        return res.status(404).json({ message: "Not found" });
+      }
+      const requestorUsername = data.username;
+      const requesteeUsername = req.params.username;
 
-      if (username === req.params.username) {
-        return res.status(401).json({ message: "Unauthorized" });
+      // If the user is trying to follow themselves
+      if (requestorUsername === requesteeUsername) {
+        return res.status(400).json({ message: "Bad request" });
       }
 
       // If the user is trying to follow someone they are already following
-      const requestee = await db_user.findOne({
-        username: username,
+      const data2 = await db_user.findOne({
+        username: requesteeUsername,
       });
+      if(!data2) {
+        return res.status(404).json({ message: "Not found" });
+      }
+      console.log('In followCineFellow, requesteeUsername', requesteeUsername);
       const requestorId = req.user.id;
-      const requesteeId = requestee ? requestee.id : null;
+      const requesteeId = data2.id;
 
-      // If any of the users are not found
-      if (!requesteeId) {
-        return res.status(404).json({ message: "User not found." });
+      console.log('In followCinefellow, requesteeId:', requesteeId, 'RequestorId: ', requestorId);
+
+      const result = await db_user.followCinefellow({
+        userId: requestorId,
+        fellowId: requesteeId,
+      });
+
+      if (result) {
+        res
+          .status(200)
+          .json({ message: "CineFellow followed successfully." });
+      } else {
+        res.status(404).json({ message: "CineFellow not found." });
       }
-
-      const { fellowId } = req.body;
-
-      const result = await db_user.followCinefellow({ requestorId, fellowId });
-
-      if(result){
-        res.status(200).json({ message: "CineFellow followed successfully." });
-      }
-      else {
-        res.status(404).json({ message: "Already following" });
-      }
-
-      
     } catch (error) {
-      console.error("Failed to follow cinefellow:", error.message);
+      console.error("Failed to unfollow cinefellow:", error.message);
       res.status(500).json({ message: "Internal server error" });
     }
   },
+  
+  withdrawCineFellowRequest: async (req, res) => {
+    try {
+        if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+        // Assuming req.user.id is the ID of the user who is making the request
+        // and req.params.username is the username of the user to whom the request was sent
+        const requestorId = req.user.id;
+        
+        // First, find the user ID of the requestee based on the username provided in the URL
+        const requesteeData = await db_user.findOne({ username: req.params.username });
+        if (!requesteeData) {
+            return res.status(404).json({ message: "Requestee not found." });
+        }
+        const requesteeId = requesteeData.id;
+
+        // Now, call the model function to withdraw the cinefellow request
+        const result = await db_user.withdrawCineFellowRequest({ requestorId, requesteeId });
+        console.log('result:', result);
+
+        // Based on the result, send appropriate response
+        if (result.success) {
+            res.status(200).json({ message: result.message });
+        } else {
+            res.status(404).json({ message: result.message });
+        }
+    } catch (error) {
+        console.error("Failed to withdraw cinefellow request:", error.message);
+        res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+},
+
 
   unfollowCineFellow: async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-      const username = await db_user.findOneById(req.user.id);
-
+      const data = await db_user.findOneById(req.user.id);
+      if(!data) {
+        return res.status(404).json({ message: "Not found" });
+      }
+      const requestorUsername = data.username;  //user 
+      const requesteeUsername = req.params.username;  //profileHolder
+        
       // If the user is trying to unfollow themselves
-      if (username === req.params.username) {
-        return res.status(401).json({ message: "Unauthorized" });
+      if (requestorUsername === requesteeUsername) {
+        return res.status(400).json({ message: "Bad request" });
       }
 
-      // If the user is trying to unfollow someone they are not following
-      const requestee = await db_user.findOne({
-        username: username,
+      // If the user is trying to unfollow a non-existent profile
+      console.log('In unfollowCineFellow, requestorUsername:', requestorUsername);
+      const data2 = await db_user.findOne({
+        username: requesteeUsername,
       });
-      const requestorId = req.user.id;
-      const requesteeId = requestee ? requestee.id : null;
-
-      // If any of the users are not found
-      if (!requesteeId) {
-        return res.status(404).json({ message: "User not found." });
+      if(!data2) {
+        return res.status(404).json({ message: "Not found" });
       }
+      console.log('In unfollowCineFellow, requesteeUsername', requesteeUsername);
+      const requestorId = req.user.id;
+      const requesteeId = data2.id;
 
-      const { fellowId } = req.body;
+      console.log('In unfollowCinefellow, requesteeId:', requesteeId, 'RequestorId: ', requestorId);
 
       const result = await db_user.unfollowCinefellow({
-        requestorId,
-        fellowId,
+        userId: requestorId,
+        fellowId: requesteeId,
       });
 
       if (result) {
@@ -155,11 +198,14 @@ const userController = {
   },
 
   getPendingRequests: async (req, res) => {
+    console.log("Inside getPendingRequests controller: DHUKSI");
+    // console.log("Inside getPendingRequests controller: req.user -->", req.user);
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-
-      const userName = await db_user.findOneById(req.user.id);
-
+      console.log("Inside getPendingRequests controller: DEBUGGING 1");
+      const sessionUser = await db_user.findOneById(req.user.id);
+      const userName = sessionUser.username;
+      console.log("Inside getPendingRequests controller: DEBUGGING 2");
       // If the user is trying to fetch pending requests for someone else
       if (userName !== req.params.username) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -168,12 +214,12 @@ const userController = {
       const username = req.params.username;
       const user = await db_user.findOne({ username });
       const userId = user ? user.id : null;
-
+      console.log("Inside getPendingRequests controller: DEBUGGING 3");
       // If user not found
       if (!userId) {
         return res.status(404).json({ message: "User not found." });
       }
-
+      console.log("Inside getPendingRequests controller: DEBUGGING 4");
       const limit = req.query.limit || 10; // Default limit to 10 if not specified
       const offset = req.query.offset || 0; // Default offset to 0 if not specified
 
@@ -182,7 +228,7 @@ const userController = {
         limit,
         offset,
       });
-
+      console.log("Inside getPendingRequests controller: DEBUGGING 5");
       res.status(200).json({ pendingRequests });
     } catch (error) {
       console.error("Failed to fetch pending requests:", error.message);
@@ -193,84 +239,99 @@ const userController = {
   acceptCineFellowRequest: async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-
-      const userName = await db_user.findOneById(req.user.id);
-
-      // If the user is trying to accept a request for someone else
-      if (userName !== req.params.username) {
-        return res.status(401).json({ message: "Unauthorized" });
+      const data = await db_user.findOneById(req.user.id);
+      if(!data) {
+        return res.status(404).json({ message: "Not found" });
+      }
+      const requestorUsername = data.username;
+      const requesteeUsername = req.params.username;
+        
+      // If the user is trying to accept/reject themselves
+      if (requestorUsername === requesteeUsername) {
+        return res.status(400).json({ message: "Bad request" });
       }
 
-      const { requestId } = req.body;
-      const username = req.params.username;
-      const user = await db_user.findOne({ username });
-      const userId = user ? user.id : null;
-
-      // If the user is trying to accept a request that doesn't exist
-      if (!requestId) {
-        return res.status(404).json({ message: "Request not found." });
+      // If the user is trying to accept/reject someone who hasn't sent a request
+      // console.log('In acceptCineFellowRequest, requestorUsername:', requestorUsername); //here requestor is the user (one who 
+                                                                                        //is accepting/rejecting the request) 
+      const data2 = await db_user.findOne({
+        username: requesteeUsername,  // requestee is the one who sent the follow request
+      });
+      if(!data2) {
+        return res.status(404).json({ message: "Not found" });
       }
 
-      // If user not found
-      if (!userId) {
-        return res.status(404).json({ message: "User not found." });
-      }
+      const requestorId = req.user.id;
+      const requesteeId = data2.id;
+
+      // console.log('In acceptCinefellowRequest controller, requesteeId(profileholder):', requesteeId, 'RequestorId(user):', requestorId);
 
       const result = await db_user.acceptCineFellowRequest({
-        requestId,
-        userId,
+        userId: requestorId,
+        requestorId: requesteeId,
       });
 
-      res
-        .status(200)
-        .json({ message: "CineFellow request accepted successfully." });
+      if (result) {
+        res
+          .status(200)
+          .json({ message: "CineFellow request accepted successfully." });
+      } else {
+        res.status(404).json({ message: "CineFellow request not found." });
+      }
     } catch (error) {
       console.error("Failed to accept cinefellow request:", error.message);
       res.status(500).json({ message: "Internal server error" });
     }
+
+      
   },
 
   rejectCineFellowRequest: async (req, res) => {
+    // console.log('Inside rejectCineFellowRequest controller: DHUKSI')
     try {
+      // console.log('Inside rejectCineFellowRequest controller: TRY BLOCK E DHUKSI')
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-
-      const userName = await db_user.findOneById(req.user.id);
-
-      // If the user is trying to reject a request for someone else
-      if (userName !== req.params.username) {
-        return res.status(401).json({ message: "Unauthorized" });
+      const data = await db_user.findOneById(req.user.id);
+      if(!data) {
+        return res.status(404).json({ message: "Not found" });
+      }
+      const requestorUsername = data.username;  // user
+      const requesteeUsername = req.params.username;  // profileHolder
+        
+      // If the user is trying to accept/reject themselves
+      if (requestorUsername === requesteeUsername) {
+        return res.status(400).json({ message: "Bad request" });
       }
 
-      const { requestId } = req.body;
-      const username = req.params.username;
-      const user = await db_user.findOne({ username });
-      const userId = user ? user.id : null;
-
-      // If the user is trying to reject a request that doesn't exist
-      if (!requestId) {
-        return res.status(404).json({ message: "Request not found." });
+      // If the user is trying to accept/reject someone who hasn't sent a request
+      // console.log('In rejectCineFellowRequest, requestorUsername:', requestorUsername); //here requestor is the user (one who 
+                                                                                        //is accepting/rejecting the request) 
+      const data2 = await db_user.findOne({
+        username: requesteeUsername,  // requestee is the one who sent the follow request
+      });
+      if(!data2) {
+        return res.status(404).json({ message: "Not found" });
       }
 
-      // If user not found
-      if (!userId) {
-        return res.status(404).json({ message: "User not found." });
-      }
+      const requestorId = req.user.id;
+      const requesteeId = data2.id;
+
+      // console.log('In rejectCinefellowRequest controller, requesteeId(profileholder):', requesteeId, 'RequestorId(user):', requestorId);
 
       const result = await db_user.rejectCineFellowRequest({
-        requestId,
-        userId,
+        userId: requestorId,
+        requestorId: requesteeId,
       });
 
-      res
-        .status(200)
-        .json({
-          message: "CineFellow request rejected or cancelled successfully.",
-        });
+      if (result) {
+        res
+          .status(200)
+          .json({ message: "CineFellow request rejected successfully." });
+      } else {
+        res.status(404).json({ message: "CineFellow request not found." });
+      }
     } catch (error) {
-      console.error(
-        "Failed to reject/cancel cinefellow request:",
-        error.message
-      );
+      console.error("Failed to reject cinefellow request:", error.message);
       res.status(500).json({ message: "Internal server error" });
     }
   },
@@ -423,6 +484,71 @@ const userController = {
             res.status(500).json({ message: 'Internal server error' });
         }
     },
+
+    // figure out if the visited profile belongs to the user themselves, or to a cinefellow, or to some other user who is not a cinefellow
+    identifyProfileHolder : async (req, res) => {
+        // userType 1: self, 2: cinefellow, 3: (Profile)Requested, 4: (Profile)Requestee, 5: Non-Cinefellow, 6: Non-User
+        let userType = 6;
+        try {
+            // console.log('Inside identifyProfileHolder: DEBUG_CHECKPOINT_1');
+            if(!req.user) return res.status(401).json({ userType, message: 'unauthenticated' });
+            const user = await db_user.findOneById(req.user.id);
+            // console.log('Inside identifyProfileHolder: DEBUG_CHECKPOINT_2 --> ', user.username);
+            const username = req.params.username;
+            // console.log(username)
+            const user2 = await db_user.findOne({ username });
+            // console.log('Inside identifyProfileHolder: DEBUG_CHECKPOINT_3 --> ', user2.username);
+            if(user.id === user2.id) userType = 1;
+            else {
+                const user1Id = user.id
+                const user2Id = user2.id
+                // console.log('Inside identifyProfileHolder: DEBUG_CHECKPOINT_4 --> ', user1Id, user2Id);
+                const fellow = await db_user.isFollowing({ userId: user1Id, fellowId: user2Id });
+                // console.log('Inside identifyProfileHolder: DEBUG_CHECKPOINT_5 --> ', fellow);
+                if(fellow) userType = 2;
+                else {
+                    const hasRequested = await db_user.checkIfTheyRequested({ userId: user.id, fellowId: user2.id });
+                    console.log('Inside identifyProfileHolder: DEBUG_CHECKPOINT_6 --> ', hasRequested);
+                    if(hasRequested) userType = 3;
+                    else {
+                        const hasBeenRequested = await db_user.checkIfIRequested({ userId: user.id, fellowId: user2.id });
+                        console.log('Inside identifyProfileHolder: DEBUG_CHECKPOINT_7 --> ', hasBeenRequested);
+                        if(hasBeenRequested) userType = 4;
+                        else userType = 5;
+                    }
+                }
+            }
+            console.log('Inside identifyProfileHolder: DEBUG_CHECKPOINT_8 --> Out of all checks, userType:', userType);
+            res.status(200).json({ userType, message: 'website user'});
+        } catch (error) {
+            console.error('Failed to authenticate user:', error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getProfileDetails : async (req, res) => {
+        try {
+            const username = req.params.username;
+            const profileInfo = await db_user.getProfileDetails({ username });
+            if(profileInfo) res.status(200).json({ profileInfo });
+            else res.status(404).json({ message: 'User not found.' });
+        } catch (error) {
+            console.error('Failed to fetch user:', error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getProfileById : async (req, res) => {
+      try {
+          const userId = req.params.id;
+          const profileInfo = await db_user.fetchUserById({ userId });
+          if(profileInfo) res.status(200).json({ profileInfo });
+          else res.status(404).json({ message: 'User not found.' });
+      } catch (error) {
+          console.error('Failed to fetch user:', error.message);
+          res.status(500).json({ message: 'Internal server error' });
+      }
+  },
 };
 
 module.exports = userController;

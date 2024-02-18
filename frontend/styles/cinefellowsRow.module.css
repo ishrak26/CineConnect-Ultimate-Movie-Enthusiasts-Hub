@@ -1,0 +1,13 @@
+/* CinefellowsRow.module.css */
+.cinefellowsContainer {
+  display: flex;
+  /* Additional styles can go here */
+}
+
+.profilePhoto {
+  width: 180px; /* This is equivalent to h-32 in Tailwind, adjust as needed */
+  height: 180px; /* This is equivalent to w-32 in Tailwind, adjust as needed */
+  border-radius: 50%; /* This will make it circular like rounded-full */
+  margin-right: 32px; /* This is equivalent to mr-8 in Tailwind, adjust as needed */
+  object-fit: cover; /* This will cover the area of the container without stretching the image */
+}

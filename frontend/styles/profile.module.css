@@ -1,0 +1,13 @@
+.edit-profile-btn {
+    border: 2px solid #171616; /* Solid border with the specified color */
+    background-color: #171616; /* Button background color */
+    color: #ffffff; /* Text color */
+    padding: 8px 16px; /* Padding inside the button */
+    cursor: pointer; /* Change cursor to pointer on hover over the button */
+    transition: background-color 0.3s; /* Smooth transition for background color change */
+  }
+  
+  .edit-profile-btn:hover {
+    background-color: #FFD700; /* Button background color changes on hover */
+  }
+  

@@ -4,6 +4,7 @@ import '../styles/globals.css'
 import '@fontsource/poppins/400.css'
 import '@fontsource/poppins/600.css'
 import '@fontsource/poppins/700.css'
+// import the fontsources for lato and inter
 import Script from 'next/script'
 import ScrollTop from '@components/scroll-top'
 import { SidebarProvider } from 'context/SidebarContext'
