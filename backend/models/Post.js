@@ -30,6 +30,25 @@ async function fetchSinglePostById(postId, imgLimit) {
     }
 }
 
+async function fetchPostAuthorByPostId(postId) {
+    const { data, error } = await supabase
+        .from('post')
+        .select('author_id')
+        .eq('id', postId);
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    if (data.length > 1) {
+        console.error('Error: more than one author found');
+        return null;
+    }
+
+    return data[0].author_id;
+}
+
 async function fetchPostReactionCount(postId) {
     try {
         const { data, error } = await supabase.rpc('get_post_reaction_count', {
@@ -68,6 +87,30 @@ async function createNewPost(userId, movieId, content, images) {
         }
 
         console.log('Returning from createNewPost: new post ID:', data);
+        return data;
+    } catch (err) {
+        console.error('Exception creating new post:', err.message);
+    }
+}
+
+async function updatePost(postId, title, content, images) {
+    try {
+        const { data, error } = await supabase.rpc(
+            'update_forum_post_version',
+            {
+                p_post_id: postId,
+                p_content: content,
+                p_title: title,
+                p_images: images,
+            }
+        );
+
+        if (error) {
+            console.error('Error updating post:', error.message);
+            return null;
+        }
+
+        console.log('Returning from updatePost: new post_version ID:', data);
         return data;
     } catch (err) {
         console.error('Exception creating new post:', err.message);
@@ -271,7 +314,6 @@ async function fetchTotalMemberCountInForum(forumId) {
 }
 
 async function fetchForumById(forumId) {
-
     const { data, error } = await supabase
         .from('movie')
         .select('id, title, poster_url, release_date, plot_summary')
@@ -288,6 +330,7 @@ async function fetchForumById(forumId) {
 
 module.exports = {
     createNewPost,
+    updatePost,
     isJoinedForumByForumId,
     fetchMovieIdByPostId,
     joinForum,
@@ -302,4 +345,5 @@ module.exports = {
     fetchPostReactionCount,
     fetchCommentsByPostId,
     fetchForumById,
+    fetchPostAuthorByPostId,
 };
