@@ -693,6 +693,42 @@ const postController = {
         }
     },
 
+    getPostImageUrl: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const forumId = req.params.forumId;
+            const userId = req.user.id;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const { extension } = req.body;
+            const folder = `${forumId}/${userId}`;
+            const signedUrl = await dbPost.getSignedUrlForPostImage(
+                folder,
+                extension
+            );
+            if (!signedUrl) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+
+            res.status(200).json({ imageUrl: signedUrl });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 

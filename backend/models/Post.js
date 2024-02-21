@@ -1,4 +1,5 @@
 const supabase = require('../config/supabaseConfig');
+const { randomUUID } = require('crypto');
 
 /*
     returns a specific post given the postId
@@ -271,7 +272,6 @@ async function fetchTotalMemberCountInForum(forumId) {
 }
 
 async function fetchForumById(forumId) {
-
     const { data, error } = await supabase
         .from('movie')
         .select('id, title, poster_url, release_date, plot_summary')
@@ -284,6 +284,22 @@ async function fetchForumById(forumId) {
     }
 
     return data;
+}
+
+async function getSignedUrlForPostImage(folder, extension) {
+    const randomFileName = `${randomUUID()}.${extension}`;
+    const filePath = `forum/${folder}/${randomFileName}`;
+    console.log('filePath', filePath);
+    const { signedURL, error } = await supabase.storage
+        .from('forum')
+        .createSignedUrl(filePath, 60); // URL expires in 60 seconds
+
+    if (error) {
+        console.error('Error in getSignedUrForPostImage:', error.message);
+        throw error;
+    }
+
+    return signedURL;
 }
 
 module.exports = {
@@ -302,4 +318,5 @@ module.exports = {
     fetchPostReactionCount,
     fetchCommentsByPostId,
     fetchForumById,
+    getSignedUrlForPostImage,
 };
