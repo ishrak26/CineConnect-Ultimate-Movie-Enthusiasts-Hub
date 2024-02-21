@@ -117,6 +117,21 @@ async function updatePost(postId, title, content, images) {
     }
 }
 
+async function removePost(postId) {
+    const { data, error } = await supabase
+        .from('post')
+        .delete()
+        .eq('id', postId)
+        .select();
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
 async function createNewComment(userId, parentId, content, images) {
     // Convert images array to JSONB format expected by the PostgreSQL function
     // const imagesJsonb = JSON.stringify(images);
@@ -346,4 +361,5 @@ module.exports = {
     fetchCommentsByPostId,
     fetchForumById,
     fetchPostAuthorByPostId,
+    removePost,
 };

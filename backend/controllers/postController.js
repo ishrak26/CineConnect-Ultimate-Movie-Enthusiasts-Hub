@@ -377,18 +377,30 @@ const postController = {
             if (!req.user)
                 return res.status(401).json({ message: 'Unauthorized' });
 
-            //TODO
-
             const postId = req.params.postId;
-            const post = await dbPost.fetchSinglePostById(postId, 0);
-            if (!post) {
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const author = await dbPost.fetchPostAuthorByPostId(postId);
+            if (!author) {
                 return res.status(404).json({ message: 'Post not found' });
             }
 
-            if (post.author_id !== req.user.id) {
-                return res.status(403).json({
-                    message: 'User not authorized to delete the post',
-                });
+            if (author !== req.user.id) {
+                return res
+                    .status(403)
+                    .json({
+                        message: 'User not authorized to delete the post',
+                    });
             }
 
             const deletedPost = await dbPost.removePost(postId);

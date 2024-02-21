@@ -51,8 +51,6 @@ router.get(
     postController.getReactionsByPostId
 ); // **//
 
-
-
 // Route for getting userId from request
 router.get('/user', postController.getUserId); // **//
 
@@ -61,6 +59,5 @@ router.get('/:forumId', postController.getForumById); // **//
 
 // Route to check if user voted to a post
 router.get('/:forumId/post/:postId/voted', postController.checkUserVotedPost); // **//
-
 
 module.exports = router;
