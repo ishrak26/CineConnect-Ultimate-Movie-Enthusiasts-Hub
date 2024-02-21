@@ -30,6 +30,7 @@ const postController = {
             if (post) {
                 const data = {
                     postId: postId,
+                    title: post.title,
                     content: post.content,
                     images: post.images,
                     created_at: post.created_at,
@@ -103,7 +104,7 @@ const postController = {
                     .json({ message: 'User not a member of the forum' });
             }
 
-            const { content } = req.body;
+            const { title, content } = req.body;
             let { images } = req.body;
             if (!content) {
                 return res
@@ -130,12 +131,13 @@ const postController = {
                 images = [];
             }
 
-            console.log('images', images);
-            console.log('content', content);
+            // console.log('images', images);
+            // console.log('content', content);
 
             const newPost = await dbPost.createNewPost(
                 userId,
                 forumId,
+                title,
                 content,
                 images
             );
@@ -230,6 +232,7 @@ const postController = {
                             username: post.username,
                             image_url: post.user_image_url,
                         },
+                        title: post.title,
                         content: post.content.substring(0, contentLimit),
                         contentFull: post.content.length <= contentLimit,
                         totalImages: post.total_images,
@@ -396,11 +399,9 @@ const postController = {
             }
 
             if (author !== req.user.id) {
-                return res
-                    .status(403)
-                    .json({
-                        message: 'User not authorized to delete the post',
-                    });
+                return res.status(403).json({
+                    message: 'User not authorized to delete the post',
+                });
             }
 
             const deletedPost = await dbPost.removePost(postId);
