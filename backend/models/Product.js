@@ -1,22 +1,18 @@
 const supabase = require('../config/supabaseConfig');
 
 async function fetchAllTags(offset, limit) {
-    try {
-        const { data, error } = await supabase.rpc('fetch_distinct_tags', {
-            limit_val: limit,
-            offset_val: offset,
-        });
+    const { data, error } = await supabase.rpc('fetch_distinct_tags', {
+        limit_val: limit,
+        offset_val: offset,
+    });
 
-        if (error) {
-            console.error('Error fetching tags:', error.message);
-            return null;
-        }
-
-        // console.log('Returning from fetchAllTags:', data);
-        return data;
-    } catch (err) {
-        console.error('Exception fetching tags:', err.message);
+    if (error) {
+        console.error('Error fetching tags:', error.message);
+        throw error;
     }
+
+    // console.log('Returning from fetchAllTags:', data);
+    return data;
 }
 
 async function fetchProductsByTagsAndMovies(
@@ -26,38 +22,49 @@ async function fetchProductsByTagsAndMovies(
     offset,
     sortType
 ) {
-    try {
-        // Prepare the parameters, ensuring empty arrays are correctly formatted
-        const tagNames = tags.length > 0 ? tags : null;
-        const movieTitles = movies.length > 0 ? movies : null;
-        const sortTypeUsed = sortType || 'name_asc';
+    // Prepare the parameters, ensuring empty arrays are correctly formatted
+    const tagNames = tags.length > 0 ? tags : null;
+    const movieTitles = movies.length > 0 ? movies : null;
+    const sortTypeUsed = sortType || 'name_asc';
 
-        // Call the stored procedure
-        const { data, error } = await supabase.rpc(
-            'fetch_products_by_tags_movies_and_sort',
-            {
-                tag_names: tagNames,
-                movie_titles: movieTitles,
-                limit_val: limit,
-                offset_val: offset,
-                sort_type: sortTypeUsed,
-            }
-        );
-
-        if (error) {
-            console.error('Error fetching products:', error.message);
-            return null;
+    // Call the stored procedure
+    const { data, error } = await supabase.rpc(
+        'fetch_products_by_tags_movies_and_sort',
+        {
+            tag_names: tagNames,
+            movie_titles: movieTitles,
+            limit_val: limit,
+            offset_val: offset,
+            sort_type: sortTypeUsed,
         }
+    );
 
-        console.log('Returning from fetchProductsByTagsAndMovies:', data);
-        return data;
-    } catch (error) {
-        console.error('Exception fetching products:', error);
-        throw error; // or handle it as needed
+    if (error) {
+        console.error('Error fetching products:', error.message);
+        throw error;
     }
+
+    // console.log('Returning from fetchProductsByTagsAndMovies:', data);
+    return data;
+}
+
+async function getProductRatingInfo(productId, userId = null) {
+    const { data, error } = await supabase.rpc('get_product_rating_info', {
+        pid: productId,
+        uid: userId,
+    });
+
+    if (error) {
+        console.error('Error fetching product rating info:', error);
+        throw error;
+    }
+
+    console.log('Returning from getProductRatingInfo:', data);
+    return data;
 }
 
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
+    getProductRatingInfo,
 };

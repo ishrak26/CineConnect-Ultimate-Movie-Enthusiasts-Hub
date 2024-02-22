@@ -49,6 +49,26 @@ const marketplaceController = {
         }
     },
 
+    getProductRating: async (req, res) => {
+        try {
+            const productId = req.params.id;
+            const userId = req.user ? req.user.id : null;
+            const ratingInfo = await dbProduct.getProductRatingInfo(
+                productId,
+                userId
+            );
+            if (!ratingInfo) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(200).json(ratingInfo);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 
