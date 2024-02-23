@@ -25,6 +25,7 @@ import {
   IoPeopleCircleOutline,
 } from 'react-icons/io5'
 import { MdOutlineDelete } from 'react-icons/md'
+import { number } from 'sharp/lib/is'
 // import PostItemError from "../atoms/ErrorMessage";
 
 const PostItem = ({
@@ -36,38 +37,39 @@ const PostItem = ({
   onDeletePost,
   onSelectPost,
   showForumImage,
+  numberOfComments,
   // cookie,
 }) => {
   const [loadingImage, setLoadingImage] = useState(true)
   const [error, setError] = useState(false)
   const [loadingDelete, setLoadingDelete] = useState(false)
-  const [commentCount, setCommentCount] = useState(0)
+  const [commentCount, setCommentCount] = useState(numberOfComments)
   const router = useRouter()
   const showToast = useCustomToast()
   const { onCopy, value, setValue, hasCopied } = useClipboard('')
 
   const singlePostPage = !onSelectPost
 
-  useEffect(() => {
-    const getCommentCount = async (forumId, postId) => {
-      const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // ...(cookie ? { Cookie: cookie } : {}),
-          },
-          credentials: 'include',
-        }
-      )
-      const data = await response.json() // Convert the response to JSON
+  // useEffect(() => {
+  //   const getCommentCount = async (forumId, postId) => {
+  //     const response = await fetch(
+  //       `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
+  //       {
+  //         method: 'GET',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           // ...(cookie ? { Cookie: cookie } : {}),
+  //         },
+  //         credentials: 'include',
+  //       }
+  //     )
+  //     const data = await response.json() // Convert the response to JSON
 
-      setCommentCount(data.total_comments)
-    }
+  //     setCommentCount(data.total_comments)
+  //   }
 
-    getCommentCount(forumId, post.postId)
-  }, [forumId, post.postId])
+  //   getCommentCount(forumId, post.postId)
+  // }, [forumId, post.postId])
 
   const handleDelete = async (event) => {
     event.stopPropagation()
@@ -188,6 +190,28 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
   const [voteType, setVoteType] = useState('')
 
   useEffect(() => {
+    const getVoteCount = async (forumId, postId) => {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      const data = await response.json() // Convert the response to JSON
+
+      setVoteCount(data.upvotes)
+      setDownvoteCount(data.downvotes)
+    }
+
+    getVoteCount(forumId, post.postId)
+  }, [isVoted, forumId, post.postId])
+
+  useEffect(() => {
     const checkIfVoted = async (forumId, postId) => {
       const response = await fetch(
         `http://localhost:4000/v1/forum/${forumId}/post/${postId}/voted`,
@@ -210,28 +234,6 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
     checkIfVoted(forumId, post.postId)
   }, [isVoted, forumId, post.postId])
 
-  useEffect(() => {
-    const getVoteCount = async (forumId, postId) => {
-      const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // ...(cookie ? { Cookie: cookie } : {}),
-          },
-          credentials: 'include',
-        }
-      )
-      const data = await response.json() // Convert the response to JSON
-
-      setVoteCount(data.upvotes)
-      setDownvoteCount(data.downvotes)
-    }
-
-    getVoteCount(forumId, post.postId)
-  }, [voteCount, downvoteCount, forumId, post.postId])
-
   const handleClick = async (event, value, isVoted) => {
     event.stopPropagation()
 
@@ -241,21 +243,19 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
       setVoteCount(voteCount + 1)
       setIsVoted(true)
       // console.log('voteCount', voteCount)
-    } else if(value === -1 && !isVoted) {
+    } else if (value === -1 && !isVoted) {
       setDownvoteCount(downvoteCount + 1)
       setIsVoted(true)
       // console.log('downvoteCount', downvoteCount)
-    }
-    else if(value === 1 && isVoted) {
+    } else if (value === 1 && isVoted && voteCount > 0) {
       setVoteCount(voteCount - 1)
       setIsVoted(false)
       // console.log('voteCount', voteCount)
-    } else if(value === -1 && isVoted) {
+    } else if (value === -1 && isVoted && downvoteCount > 0) {
       setDownvoteCount(downvoteCount - 1)
       setIsVoted(false)
       // console.log('downvoteCount', downvoteCount)
     }
-
   }
 
   return (
