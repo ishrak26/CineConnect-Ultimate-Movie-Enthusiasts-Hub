@@ -23,9 +23,14 @@ Usage:
     /v1/marketplace/products?limit=10&offset=0
     /v1/marketplace/products?sortType=name_asc
     /v1/marketplace/products
+
+    sortTypes: name_asc, name_desc, price_asc, price_desc, rating_asc, rating_desc
 */
 
 // Route for fetching product rating
 router.get('/product/:id/rating', marketplaceController.getProductRating); // **//
+
+// Route for fetching product details
+router.get('/product/:id', marketplaceController.getProductDetails); // **//
 
 module.exports = router;

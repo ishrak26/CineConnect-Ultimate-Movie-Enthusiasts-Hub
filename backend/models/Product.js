@@ -59,12 +59,27 @@ async function getProductRatingInfo(productId, userId = null) {
         throw error;
     }
 
-    console.log('Returning from getProductRatingInfo:', data);
+    // console.log('Returning from getProductRatingInfo:', data);
     return data;
+}
+
+async function fetchProductDetails(productId) {
+    const { data, error } = await supabase.rpc('fetch_product_details', {
+        pid: productId,
+    });
+
+    if (error || data.length !== 1) {
+        console.error('Error fetching product details:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchProductDetails', data[0]);
+    return data[0];
 }
 
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
     getProductRatingInfo,
+    fetchProductDetails,
 };

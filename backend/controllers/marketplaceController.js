@@ -69,6 +69,38 @@ const marketplaceController = {
         }
     },
 
+    getProductDetails: async (req, res) => {
+        try {
+            const productId = req.params.id;
+            const productDetails = await dbProduct.fetchProductDetails(
+                productId
+            );
+            if (!productDetails) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            const data = {
+                productName: productDetails.name,
+                price: productDetails.price,
+                owner: {
+                    id: productDetails.owner_id,
+                    username: productDetails.username,
+                },
+                sizes: productDetails.sizes,
+                colors: productDetails.colors,
+                availableQuantity: productDetails.available_qty,
+                thumbnailUrl: productDetails.thumbnail_url,
+                movieName: productDetails.movie_name,
+                reviewCount: productDetails.total_reviews_count,
+            };
+            res.status(200).json(data);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 
