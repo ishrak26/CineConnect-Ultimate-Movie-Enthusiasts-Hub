@@ -186,6 +186,31 @@ async function fetchProductImages(productId, offset, limit) {
     return data;
 }
 
+async function createNewProduct(product) {
+    const { data, error } = await supabase.rpc('create_new_product', {
+        _name: product.name,
+        _price: product.price,
+        _owner_id: product.ownerId,
+        _sizes: product.sizes,
+        _colors: product.colors,
+        _available_qty: product.availableQty,
+        _thumbnail_url: product.thumbnailUrl,
+        _movie_id: product.movieId,
+        _features: product.features,
+        _tags: product.tags,
+        _images: product.images,
+        _category: product.category,
+    });
+
+    if (error) {
+        console.error('Error inserting new product:', error);
+        throw error;
+    }
+
+    // console.log('Returning from createNewProduct:', data);
+    return data; // This will be the UUID of the newly inserted product
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -197,4 +222,5 @@ module.exports = {
     addProductToWishlist,
     removeProductFromWishlist,
     fetchProductImages,
+    createNewProduct,
 };

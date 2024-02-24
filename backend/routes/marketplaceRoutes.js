@@ -94,4 +94,11 @@ router.get('/product/:id/images', marketplaceController.getProductImages); // **
     See the response format in the snippet from marketplaceController.getProductImages
 */
 
+// Route for creating a new product
+router.post('/product', marketplaceController.createProduct); // **//
+
+/*
+    See the request body format in the snippet from marketplaceController.createProduct
+*/
+
 module.exports = router;

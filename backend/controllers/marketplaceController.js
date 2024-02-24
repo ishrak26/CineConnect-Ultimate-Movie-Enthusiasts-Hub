@@ -96,6 +96,7 @@ const marketplaceController = {
             const data = {
                 productName: productDetails.name, // string
                 price: productDetails.price, // numeric
+                category: productDetails.category, // string
                 owner: {
                     id: productDetails.owner_id, // uuid
                     username: productDetails.username, // string
@@ -238,6 +239,68 @@ const marketplaceController = {
                 });
             }
             res.status(200).json(data);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    createProduct: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const userId = req.user.id;
+            const {
+                name, // string
+                price, // numeric
+                category, // string
+                sizes, // array of strings
+                colors, // array of strings
+                availableQty, // numeric
+                thumbnailUrl, // string
+                movieId, // uuid (string)
+                tags, // array of strings
+                features, // array of strings
+                images, // array of objects, each having imageUrl and caption
+            } = req.body;
+
+            if (
+                !name ||
+                !price ||
+                !category ||
+                !availableQty ||
+                !thumbnailUrl ||
+                !movieId ||
+                !tags ||
+                !features
+            ) {
+                return res.status(400).json({ message: 'Bad request' });
+            }
+
+            const product = {
+                name,
+                price,
+                ownerId: userId,
+                sizes: sizes ? sizes : [],
+                colors: colors ? colors : [],
+                category,
+                availableQty,
+                thumbnailUrl,
+                movieId,
+                tags,
+                features,
+                images: images ? images : [],
+            };
+
+            const productId = await dbProduct.createNewProduct(product);
+            if (!productId) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(201).json({ success: true });
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });
