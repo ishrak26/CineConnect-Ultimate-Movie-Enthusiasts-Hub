@@ -85,4 +85,7 @@ router.get('/v1/movies/count', movieController.getTotalMovieCount);
 // Rouer to get movie related info for this user
 router.get('/v1/movie/:movieId/userInfo', movieController.getUserInfoForMovie);
 
+// Router to get search results for movies, moviePersons, users
+router.get('/v1/search', movieController.searchAllTypes);
+
 module.exports = router;

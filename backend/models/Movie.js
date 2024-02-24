@@ -692,6 +692,23 @@ const fetchUserInfoForMovie = async (userId, movieId) => {
     return ret;
 };
 
+async function searchAllTypes(searchText, offset, limit) {
+    // Call the RPC (Remote Procedure Call) function
+    const { data, error } = await supabase.rpc('search_all_types_with_rank', {
+        search_text: searchText,
+        limit_val: limit,
+        offset_val: offset,
+    });
+
+    if (error) {
+        console.error('Error fetching search results:', error);
+        throw error;
+    }
+
+    // console.log('Returning from searchAllTypes', data);
+    return data;
+}
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -710,4 +727,5 @@ module.exports = {
     fetchTotalMovieCount,
     isMovieInWatchedlist,
     fetchUserInfoForMovie,
+    searchAllTypes,
 };
