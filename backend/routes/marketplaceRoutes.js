@@ -13,6 +13,7 @@ router.get('/tags', marketplaceController.getAllTags); // **//
     /v1/marketplace/tags
 
     Returns an array of strings (tags) as response
+    ['tag1', 'tag2', 'tag3']
 */
 
 // Route for fetching all products for movies, tags, etc.
@@ -46,8 +47,15 @@ router.get('/product/:id', marketplaceController.getProductDetails); // **//
 // Route for fetching product features
 router.get('/product/:id/features', marketplaceController.getProductFeatures); // **//
 /*
-    returns response as an array of product features
+    Returns response as an array of product features
     ['feature1', 'feature2', 'feature3']
+*/
+
+// Route for fetchign product tags
+router.get('/product/:id/tags', marketplaceController.getProductTags); // **//
+/*
+    Returns an array of strings (tags) as response
+    ['tag1', 'tag2', 'tag3']
 */
 
 module.exports = router;

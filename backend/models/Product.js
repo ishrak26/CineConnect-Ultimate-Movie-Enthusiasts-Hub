@@ -102,10 +102,29 @@ async function fetchProductFeatures(productId) {
     return data[0].features;
 }
 
+async function fetchProductTags(productId, offset, limit) {
+    const { data, error } = await supabase
+        .from('product_has_tags')
+        .select('name')
+        .eq('product_id', productId)
+        .range(offset, offset + limit - 1)
+        .order('name', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching product tags:', error);
+        throw error;
+    }
+
+    // const tags = data.map((tag) => tag.tag_name);
+    console.log('Returning from fetchProductTags:', data);
+    return data;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
     getProductRatingInfo,
     fetchProductDetails,
     fetchProductFeatures,
+    fetchProductTags,
 };
