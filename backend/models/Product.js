@@ -120,6 +120,23 @@ async function fetchProductTags(productId, offset, limit) {
     return data;
 }
 
+async function isAddedToWishlist(productId, userId) {
+    const { data, error } = await supabase
+        .from('user_wishes_product')
+        .select('id')
+        .eq('product_id', productId)
+        .eq('user_id', userId);
+
+    if (error || data.length > 1) {
+        console.error('Error fetching wishlist:', error);
+        throw error;
+    }
+
+    console.log('Returning from isAddedToWishlist:', data.length === 1);
+
+    return data.length === 1;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -127,4 +144,5 @@ module.exports = {
     fetchProductDetails,
     fetchProductFeatures,
     fetchProductTags,
+    isAddedToWishlist,
 };

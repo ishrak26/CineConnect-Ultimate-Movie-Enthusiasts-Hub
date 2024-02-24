@@ -151,6 +151,23 @@ const marketplaceController = {
         }
     },
 
+    checkProductInWishlist: async (req, res) => {
+        try {
+            if (!req.user) return res.status(200).json({ inWishlist: false });
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+            const inWishlist = await dbProduct.isAddedToWishlist(
+                productId,
+                userId
+            );
+            res.status(200).json({ inWishlist });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 

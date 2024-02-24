@@ -58,4 +58,16 @@ router.get('/product/:id/tags', marketplaceController.getProductTags); // **//
     ['tag1', 'tag2', 'tag3']
 */
 
+// Route to check if user added the product to wishlist
+router.get(
+    '/product/:id/inWishlist',
+    marketplaceController.checkProductInWishlist
+); // **//
+/*
+    Response format:
+    {
+        inWishlist: true/false
+    }
+*/
+
 module.exports = router;
