@@ -132,11 +132,11 @@ export default function Search({ forwardedRef }) {
             hasIcon
             required
           />
-          <InputLabel>Search Movies </InputLabel>
+          <InputLabel>Search Movies, Movie Persons, Users... </InputLabel>
           {dropdownVisible && (
             <div
               ref={resultElementRef}
-              className="absolute mx-10 z-50 bg-white shadow-lg rounded-md max-h-60 overflow-y-auto"
+              className="absolute mx-10 z-50 bg-black-100 shadow-lg rounded-md max-h-60 overflow-y-auto"
             >
               {filteredData.length > 0 ? (
                 filteredData.map((record, index) => (
@@ -146,7 +146,7 @@ export default function Search({ forwardedRef }) {
                     onClick={() => handleSelection(record)} // Adjusted to use movie.id for redirection
                     style={{
                       backgroundColor:
-                        index === focusedIndex ? 'rgba(0,0,0,0.1)' : '',
+                        index === focusedIndex ? 'rgba(255,255,255,0.1)' : '',
                     }}
                   >
                     {/* Poster Image */}
@@ -167,7 +167,7 @@ export default function Search({ forwardedRef }) {
                           ? record.release_date
                           : record.username
                           ? record.username
-                          : ')'}
+                          : ''}
                       </div>
                     </div>
                   </div>
