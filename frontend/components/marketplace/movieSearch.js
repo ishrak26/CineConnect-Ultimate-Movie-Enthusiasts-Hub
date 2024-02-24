@@ -1,16 +1,16 @@
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { Input, InputGroup, InputLabel } from './input'
+import { Input, InputGroup, InputLabel } from '@components/input'
 import SearchIcon from '@components/icons/search.svg'
 import TimesIcon from '@components/icons/times.svg'
 import clsx from 'clsx'
 
 import React, { useEffect } from 'react'
-import useKeyboardNavigation from '../hooks/useKeyboardNavigation'
+import useKeyboardNavigation from '../../hooks/useKeyboardNavigation'
 
 import debounce from 'lodash.debounce'
 
-export default function Search({ forwardedRef }) {
+export default function Search({ forwardedRef, ...props}) {
   const ref = useRef(null)
   const router = useRouter()
   const [value, setValue] = useState(router.query.query || '')
@@ -62,7 +62,8 @@ export default function Search({ forwardedRef }) {
     setValue(title)
     setDropdownVisible(false) // Close the dropdown after selection
     // ref.current.focus(); // Focus the search input after selection
-    router.push(`/movie/${movieId}`)
+    // router.push(`/movie/${movieId}`)
+    props.onMovieSelect(movieId)
   }
 
   const handleContainerBlur = (event) => {
@@ -176,6 +177,3 @@ text-lg font-semibold and text-sm text-gray-500: These classes are for the title
     </div>
   )
 }
-
-
-

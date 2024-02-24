@@ -12,6 +12,8 @@ function ProductCard({ item }) {
   // const { size, image } = item.prop[0];
   // const dispatch = useDispatch();
 
+  
+
   return (
     <div className="rounded-xl cursor-pointer">
       <div className="w-45 h-64 overflow-hidden cursor-default rounded-xl relative group">
