@@ -106,6 +106,7 @@ const marketplaceController = {
                 thumbnailUrl: productDetails.thumbnail_url, // string
                 movieName: productDetails.movie_name, // string
                 reviewCount: productDetails.total_reviews_count, // integer
+                wishlistCount: productDetails.wishlist_count, // integer
             };
             res.status(200).json(data);
         } catch (error) {
@@ -162,6 +163,54 @@ const marketplaceController = {
                 userId
             );
             res.status(200).json({ inWishlist });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    addToWishlist: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+            const added = await dbProduct.addProductToWishlist(
+                productId,
+                userId
+            );
+            if (!added) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(201).json({ message: 'Added to wishlist' });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    removeFromWishlist: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+            const removed = await dbProduct.removeProductFromWishlist(
+                productId,
+                userId
+            );
+            if (!removed) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(200).json({ message: 'Removed from wishlist' });
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });

@@ -60,7 +60,7 @@ router.get('/product/:id/tags', marketplaceController.getProductTags); // **//
 
 // Route to check if user added the product to wishlist
 router.get(
-    '/product/:id/inWishlist',
+    '/product/:id/wishlist',
     marketplaceController.checkProductInWishlist
 ); // **//
 /*
@@ -69,5 +69,14 @@ router.get(
         inWishlist: true/false
     }
 */
+
+// Route to add product to wishlist
+router.post('/product/:id/wishlist', marketplaceController.addToWishlist); // **//
+
+// Route to remove product from wishlist
+router.delete(
+    '/product/:id/wishlist',
+    marketplaceController.removeFromWishlist
+); // **//
 
 module.exports = router;

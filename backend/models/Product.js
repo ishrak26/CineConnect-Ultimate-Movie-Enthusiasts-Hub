@@ -137,6 +137,38 @@ async function isAddedToWishlist(productId, userId) {
     return data.length === 1;
 }
 
+async function addProductToWishlist(productId, userId) {
+    const { data, error } = await supabase
+        .from('user_wishes_product')
+        .insert({ product_id: productId, user_id: userId })
+        .select('id');
+
+    if (error) {
+        console.error('Error adding to wishlist:', error);
+        throw error;
+    }
+
+    // console.log('Returning from addProductToWishlist:', data);
+    return data.length === 1;
+}
+
+async function removeProductFromWishlist(productId, userId) {
+    const { data, error } = await supabase
+        .from('user_wishes_product')
+        .delete()
+        .eq('product_id', productId)
+        .eq('user_id', userId)
+        .select('id');
+
+    if (error) {
+        console.error('Error removing from wishlist:', error);
+        throw error;
+    }
+
+    // console.log('Returning from removeFromWishlist:', data);
+    return data.length === 1;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -145,4 +177,6 @@ module.exports = {
     fetchProductFeatures,
     fetchProductTags,
     isAddedToWishlist,
+    addProductToWishlist,
+    removeProductFromWishlist,
 };
