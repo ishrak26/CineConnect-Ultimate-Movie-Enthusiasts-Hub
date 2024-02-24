@@ -206,19 +206,21 @@ const userController = {
       const sessionUser = await db_user.findOneById(req.user.id);
       const userName = sessionUser.username;
       console.log("Inside getPendingRequests controller: DEBUGGING 2");
-      // If the user is trying to fetch pending requests for someone else
-      if (userName !== req.params.username) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      // // If the user is trying to fetch pending requests for someone else
+      // if (userName !== req.params.username) {
+      //   console.log("Inside getPendingRequests controller, req.params.username:", req.params.username);
+      //   return res.status(401).json({ message: "Unauthorized" });
+      // }
 
-      const username = req.params.username;
-      const user = await db_user.findOne({ username });
-      const userId = user ? user.id : null;
+      // const username = req.params.username;
+      // const user = await db_user.findOne({ username });
+      const userId = req.user.id;
       console.log("Inside getPendingRequests controller: DEBUGGING 3");
       // If user not found
       if (!userId) {
         return res.status(404).json({ message: "User not found." });
       }
+
       console.log("Inside getPendingRequests controller: DEBUGGING 4");
       const limit = req.query.limit || 10; // Default limit to 10 if not specified
       const offset = req.query.offset || 0; // Default offset to 0 if not specified
@@ -228,12 +230,115 @@ const userController = {
         limit,
         offset,
       });
+      const pendingRequestCount = await db_user.getPendingRequestCount({ userId });
+
       console.log("Inside getPendingRequests controller: DEBUGGING 5");
-      res.status(200).json({ pendingRequests });
+      console.log("Inside getPendingRequests controller: pendingRequestCount -->", pendingRequestCount);
+      console.log("Inside getPendingRequests controller: pendingRequests -->", pendingRequests);
+      res.status(200).json({ pendingRequests, pendingRequestCount });
     } catch (error) {
       console.error("Failed to fetch pending requests:", error.message);
       res.status(500).json({ message: "Internal server error" });
     }
+  },
+
+  getPendingRequestsWithRequesters: async (req, res) => {
+    // console.log("Inside getPendingRequests controller: DHUKSI");
+    // console.log("Inside getPendingRequests controller: req.user -->", req.user);
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      // console.log("Inside getPendingRequests controller: DEBUGGING 1");
+      const sessionUser = await db_user.findOneById(req.user.id);
+      const userName = sessionUser.username;
+      // console.log("Inside getPendingRequests controller: DEBUGGING 2");
+      // // If the user is trying to fetch pending requests for someone else
+      // if (userName !== req.params.username) {
+      //   console.log("Inside getPendingRequests controller, req.params.username:", req.params.username);
+      //   return res.status(401).json({ message: "Unauthorized" });
+      // }
+
+      // const username = req.params.username;
+      // const user = await db_user.findOne({ username });
+      const userId = req.user.id;
+      // console.log("Inside getPendingRequests controller: DEBUGGING 3");
+      // If user not found
+      if (!userId) {
+        return res.status(404).json({ message: "User not found." });
+      }
+
+      // console.log("Inside getPendingRequests controller: DEBUGGING 4");
+      const limit = req.query.limit || 10; // Default limit to 10 if not specified
+      const offset = req.query.offset || 0; // Default offset to 0 if not specified
+
+      const pendingRequests = await db_user.getPendingRequestsWithRequesters({
+        userId,
+        limit,
+        offset,
+      });
+      const pendingRequestCount = await db_user.getPendingRequestCount({ userId });
+
+      // console.log("Inside getPendingRequests controller: DEBUGGING 5");
+      // console.log("Inside getPendingRequests controller: pendingRequestCount -->", pendingRequestCount);
+      // console.log("Inside getPendingRequests controller: pendingRequests -->", pendingRequests);
+      res.status(200).json({ pendingRequests, pendingRequestCount });
+    } catch (error) {
+      console.error("Failed to fetch pending requests:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  acceptSpecificPendingRequest: async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const requestId = req.params.requestId;
+
+      if(!requestId) {
+        return res.status(404).json({ message: "Request not found" });
+      }
+
+      const result = await db_user.acceptCineFellowRequestByReqId({
+        reqId: requestId,
+      });
+
+      if (result) {
+        res
+          .status(200)
+          .json({ message: "CineFellow request accepted successfully." });
+      } else {
+        res.status(404).json({ message: "CineFellow request not found." });
+      }
+    } catch (error) {
+      console.error("Failed to accept cinefellow request:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+
+  },
+
+  rejectSpecificPendingRequest: async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const requestId = req.params.requestId;
+
+      if(!requestId) {
+        return res.status(404).json({ message: "Request not found" });
+      }
+
+      const result = await db_user.rejectCineFellowRequestByReqId({
+        reqId: requestId,
+      });
+
+      if (result) {
+        res
+          .status(200)
+          .json({ message: "CineFellow request rejected successfully." });
+      } else {
+        res.status(404).json({ message: "CineFellow request not found." });
+      }
+    } catch (error) {
+      console.error("Failed to reject cinefellow request:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+
   },
 
   acceptCineFellowRequest: async (req, res) => {

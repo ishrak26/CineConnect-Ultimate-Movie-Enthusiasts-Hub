@@ -338,6 +338,24 @@ async function isFollowing({ userId, fellowId }) {
     }
 }
 
+const getPendingRequestCount = async ({ userId }) => {  
+    try {
+        const { data, error } = await supabase
+            .from('cinefellow_request')
+            .select('id')
+            .eq('to_id', userId)
+            .eq('status', 'pending');
+
+        if (error) throw error;
+
+        return data.length;
+
+    } catch (error) {
+        console.error('Error fetching pending request count:', error.message);
+        throw error;
+    }
+}
+
 const getPendingRequests = async ({ userId, limit, offset }) => {
     try {
         // Fetch incoming requests
@@ -351,6 +369,34 @@ const getPendingRequests = async ({ userId, limit, offset }) => {
         if (incomingError) throw incomingError;
 
         return { incomingRequests };
+    } catch (error) {
+        console.error('Error fetching pending requests:', error.message);
+        throw error;
+    }
+}
+
+const getPendingRequestsWithRequesters = async ({ userId, limit, offset }) => {
+    try {
+        // Fetch incoming requests
+        const { data: incomingRequests, error: incomingError } = await supabase
+            .from('cinefellow_request')
+            .select('*')
+            .eq('to_id', userId)
+            .eq('status', 'pending')
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
+        if (incomingError) throw incomingError;
+
+        // Fetch requester details for each incoming request
+        const requestsWithRequesterDetails = await Promise.all(incomingRequests.map(async (request) => {
+            const requesterDetails = await fetchUserPhotoById({ id: request.from_id });
+            return {
+                ...request,
+                requesterDetails, // Add the requesterDetails to the request object
+            };
+        }));
+
+        return { incomingRequests: requestsWithRequesterDetails };
     } catch (error) {
         console.error('Error fetching pending requests:', error.message);
         throw error;
@@ -396,7 +442,7 @@ const acceptCineFellowRequest = async ({ userId, requestorId }) => {
         console.error('Error accepting cinefellow request:', error.message);
         throw error;
     }
-};
+}
 
 
 const rejectCineFellowRequest = async ({ userId, requestorId }) => {
@@ -425,6 +471,63 @@ const rejectCineFellowRequest = async ({ userId, requestorId }) => {
 
         if (updateError) throw updateError;
         // console.log('Inside rejectCineFellowRequest model function, the updateError message : ', updateError);
+
+        return true;
+
+    } catch (error) {
+        console.error('Error rejecting cinefellow request:', error.message);
+        throw error;
+    }
+}
+
+const acceptCineFellowRequestByReqId = async ({ reqId }) => {
+    try {
+        // First, retrieve the request to get from_id and to_id
+        const { data: requestData, error: requestError } = await supabase
+            .from('cinefellow_request')
+            .select('*')
+            .eq('id', reqId)
+            .eq('status', 'pending')
+        if (requestError) throw requestError;
+        if (!requestData) throw new Error('Request not found.');
+        // Update request status to 'accepted'
+        const { error: updateError } = await supabase
+            .from('cinefellow_request')
+            .update({ status: 'accepted' })
+            .eq('id', reqId);
+        if (updateError) throw updateError;
+        // Add to the cinefellow table
+        const { error: cinefellowError } = await supabase
+            .from('cinefellow')
+            .insert([
+                { requestor_id: requestData[0].from_id, requestee_id: requestData[0].to_id },
+            ]);
+        if (cinefellowError) throw cinefellowError;
+
+        return true;
+
+    } catch (error) {
+        console.error('Error accepting cinefellow request:', error.message);
+        throw error;
+    }
+}
+
+const rejectCineFellowRequestByReqId = async ({ reqId }) => {
+    try {
+        // First, retrieve the request to get from_id and to_id
+        const { data: requestData, error: requestError } = await supabase
+            .from('cinefellow_request')
+            .select('*')
+            .eq('id', reqId)
+            .eq('status', 'pending')
+        if (requestError) throw requestError;
+        if (!requestData) throw new Error('Request not found.');
+        // Update request status to 'rejected'
+        const { error: updateError } = await supabase
+            .from('cinefellow_request')
+            .update({ status: 'rejected' })
+            .eq('id', reqId);
+        if (updateError) throw updateError;
 
         return true;
 
@@ -612,6 +715,23 @@ async function fetchUserById({ id }) {
 
 }
 
+async function fetchUserPhotoById({ id }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, full_name, image_url')
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data.length !== 1) {
+        return null;
+    }
+    return data[0];
+}
+
 module.exports = {
     createUser,
     findOne,
@@ -627,8 +747,12 @@ module.exports = {
     unfollowCinefellow,
     withdrawCineFellowRequest,
     getPendingRequests,
+    getPendingRequestsWithRequesters,
+    getPendingRequestCount,
     acceptCineFellowRequest,
     rejectCineFellowRequest,
+    acceptCineFellowRequestByReqId,
+    rejectCineFellowRequestByReqId,
     checkIfIRequested,
     checkIfTheyRequested,
     getWatchedMovies,
@@ -639,4 +763,5 @@ module.exports = {
 
     getProfileDetails,
     fetchUserById,
+    fetchUserPhotoById,
 };
