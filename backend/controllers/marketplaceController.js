@@ -11,12 +11,12 @@ const marketplaceController = {
                     .status(500)
                     .json({ message: 'Internal server error' });
             }
-            const tag_names = [];
+            const data = [];
             for (let tag_name of tags) {
-                tag_names.push(tag_name.tag_name);
+                data.push(tag_name.tag_name);
             }
 
-            res.status(200).json(tag_names);
+            res.status(200).json(data);
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });
@@ -42,7 +42,17 @@ const marketplaceController = {
                     .status(500)
                     .json({ message: 'Internal server error' });
             }
-            res.status(200).json(products);
+            const data = [];
+            for (let product of products) {
+                data.push({
+                    id: product.product_id, // uuid
+                    name: product.product_name, // string
+                    price: product.price, // numeric
+                    thumbnailUrl: product.thumbnail_url, // string
+                    avgRating: product.average_rating, // numeric
+                });
+            }
+            res.status(200).json(data);
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });
@@ -62,7 +72,12 @@ const marketplaceController = {
                     .status(500)
                     .json({ message: 'Internal server error' });
             }
-            res.status(200).json(ratingInfo);
+            const data = {
+                avgRating: ratingInfo.average_rating, // numeric
+                totalRatings: ratingInfo.total_ratings, // integer
+                userRating: ratingInfo.user_rating, // numeric
+            };
+            res.status(200).json(data);
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });
@@ -76,25 +91,39 @@ const marketplaceController = {
                 productId
             );
             if (!productDetails) {
-                return res
-                    .status(500)
-                    .json({ message: 'Internal server error' });
+                return res.status(404).json({ message: 'Product not found' });
             }
             const data = {
-                productName: productDetails.name,
-                price: productDetails.price,
+                productName: productDetails.name, // string
+                price: productDetails.price, // numeric
                 owner: {
-                    id: productDetails.owner_id,
-                    username: productDetails.username,
+                    id: productDetails.owner_id, // uuid
+                    username: productDetails.username, // string
                 },
-                sizes: productDetails.sizes,
-                colors: productDetails.colors,
-                availableQuantity: productDetails.available_qty,
-                thumbnailUrl: productDetails.thumbnail_url,
-                movieName: productDetails.movie_name,
-                reviewCount: productDetails.total_reviews_count,
+                sizes: productDetails.sizes, // array
+                colors: productDetails.colors, // array
+                availableQuantity: productDetails.available_qty, // numeric
+                thumbnailUrl: productDetails.thumbnail_url, // string
+                movieName: productDetails.movie_name, // string
+                reviewCount: productDetails.total_reviews_count, // integer
             };
             res.status(200).json(data);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getProductFeatures: async (req, res) => {
+        try {
+            const productId = req.params.id;
+            const productFeatures = await dbProduct.fetchProductFeatures(
+                productId
+            );
+            if (!productFeatures) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+            res.status(200).json(productFeatures);
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });

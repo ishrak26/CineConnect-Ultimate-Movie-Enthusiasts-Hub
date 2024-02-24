@@ -59,8 +59,8 @@ async function getProductRatingInfo(productId, userId = null) {
         throw error;
     }
 
-    // console.log('Returning from getProductRatingInfo:', data);
-    return data;
+    // console.log('Returning from getProductRatingInfo:', data[0]);
+    return data[0];
 }
 
 async function fetchProductDetails(productId) {
@@ -68,13 +68,38 @@ async function fetchProductDetails(productId) {
         pid: productId,
     });
 
-    if (error || data.length !== 1) {
+    if (error || data.length > 1) {
         console.error('Error fetching product details:', error);
         throw error;
     }
 
+    if (data.length === 0) {
+        console.error('No product found with the given ID:', productId);
+        return null;
+    }
+
     // console.log('Returning from fetchProductDetails', data[0]);
     return data[0];
+}
+
+async function fetchProductFeatures(productId) {
+    const { data, error } = await supabase
+        .from('product')
+        .select('features')
+        .eq('id', productId);
+
+    if (error || data.length > 1) {
+        console.error('Error fetching product features:', error);
+        throw error;
+    }
+
+    if (data.length === 0) {
+        console.error('No product found with the given ID:', productId);
+        return null;
+    }
+
+    // console.log('Returning from fetchProductFeatures:', data[0].features);
+    return data[0].features;
 }
 
 module.exports = {
@@ -82,4 +107,5 @@ module.exports = {
     fetchProductsByTagsAndMovies,
     getProductRatingInfo,
     fetchProductDetails,
+    fetchProductFeatures,
 };

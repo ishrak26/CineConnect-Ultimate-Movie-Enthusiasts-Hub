@@ -6,11 +6,13 @@ const router = express.Router();
 // Route for fetching all tags for a marketplace
 router.get('/tags', marketplaceController.getAllTags); // **//
 /* 
-Usage:
+    Usage:
     /v1/marketplace/tags?limit=10&offset=0
     /v1/marketplace/tags?limit=10
     /v1/marketplace/tags?offset=0
     /v1/marketplace/tags
+
+    Returns an array of strings (tags) as response
 */
 
 // Route for fetching all products for movies, tags, etc.
@@ -25,12 +27,27 @@ Usage:
     /v1/marketplace/products
 
     sortTypes: name_asc, name_desc, price_asc, price_desc, rating_asc, rating_desc
+
+    See the response format in the snippet from marketplaceController.getAllProducts
 */
 
 // Route for fetching product rating
 router.get('/product/:id/rating', marketplaceController.getProductRating); // **//
+/*
+    See the response format in the snippet from marketplaceController.getProductRating
+*/
 
 // Route for fetching product details
 router.get('/product/:id', marketplaceController.getProductDetails); // **//
+/*
+    See the response format in the snippet from marketplaceController.getProductDetails
+*/
+
+// Route for fetching product features
+router.get('/product/:id/features', marketplaceController.getProductFeatures); // **//
+/*
+    returns response as an array of product features
+    ['feature1', 'feature2', 'feature3']
+*/
 
 module.exports = router;
