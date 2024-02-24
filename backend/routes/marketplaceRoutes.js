@@ -38,6 +38,22 @@ router.get('/product/:id/rating', marketplaceController.getProductRating); // **
     See the response format in the snippet from marketplaceController.getProductRating
 */
 
+// Route for rating a product
+router.post('/product/:id/rating', marketplaceController.rateProduct); // **//
+/*
+    Request body: {
+        rating: 4
+    }
+*/
+
+// Route for updating product rating
+router.put('/product/:id/rating', marketplaceController.updateProductRating); // **//
+/*
+    Request body: {
+        rating: 4
+    }
+*/
+
 // Route for fetching product details
 router.get('/product/:id', marketplaceController.getProductDetails); // **//
 /*

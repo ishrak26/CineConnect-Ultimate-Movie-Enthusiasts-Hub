@@ -314,6 +314,38 @@ async function fetchProductsByUsername(username, limit, offset) {
     return data;
 }
 
+async function rateProduct(productId, userId, rating) {
+    const { data, error } = await supabase
+        .from('product_has_user_rating')
+        .insert({ product_id: productId, user_id: userId, rating: rating })
+        .select('id');
+
+    if (error) {
+        console.error('Error rating product:', error);
+        throw error;
+    }
+
+    // console.log('Returning from rateProduct:', data);
+    return data.length === 1;
+}
+
+async function updateRating(productId, userId, rating) {
+    const { data, error } = await supabase
+        .from('product_has_user_rating')
+        .update({ rating: rating })
+        .eq('product_id', productId)
+        .eq('user_id', userId)
+        .select('id');
+
+    if (error) {
+        console.error('Error updating product rating:', error);
+        throw error;
+    }
+
+    // console.log('Returning from updateRating:', data);
+    return data.length === 1;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -332,4 +364,6 @@ module.exports = {
     fetchTotalProductCountByUsername,
     fetchProductsByMovieId,
     fetchProductsByUsername,
+    rateProduct,
+    updateRating,
 };

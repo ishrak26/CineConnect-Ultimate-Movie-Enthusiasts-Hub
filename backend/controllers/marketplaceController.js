@@ -430,6 +430,79 @@ const marketplaceController = {
         }
     },
 
+    rateProduct: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+
+            const owner_id = await dbProduct.fetchProductOwner(productId);
+            if (!owner_id) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+            if (owner_id === userId) {
+                return res
+                    .status(403)
+                    .json({ message: 'Cannot rate own product' });
+            }
+
+            const { rating } = req.body;
+
+            if (!rating) {
+                return res.status(400).json({ message: 'Bad request' });
+            }
+
+            const rated = await dbProduct.rateProduct(
+                productId,
+                userId,
+                rating
+            );
+            if (!rated) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(201).json({ success: true });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    updateProductRating: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+            const { rating } = req.body;
+
+            if (!rating) {
+                return res.status(400).json({ message: 'Bad request' });
+            }
+
+            const updated = await dbProduct.updateRating(
+                productId,
+                userId,
+                rating
+            );
+            if (!updated) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(200).json({ success: true });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 
