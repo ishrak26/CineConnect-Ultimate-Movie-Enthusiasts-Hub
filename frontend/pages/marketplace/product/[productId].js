@@ -10,7 +10,12 @@ import { useDispatch } from 'react-redux'
 import ProductCard from '@components/marketplace/productcard'
 import Head from 'next/head'
 
-export default function Product({ dataItem }) {
+export default function Product({
+  dataItem,
+  dataImages,
+  dataFeatures,
+  dataTags,
+}) {
   const [selectedSize, setSelectedSize] = useState(0)
   // const dispatch = useDispatch();
   const [imgSelected, setImgSelected] = useState(0)
@@ -20,7 +25,7 @@ export default function Product({ dataItem }) {
   return (
     <>
       <Head>
-        <title>{dataItem?.name}</title>
+        <title>{dataItem?.productName}</title>
       </Head>
       <div className="bg-cusgray min-h-screen pb-10">
         <Header />
@@ -53,15 +58,15 @@ export default function Product({ dataItem }) {
               <div>
                 <img
                   className=" h-90 object-cover w-full md:rounded-2xl"
-                  src={dataItem.prop[0].image[imgSelected]}
+                  src={dataImages[imgSelected].imageUrl}
                   alt=""
                 />
               </div>
               <div className="px-2 md:px-0 flex mt-4">
-                {dataItem.prop[0].image.map((img, idx) => (
+                {dataImages?.map((img, idx) => (
                   <img
                     key={idx}
-                    src={img}
+                    src={img.imageUrl}
                     onClick={() => setImgSelected(idx)}
                     className={`${
                       imgSelected == idx
@@ -75,7 +80,7 @@ export default function Product({ dataItem }) {
             </div>
             <div className="detail px-2 md:px-0 mt-3 md:mt-0 md:ml-6 py-2 md:w-2/3">
               <p className="flex place-items-center text-sm text-gray-400">
-                {dataItem?.type.name}
+                {dataItem?.movie.title}
                 <span className="mx-1">
                   <svg
                     className="w-4 h-4"
@@ -90,20 +95,44 @@ export default function Product({ dataItem }) {
                     />
                   </svg>
                 </span>
-                {dataItem?.category.name}
+                {dataItem?.category}
               </p>
               <h1 className="text-3xl text-cusblack font-medium my-3">
-                {dataItem?.name}
+                {dataItem?.productName}
               </h1>
-              <p className="text-sm text-gray-400">{dataItem?.color}</p>
 
-              <p className="my-3 font-semibold text-lg text-cusblack">
+              <p className="py-2 text-base text-gray-400">Tags:</p>
+              <div className="flex flex-wrap gap-2 pb-4">
+                {dataTags?.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 text-black-100 bg-primary-600 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <p className="py-2 text-base text-gray-400">Colors:</p>
+              <div className="flex flex-wrap gap-2 pb-4">
+                {dataItem.colors?.map((color, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 text-black-100 bg-primary-600 rounded-full"
+                  >
+                    {color}
+                  </span>
+                ))}
+              </div>
+
+              <p className="py-2 text-base text-gray-400">Price:</p>
+              <p className="font-semibold text-lg text-cusblack pb-4">
                 Tk {dataItem?.price}
               </p>
-              <div className="sizes text-sm text-gray-400">
+              <div className="sizes text-base text-gray-400">
                 <p className="mb-2">Select size</p>
                 <div className="flex">
-                  {dataItem.prop[0].size.map((size, idx) => (
+                  {dataItem.sizes?.map((size, idx) => (
                     <button
                       onClick={() => setSelectedSize(idx)}
                       key={idx}
@@ -188,97 +217,76 @@ export default function Product({ dataItem }) {
   )
 }
 
-// export async function getStaticPaths() {
-//   // const res = await fetch(process.env.NEXT_PUBLIC_APIURL + "/items");
-//   // const data = await res.json();
-
-//   const res = []
-//   const data = []
-
-//   const paths = data.map((cat) => ({
-//     params: { slug: cat.slug },
-//   }))
-
-//   return {
-//     paths,
-//     fallback: true,
-//   }
-// }
-
-// export async function getStaticProps({ params }) {
-//   const { slug } = params
-//   // const res = await fetch(
-//   //   process.env.NEXT_PUBLIC_APIURL + `/items?slug=${slug}`
-//   // );
-//   // const data = await res.json();
-//   // const dataItem = data[0];
-//   // const resAlso = await fetch(
-//   //   process.env.NEXT_PUBLIC_APIURL +
-//   //     `/items?category.slug=${dataItem?.category.slug}`
-//   // );
-//   // const dataAlso = await resAlso.json();
-
-//   // if (!data.length) {
-//   //   return {
-//   //     redirect: {
-//   //       destination: "/shop",
-//   //       permanent: false,
-//   //     },
-//   //   };
-//   // }
-
-//   const dataItem = {
-//     name: 'Interstellar Notebook',
-//     price: '200',
-//     color: 'White',
-//     type: { name: 'Notebook' },
-//     category: { name: 'Stationary' },
-//     prop: [
-//       {
-//         size: ['S', 'M', 'L'],
-//         image: [
-//           'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-//           'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-//           'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-//         ],
-//       },
-//     ],
-//   }
-
-//   return {
-//     props: {
-//       dataItem,
-//       // dataAlso,
-//     },
-//     revalidate: 5,
-//   }
-// }
-
 export async function getServerSideProps(context) {
-  const { slug } = context.params
+  const cookie = context.req.headers.cookie
 
-  const dataItem = {
-    name: 'Interstellar Notebook',
-    price: '200',
-    color: 'White',
-    type: { name: 'Notebook' },
-    category: { name: 'Stationary' },
-    prop: [
-      {
-        size: ['S', 'M', 'L'],
-        image: [
-          'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-          'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-          'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-        ],
-      },
-    ],
+  // Helper function to fetch data
+  async function fetchData(url, params) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+        ...params,
+      })
+
+      // console.log("response ", response);
+
+      if (response.ok) {
+        return await response.json()
+      }
+      return { error: response.statusText }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return { notFound: true }
+      }
+      return { error: error.message }
+    }
   }
+
+  const productId = context.params.productId
+
+  const dataItem = await fetchData(
+    `http://localhost:4000/v1/marketplace/product/${productId}`
+  )
+
+  const dataImages = await fetchData(
+    `http://localhost:4000/v1/marketplace/product/${productId}/images`
+  )
+  const dataFeatures = await fetchData(
+    `http://localhost:4000/v1/marketplace/product/${productId}/features`
+  )
+  const dataTags = await fetchData(
+    `http://localhost:4000/v1/marketplace/product/${productId}/tags`
+  )
+
+  // const dataItem = {
+  //   name: 'Interstellar Notebook',
+  //   price: '200',
+  //   color: 'White',
+  //   type: { name: 'Notebook' },
+  //   category: { name: 'Stationary' },
+  //   prop: [
+  //     {
+  //       size: ['S', 'M', 'L'],
+  //       image: [
+  //         'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+  //         'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+  //         'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
+  //       ],
+  //     },
+  //   ],
+  // }
 
   return {
     props: {
       dataItem,
-      // dataAlso,
+      dataImages,
+      dataFeatures,
+      dataTags,
     },
   }
 }

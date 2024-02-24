@@ -9,10 +9,7 @@ import Link from 'next/link'
 
 function ProductCard({ item }) {
   console.log(item)
-  // const { size, image } = item.prop[0];
-  // const dispatch = useDispatch();
 
-  
 
   return (
     <div className="rounded-xl cursor-pointer">

@@ -126,7 +126,7 @@ export default function Search({ forwardedRef }) {
                     onClick={() => handleSelection(movie.title, movie.id)} // Adjusted to use movie.id for redirection
                     style={{
                       backgroundColor:
-                        index === focusedIndex ? 'rgba(0,0,0,0.1)' : '',
+                        index === focusedIndex ? 'rgba(0,0,0,0.8)' : '',
                     }}
                   >
                     {/* Poster Image */}
@@ -176,6 +176,3 @@ text-lg font-semibold and text-sm text-gray-500: These classes are for the title
     </div>
   )
 }
-
-
-
