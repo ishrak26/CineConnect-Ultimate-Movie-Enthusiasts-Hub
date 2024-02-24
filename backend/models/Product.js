@@ -1,6 +1,6 @@
 const supabase = require('../config/supabaseConfig');
 
-async function fetchAllTags(offset, limit) {
+async function fetchAllTags(limit, offset) {
     const { data, error } = await supabase.rpc('fetch_distinct_tags', {
         limit_val: limit,
         offset_val: offset,
@@ -102,7 +102,7 @@ async function fetchProductFeatures(productId) {
     return data[0].features;
 }
 
-async function fetchProductTags(productId, offset, limit) {
+async function fetchProductTags(productId, limit, offset) {
     const { data, error } = await supabase
         .from('product_has_tags')
         .select('name')
@@ -169,7 +169,7 @@ async function removeProductFromWishlist(productId, userId) {
     return data.length === 1;
 }
 
-async function fetchProductImages(productId, offset, limit) {
+async function fetchProductImages(productId, limit, offset) {
     const { data, error } = await supabase
         .from('product_has_images')
         .select('image_url, caption')
@@ -282,6 +282,38 @@ async function fetchTotalProductCountByUsername(username) {
     return data;
 }
 
+async function fetchProductsByMovieId(movieId, limit, offset) {
+    const { data, error } = await supabase.rpc('fetch_products_by_movie_id', {
+        mid: movieId,
+        limit_val: limit,
+        offset_val: offset,
+    });
+
+    if (error) {
+        console.error('Error fetching products by movie id:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchProductsByMovieId:', data);
+    return data;
+}
+
+async function fetchProductsByUsername(username, limit, offset) {
+    const { data, error } = await supabase.rpc('fetch_products_by_username', {
+        username_input: username,
+        limit_val: limit,
+        offset_val: offset,
+    });
+
+    if (error) {
+        console.error('Error fetching products by username:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchProductsByUsername:', data);
+    return data;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -298,4 +330,6 @@ module.exports = {
     fetchProductOwner,
     fetchTotalProductCountByMovieId,
     fetchTotalProductCountByUsername,
+    fetchProductsByMovieId,
+    fetchProductsByUsername,
 };

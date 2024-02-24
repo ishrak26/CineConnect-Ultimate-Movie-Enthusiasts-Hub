@@ -127,6 +127,15 @@ router.get(
 
 */
 
+// Route to get all products under a movie
+router.get(
+    '/movie/:movieId/products',
+    marketplaceController.getProductsByMovie
+); // **//
+/*
+    See the response format in the snippet from marketplaceController.getProductsByMovie
+*/
+
 // Route for getting total product count by username
 router.get(
     '/user/:username/products/count',
@@ -139,6 +148,16 @@ router.get(
         count: 100
     }
 
+*/
+
+// Route to get all products by a user
+router.get(
+    '/user/:username/products',
+    marketplaceController.getProductsByUsername
+); // **//
+
+/*
+    See the response format in the snippet from marketplaceController.getProductsByUsername
 */
 
 module.exports = router;

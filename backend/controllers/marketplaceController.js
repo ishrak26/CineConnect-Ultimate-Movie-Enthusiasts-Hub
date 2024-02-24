@@ -5,7 +5,7 @@ const marketplaceController = {
         try {
             const limit = parseInt(req.query.limit) || 10;
             const offset = parseInt(req.query.offset) || 0;
-            const tags = await dbProduct.fetchAllTags(offset, limit);
+            const tags = await dbProduct.fetchAllTags(limit, offset);
             if (!tags) {
                 return res
                     .status(500)
@@ -29,7 +29,7 @@ const marketplaceController = {
             const offset = parseInt(req.query.offset) || 0;
             const tags = req.query.tags ? req.query.tags.split(',') : [];
             const movies = req.query.movies ? req.query.movies.split(',') : [];
-            const sortType = req.query.sortType || 'name_asc';
+            const sortType = req.query.sortType || 'price_asc';
             const products = await dbProduct.fetchProductsByTagsAndMovies(
                 tags,
                 movies,
@@ -142,8 +142,8 @@ const marketplaceController = {
             const offset = parseInt(req.query.offset) || 0;
             const tags = await dbProduct.fetchProductTags(
                 productId,
-                offset,
-                limit
+                limit,
+                offset
             );
             const data = [];
             for (let tag_name of tags) {
@@ -228,8 +228,8 @@ const marketplaceController = {
             const offset = parseInt(req.query.offset) || 0;
             const images = await dbProduct.fetchProductImages(
                 productId,
-                offset,
-                limit
+                limit,
+                offset
             );
             const data = [];
             for (let image of images) {
@@ -372,6 +372,58 @@ const marketplaceController = {
                 return res.status(404).json({ message: 'User not found' });
             }
             res.status(200).json({ count });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getProductsByMovie: async (req, res) => {
+        try {
+            const movieId = req.params.movieId;
+            const limit = parseInt(req.query.limit) || 10;
+            const offset = parseInt(req.query.offset) || 0;
+            const products = await dbProduct.fetchProductsByMovieId(
+                movieId,
+                limit,
+                offset
+            );
+            const data = [];
+            for (let product of products) {
+                data.push({
+                    id: product.id, // uuid
+                    name: product.name, // string
+                    price: product.price, // numeric
+                    thumbnailUrl: product.thumbnail_url, // string
+                });
+            }
+            res.status(200).json(data);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getProductsByUsername: async (req, res) => {
+        try {
+            const username = req.params.username;
+            const limit = parseInt(req.query.limit) || 10;
+            const offset = parseInt(req.query.offset) || 0;
+            const products = await dbProduct.fetchProductsByUsername(
+                username,
+                limit,
+                offset
+            );
+            const data = [];
+            for (let product of products) {
+                data.push({
+                    id: product.id, // uuid
+                    name: product.name, // string
+                    price: product.price, // numeric
+                    thumbnailUrl: product.thumbnail_url, // string
+                });
+            }
+            res.status(200).json(data);
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });
