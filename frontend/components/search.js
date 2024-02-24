@@ -67,12 +67,21 @@ export default function Search({ forwardedRef }) {
     setValue(record.title ? record.title : record.name)
     setDropdownVisible(false) // Close the dropdown after selection
     // ref.current.focus(); // Focus the search input after selection
+    // if (record.type === 'movie') {
+    //   router.push(`/movie/${record.id}`)
+    // } else if (record.type === 'moviePerson') {
+    //   router.push(`/moviePerson/${record.id}`)
+    // } else if (record.type === 'user') {
+    //   router.push(`/profile/${record.username}`)
+    // }
+
+    // enforce server-side navigation
     if (record.type === 'movie') {
-      router.push(`/movie/${record.id}`)
+      window.location.href = `/movie/${record.id}`
     } else if (record.type === 'moviePerson') {
-      router.push(`/moviePerson/${record.id}`)
+      window.location.href = `/moviePerson/${record.id}`
     } else if (record.type === 'user') {
-      router.push(`/profile/${record.username}`)
+      window.location.href = `/profile/${record.username}`
     }
   }
 
