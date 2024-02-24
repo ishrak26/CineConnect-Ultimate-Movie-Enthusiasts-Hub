@@ -116,7 +116,7 @@ async function fetchProductTags(productId, offset, limit) {
     }
 
     // const tags = data.map((tag) => tag.tag_name);
-    console.log('Returning from fetchProductTags:', data);
+    // console.log('Returning from fetchProductTags:', data);
     return data;
 }
 
@@ -132,7 +132,7 @@ async function isAddedToWishlist(productId, userId) {
         throw error;
     }
 
-    console.log('Returning from isAddedToWishlist:', data.length === 1);
+    // console.log('Returning from isAddedToWishlist:', data.length === 1);
 
     return data.length === 1;
 }
@@ -169,6 +169,23 @@ async function removeProductFromWishlist(productId, userId) {
     return data.length === 1;
 }
 
+async function fetchProductImages(productId, offset, limit) {
+    const { data, error } = await supabase
+        .from('product_has_images')
+        .select('image_url, caption')
+        .eq('product_id', productId)
+        .range(offset, offset + limit - 1);
+
+    if (error) {
+        console.error('Error fetching product images:', error);
+        throw error;
+    }
+
+    // const images = data.map((img) => img.url);
+    // console.log('Returning from fetchProductImages:', data);
+    return data;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -179,4 +196,5 @@ module.exports = {
     isAddedToWishlist,
     addProductToWishlist,
     removeProductFromWishlist,
+    fetchProductImages,
 };

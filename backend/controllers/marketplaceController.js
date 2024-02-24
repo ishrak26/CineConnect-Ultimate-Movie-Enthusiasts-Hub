@@ -217,6 +217,30 @@ const marketplaceController = {
         }
     },
 
+    getProductImages: async (req, res) => {
+        try {
+            const productId = req.params.id;
+            const limit = parseInt(req.query.limit) || 5;
+            const offset = parseInt(req.query.offset) || 0;
+            const images = await dbProduct.fetchProductImages(
+                productId,
+                offset,
+                limit
+            );
+            const data = [];
+            for (let image of images) {
+                data.push({
+                    imageUrl: image.image_url, // string
+                    caption: image.caption || '', // string
+                });
+            }
+            res.status(200).json(data);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 

@@ -79,4 +79,19 @@ router.delete(
     marketplaceController.removeFromWishlist
 ); // **//
 
+// Route to fetch images for a product (paginated)
+router.get('/product/:id/images', marketplaceController.getProductImages); // **//
+/*
+    Usage:
+    /v1/marketplace/product/:id/images?limit=10&offset=0
+    /v1/marketplace/product/:id/images?limit=10
+    /v1/marketplace/product/:id/images?offset=0
+    /v1/marketplace/product/:id/images
+
+    default limit = 5, default offset = 0
+
+    Returns an array of objects as response
+    See the response format in the snippet from marketplaceController.getProductImages
+*/
+
 module.exports = router;
