@@ -307,6 +307,45 @@ const marketplaceController = {
         }
     },
 
+    updateProductQuantity: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+
+            const owner_id = await dbProduct.fetchProductOwner(productId);
+            if (!owner_id) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+            if (owner_id !== userId) {
+                return res.status(403).json({ message: 'Forbidden' });
+            }
+
+            const { quantity } = req.body;
+
+            if (!quantity) {
+                return res.status(400).json({ message: 'Bad request' });
+            }
+
+            const updated = await dbProduct.updateProductQuantity(
+                productId,
+                quantity
+            );
+            if (!updated) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(200).json({ success: true });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 

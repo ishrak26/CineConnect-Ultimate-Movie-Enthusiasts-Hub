@@ -211,6 +211,42 @@ async function createNewProduct(product) {
     return data; // This will be the UUID of the newly inserted product
 }
 
+async function updateProductQuantity(productId, newQuantity) {
+    const { data, error } = await supabase
+        .from('product')
+        .update({ available_qty: newQuantity })
+        .eq('id', productId)
+        .select('id');
+
+    if (error) {
+        console.error('Error updating product quantity:', error);
+        throw error;
+    }
+
+    // console.log('Returning from updateProductQuantity:', data);
+    return data;
+}
+
+async function fetchProductOwner(productId) {
+    const { data, error } = await supabase
+        .from('product')
+        .select('owner_id')
+        .eq('id', productId);
+
+    if (error || data.length > 1) {
+        console.error('Error fetching product owner:', error);
+        throw error;
+    }
+
+    if (data.length === 0) {
+        console.error('No product found with the given ID:', productId);
+        return null;
+    }
+
+    // console.log('Returning from fetchProductOwner:', data[0].owner_id);
+    return data[0].owner_id;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -223,4 +259,6 @@ module.exports = {
     removeProductFromWishlist,
     fetchProductImages,
     createNewProduct,
+    updateProductQuantity,
+    fetchProductOwner,
 };

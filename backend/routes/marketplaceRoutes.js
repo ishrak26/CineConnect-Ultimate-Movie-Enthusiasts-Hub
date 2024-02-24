@@ -101,4 +101,16 @@ router.post('/product', marketplaceController.createProduct); // **//
     See the request body format in the snippet from marketplaceController.createProduct
 */
 
+// Route for updating product quantity
+router.put(
+    '/product/:id/quantity',
+    marketplaceController.updateProductQuantity
+); // **//
+
+/*
+    Request body: {
+        quantity: 100
+    }
+*/
+
 module.exports = router;
