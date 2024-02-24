@@ -247,6 +247,41 @@ async function fetchProductOwner(productId) {
     return data[0].owner_id;
 }
 
+async function fetchTotalProductCountByMovieId(movieId) {
+    const { count, error } = await supabase
+        .from('movie_has_products')
+        .select('*', { count: 'exact', head: true })
+        .eq('movie_id', movieId);
+
+    if (error) {
+        console.error('Error fetching total products count by movieId:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchTotalProductsCountByMovieId:', count);
+    return count;
+}
+
+async function fetchTotalProductCountByUsername(username) {
+    const { data, error } = await supabase.rpc(
+        'get_total_products_by_username',
+        {
+            username_input: username,
+        }
+    );
+
+    if (error) {
+        console.error(
+            'Error fetching total products count by username:',
+            error
+        );
+        throw error;
+    }
+
+    // console.log('Returning from fetchTotalProductsCountByUsername:', data);
+    return data;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -261,4 +296,6 @@ module.exports = {
     createNewProduct,
     updateProductQuantity,
     fetchProductOwner,
+    fetchTotalProductCountByMovieId,
+    fetchTotalProductCountByUsername,
 };

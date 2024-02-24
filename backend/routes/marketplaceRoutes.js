@@ -113,4 +113,32 @@ router.put(
     }
 */
 
+// Route for getting total products count by movie ID
+router.get(
+    '/movie/:movieId/products/count',
+    marketplaceController.getTotalProductCountByMovieId
+); // **//
+
+/*
+    Response format:
+    {
+        count: 100
+    }
+
+*/
+
+// Route for getting total product count by username
+router.get(
+    '/user/:username/products/count',
+    marketplaceController.getTotalProductCountByUsername
+); // **//
+
+/*
+    Response format:
+    {
+        count: 100
+    }
+
+*/
+
 module.exports = router;

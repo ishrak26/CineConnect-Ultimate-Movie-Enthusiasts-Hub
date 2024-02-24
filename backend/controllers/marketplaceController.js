@@ -346,6 +346,38 @@ const marketplaceController = {
         }
     },
 
+    getTotalProductCountByMovieId: async (req, res) => {
+        try {
+            const movieId = req.params.movieId;
+            const count = await dbProduct.fetchTotalProductCountByMovieId(
+                movieId
+            );
+            if (count === null) {
+                return res.status(404).json({ message: 'Movie not found' });
+            }
+            res.status(200).json({ count });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getTotalProductCountByUsername: async (req, res) => {
+        try {
+            const username = req.params.username;
+            const count = await dbProduct.fetchTotalProductCountByUsername(
+                username
+            );
+            if (count === null) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            res.status(200).json({ count });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 
