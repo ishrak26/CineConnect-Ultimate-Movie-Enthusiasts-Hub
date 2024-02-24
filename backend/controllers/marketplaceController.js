@@ -104,7 +104,10 @@ const marketplaceController = {
                 colors: productDetails.colors, // array
                 availableQuantity: productDetails.available_qty, // numeric
                 thumbnailUrl: productDetails.thumbnail_url, // string
-                movieName: productDetails.movie_name, // string
+                movie: {
+                    id: productDetails.movie_id, // uuid
+                    title: productDetails.movie_name, // string
+                },
                 reviewCount: productDetails.total_reviews_count, // integer
                 wishlistCount: productDetails.wishlist_count, // integer
             };
