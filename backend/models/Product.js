@@ -1,6 +1,6 @@
 const supabase = require('../config/supabaseConfig');
 
-async function fetchAllTags(offset, limit) {
+async function fetchAllTags(limit, offset) {
     const { data, error } = await supabase.rpc('fetch_distinct_tags', {
         limit_val: limit,
         offset_val: offset,
@@ -102,7 +102,7 @@ async function fetchProductFeatures(productId) {
     return data[0].features;
 }
 
-async function fetchProductTags(productId, offset, limit) {
+async function fetchProductTags(productId, limit, offset) {
     const { data, error } = await supabase
         .from('product_has_tags')
         .select('name')
@@ -169,7 +169,7 @@ async function removeProductFromWishlist(productId, userId) {
     return data.length === 1;
 }
 
-async function fetchProductImages(productId, offset, limit) {
+async function fetchProductImages(productId, limit, offset) {
     const { data, error } = await supabase
         .from('product_has_images')
         .select('image_url, caption')
@@ -247,6 +247,105 @@ async function fetchProductOwner(productId) {
     return data[0].owner_id;
 }
 
+async function fetchTotalProductCountByMovieId(movieId) {
+    const { count, error } = await supabase
+        .from('movie_has_products')
+        .select('*', { count: 'exact', head: true })
+        .eq('movie_id', movieId);
+
+    if (error) {
+        console.error('Error fetching total products count by movieId:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchTotalProductsCountByMovieId:', count);
+    return count;
+}
+
+async function fetchTotalProductCountByUsername(username) {
+    const { data, error } = await supabase.rpc(
+        'get_total_products_by_username',
+        {
+            username_input: username,
+        }
+    );
+
+    if (error) {
+        console.error(
+            'Error fetching total products count by username:',
+            error
+        );
+        throw error;
+    }
+
+    // console.log('Returning from fetchTotalProductsCountByUsername:', data);
+    return data;
+}
+
+async function fetchProductsByMovieId(movieId, limit, offset) {
+    const { data, error } = await supabase.rpc('fetch_products_by_movie_id', {
+        mid: movieId,
+        limit_val: limit,
+        offset_val: offset,
+    });
+
+    if (error) {
+        console.error('Error fetching products by movie id:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchProductsByMovieId:', data);
+    return data;
+}
+
+async function fetchProductsByUsername(username, limit, offset) {
+    const { data, error } = await supabase.rpc('fetch_products_by_username', {
+        username_input: username,
+        limit_val: limit,
+        offset_val: offset,
+    });
+
+    if (error) {
+        console.error('Error fetching products by username:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchProductsByUsername:', data);
+    return data;
+}
+
+async function rateProduct(productId, userId, rating) {
+    const { data, error } = await supabase
+        .from('product_has_user_rating')
+        .insert({ product_id: productId, user_id: userId, rating: rating })
+        .select('id');
+
+    if (error) {
+        console.error('Error rating product:', error);
+        throw error;
+    }
+
+    // console.log('Returning from rateProduct:', data);
+    return data.length === 1;
+}
+
+async function updateRating(productId, userId, rating) {
+    const { data, error } = await supabase
+        .from('product_has_user_rating')
+        .update({ rating: rating })
+        .eq('product_id', productId)
+        .eq('user_id', userId)
+        .select('id');
+
+    if (error) {
+        console.error('Error updating product rating:', error);
+        throw error;
+    }
+
+    // console.log('Returning from updateRating:', data);
+    return data.length === 1;
+}
+
 module.exports = {
     fetchAllTags,
     fetchProductsByTagsAndMovies,
@@ -261,4 +360,10 @@ module.exports = {
     createNewProduct,
     updateProductQuantity,
     fetchProductOwner,
+    fetchTotalProductCountByMovieId,
+    fetchTotalProductCountByUsername,
+    fetchProductsByMovieId,
+    fetchProductsByUsername,
+    rateProduct,
+    updateRating,
 };
