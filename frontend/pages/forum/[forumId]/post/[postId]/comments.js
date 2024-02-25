@@ -80,7 +80,7 @@ const PostPage = ({
                       onDeletePost={onDeletePost}
                       userVoteValue={votes}
                       userIsCreator={
-                        user === postStateValue.selectedPost?.author.id
+                        user.userId === postStateValue.selectedPost?.author.id
                       }
                       showForumImage={true}
                       numberOfComments={numberOfComments}

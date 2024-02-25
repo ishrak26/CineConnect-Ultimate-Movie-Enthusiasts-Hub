@@ -235,7 +235,7 @@ const Comments = ({
                     comment={comment}
                     onDeleteComment={onDeleteComment}
                     loadingDelete={loadingDelete === comment.postId}
-                    userId={user}
+                    userId={user.userId}
                   />
                 ))}
               </>

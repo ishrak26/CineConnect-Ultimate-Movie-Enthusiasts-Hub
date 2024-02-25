@@ -30,6 +30,7 @@ const postController = {
             if (post) {
                 const data = {
                     postId: postId,
+                    title: post.title,
                     content: post.content,
                     images: post.images,
                     created_at: post.created_at,
@@ -103,7 +104,7 @@ const postController = {
                     .json({ message: 'User not a member of the forum' });
             }
 
-            const { content } = req.body;
+            const { title, content } = req.body;
             let { images } = req.body;
             if (!content) {
                 return res
@@ -130,12 +131,13 @@ const postController = {
                 images = [];
             }
 
-            console.log('images', images);
-            console.log('content', content);
+            // console.log('images', images);
+            // console.log('content', content);
 
             const newPost = await dbPost.createNewPost(
                 userId,
                 forumId,
+                title,
                 content,
                 images
             );
@@ -267,6 +269,7 @@ const postController = {
                             username: post.username,
                             image_url: post.user_image_url,
                         },
+                        title: post.title,
                         content: post.content.substring(0, contentLimit),
                         contentFull: post.content.length <= contentLimit,
                         totalImages: post.total_images,
@@ -341,21 +344,31 @@ const postController = {
             if (!req.user)
                 return res.status(401).json({ message: 'Unauthorized' });
 
-            //TODO
-
             const postId = req.params.postId;
-            const post = await dbPost.fetchSinglePostById(postId, 0);
-            if (!post) {
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const author = await dbPost.fetchPostAuthorByPostId(postId);
+            if (!author) {
                 return res.status(404).json({ message: 'Post not found' });
             }
 
-            if (post.author_id !== req.user.id) {
+            if (author !== req.user.id) {
                 return res
                     .status(403)
                     .json({ message: 'User not authorized to edit the post' });
             }
 
-            const { content, images } = req.body;
+            const { title, content, images } = req.body;
             if (!content) {
                 return res
                     .status(400)
@@ -381,6 +394,7 @@ const postController = {
 
             const updatedPost = await dbPost.updatePost(
                 postId,
+                title,
                 content,
                 images
             );
@@ -403,15 +417,25 @@ const postController = {
             if (!req.user)
                 return res.status(401).json({ message: 'Unauthorized' });
 
-            //TODO
-
             const postId = req.params.postId;
-            const post = await dbPost.fetchSinglePostById(postId, 0);
-            if (!post) {
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+            if (!isJoined) {
+                return res
+                    .status(403)
+                    .json({ message: 'User not a member of the forum' });
+            }
+
+            const author = await dbPost.fetchPostAuthorByPostId(postId);
+            if (!author) {
                 return res.status(404).json({ message: 'Post not found' });
             }
 
-            if (post.author_id !== req.user.id) {
+            if (author !== req.user.id) {
                 return res.status(403).json({
                     message: 'User not authorized to delete the post',
                 });

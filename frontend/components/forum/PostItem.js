@@ -75,9 +75,19 @@ const PostItem = ({
     event.stopPropagation()
     setLoadingDelete(true)
     try {
-      const success = await onDeletePost(post, forumId)
+      const success = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${post.postId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
 
-      if (!success) {
+      if (!success.ok) {
         throw new Error('Post could not be deleted')
       }
 
