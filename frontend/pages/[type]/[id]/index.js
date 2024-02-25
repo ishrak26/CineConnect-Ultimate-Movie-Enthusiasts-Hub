@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { tmdb } from '@lib/service'
 import { format, formatDuration, intervalToDuration } from 'date-fns'
 import ArrowIcon from '@components/icons/arrow.svg'
@@ -444,6 +444,27 @@ export default function Home({ data, type, casts }) {
                       <span className="text-sm text-white-30">Type</span>
                       <span className="block mt-2">Movie</span>
                     </p>
+
+                    {casts.directors && (
+                      <p>
+                        <span className="text-sm text-white-30">
+                          Directed by
+                        </span>
+                        <span className="block mt-2">
+                          {casts.directors.map((director, index) => (
+                            <span key={director.id}>
+                              {index > 0 ? ', ' : ''}
+                              <Link
+                                href={`/moviePerson/${director.id}`}
+                                className="text-blue-500 hover:text-blue-800"
+                              >
+                                {director.name}
+                              </Link>
+                            </span>
+                          ))}
+                        </span>
+                      </p>
+                    )}
                     {data.release_date && (
                       <p>
                         <span className="text-sm text-white-30">
