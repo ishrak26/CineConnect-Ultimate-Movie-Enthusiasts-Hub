@@ -659,8 +659,7 @@ const postController = {
         }
     },
 
-
-    getUserId : async (req, res) => {
+    getUserId: async (req, res) => {
         try {
             if (!req.user)
                 return res.status(401).json({ message: 'Unauthorized' });
@@ -672,12 +671,11 @@ const postController = {
         }
     },
 
-    
     getForumById: async (req, res) => {
-      try {
+        try {
             if (!req.user)
                 return res.status(401).json({ message: 'Unauthorized' });
-        const forumId = req.params.forumId;
+            const forumId = req.params.forumId;
             const forum = await dbPost.fetchForumById(forumId);
 
             if (forum) {
@@ -686,22 +684,20 @@ const postController = {
                     title: forum.title,
                     description: forum.plot_summary,
                     image_url: forum.poster_url,
-                    createdAt: forum.release_date,    
+                    createdAt: forum.release_date,
                 };
                 res.status(200).json(data);
             } else {
                 res.status(404).json({ message: 'Forum not found' });
-              }
+            }
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });
         }
     },
 
-   
-  
-  checkUserVotedPost: async (req, res) => {    
-    try {
+    checkUserVotedPost: async (req, res) => {
+        try {
             if (!req.user)
                 return res.status(401).json({ message: 'Unauthorized' });
             const userId = req.user.id;
@@ -733,7 +729,6 @@ const postController = {
             res.status(500).json({ message: 'Internal server error' });
         }
     },
-
 
     // Add more methods as per your API documentation...
 };

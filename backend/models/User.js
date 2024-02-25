@@ -124,11 +124,17 @@ async function getCineFellows({ userId, limit, offset }) {
     try {
         // Fetch fellow1 details
         const { data: fellowsAsFellow1, error: error1 } = await supabase
+            .from('cinefellow')
+            .select(
+                `
             .from("cinefellow")
             .select(
                 `
                 requestee_id,
                 user_info:requestee_id (id, username, full_name, image_url, email)
+            `
+            )
+            .eq('requestor_id', userId)
             `
             )
             .eq("requestor_id", userId)
@@ -260,6 +266,8 @@ async function unfollowCinefellow({ userId, fellowId }) {
 
         if (deleteError) throw deleteError;
 
+        if (data.length === 0) {
+            console.log('No cinefellow relationship found.');
         if (data.length === 0) {
             console.log("No cinefellow relationship found.");
             return false;

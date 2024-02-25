@@ -82,8 +82,20 @@ router.get('/v1/genre/:genreId/movies', movieController.getMoviesByGenre);
 // Router to get total count of movies
 router.get('/v1/movies/count', movieController.getTotalMovieCount);
 
-// Rouer to get movie related info for this user
-router.get('/v1/movie/:movieId/userInfo', movieController.getUserInfoForMovie);
+// Rouer to check if user added this movie to watchlist or watched-list
+router.get(
+    '/v1/movie/:movieId/watchInfo',
+    movieController.getUserWatchInfoForMovie
+);
+
+// Router to check if user rated this movie
+router.get('/v1/movie/:movieId/rated', movieController.getUserRatingForMovie);
+
+// Router to get movie rating
+router.get('/v1/movie/:movieId/rating', movieController.getMovieRating);
+
+// Router to get movie images
+router.get('/v1/movie/:movieId/images', movieController.getMovieImages);
 
 // Router to get search results for movies, moviePersons, users
 router.get('/v1/search', movieController.searchAllTypes);

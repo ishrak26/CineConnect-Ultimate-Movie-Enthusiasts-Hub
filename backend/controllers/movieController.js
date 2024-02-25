@@ -488,7 +488,7 @@ const moviesController = {
         }
     },
 
-    getUserInfoForMovie: async (req, res) => {
+    getUserWatchInfoForMovie: async (req, res) => {
         if (!req.user) {
             return res.status(200).json({ message: 'No user info found' });
         }
@@ -497,7 +497,7 @@ const moviesController = {
         const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
 
         try {
-            const userInfo = await db_movie.fetchUserInfoForMovie(
+            const userInfo = await db_movie.fetchUserWatchInfoForMovie(
                 userId,
                 movieId
             );
@@ -551,6 +551,90 @@ const moviesController = {
             res.status(200).json(data);
         } catch (error) {
             console.error('Error in searchAllTypes:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getUserRatingForMovie: async (req, res) => {
+        if (!req.user) {
+            return res.status(200).json({ rated: false });
+        }
+
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
+
+        try {
+            const rating = await db_movie.fetchMovieRatingByUser(
+                userId,
+                movieId
+            );
+            if (rating === null) {
+                return res.status(500).json({
+                    message: 'Internal server error',
+                });
+            }
+
+            if (rating.length > 0) {
+                res.status(200).json({ rated: true, rating: rating[0].rating });
+            } else {
+                res.status(200).json({
+                    rated: false,
+                });
+            }
+        } catch (error) {
+            console.error('Error in getMovieRatingByUser:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getMovieRating: async (req, res) => {
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+
+        try {
+            const rating = await db_movie.fetchMovieRatingById(movieId);
+            if (!rating) {
+                return res.status(500).json({
+                    message: 'Internal server error',
+                });
+            }
+
+            res.status(200).json({ rating });
+        } catch (error) {
+            console.error('Error in getMovieRating:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getMovieImages: async (req, res) => {
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+
+        try {
+            const limit = parseInt(req.query.limit) || 3;
+            const offset = parseInt(req.query.offset) || 0;
+            const images = await db_movie.fetchMovieImages(
+                movieId,
+                limit,
+                offset
+            );
+            console.log('In getMovieImages: images', images);
+            if (!images) {
+                return res.status(500).json({
+                    message: 'Internal server error',
+                });
+            }
+            const data = { posters: [], backdrops: [] };
+            for (let image of images) {
+                if (image.image_type === 'poster') {
+                    data.posters.push(image.image_url);
+                } else {
+                    data.backdrops.push(image.image_url);
+                }
+            }
+            console.log('In getMovieImages: data', data);
+
+            res.status(200).json({ images: data });
+        } catch (error) {
+            console.error('Error in getMovieRating:', error);
             res.status(500).json({ message: 'Internal server error' });
         }
     },
