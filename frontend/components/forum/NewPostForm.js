@@ -61,7 +61,7 @@ const NewPostForm = ({ user, currentForum }) => {
     setLoading(true)
 
     try {
-      console.log(cookie)
+      // console.log(cookie)
       const response = await fetch(
         `http://localhost:4000/v1/forum/${forumId}/submit`,
         {

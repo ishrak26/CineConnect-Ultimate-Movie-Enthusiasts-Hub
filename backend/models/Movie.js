@@ -742,7 +742,6 @@ module.exports = {
     deleteRating,
     fetchTotalMovieCount,
     isMovieInWatchedlist,
-    fetchUserInfoForMovie,
     searchAllTypes,
     fetchUserWatchInfoForMovie,
     fetchMovieRatingById,
