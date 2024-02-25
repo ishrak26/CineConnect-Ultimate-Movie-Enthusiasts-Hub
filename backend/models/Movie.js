@@ -549,6 +549,7 @@ async function isMovieInWatchedlist(userId, movieId) {
         return null;
     }
 
+    // console.log('isMovieInWatchedlist:', data);
     return data;
 }
 

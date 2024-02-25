@@ -15,7 +15,13 @@ import CommentInput from './CommentInput'
 import CommentItem from './CommentItem'
 import router from 'next/router'
 
-const Comments = ({ user, selectedPost, ForumId, Comments }) => {
+const Comments = ({
+  user,
+  selectedPost,
+  ForumId,
+  Comments,
+  updateCommentCount,
+}) => {
   const [commentText, setCommentText] = useState('')
   const [comments, setComments] = useState([])
   const [fetchLoading, setFetchLoading] = useState(true)
@@ -81,6 +87,8 @@ const Comments = ({ user, selectedPost, ForumId, Comments }) => {
           body: JSON.stringify(newComment),
         }
       )
+
+      updateCommentCount();
 
       // const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);
       // if (selectedFile) {

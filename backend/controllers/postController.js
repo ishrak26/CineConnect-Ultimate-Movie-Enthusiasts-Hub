@@ -171,14 +171,16 @@ const postController = {
                     .json({ message: 'Movie not in user watched-list' });
             }
 
-            const isJoined = isMovieInWatchedList.joined_forum;
+            // console.log('isMovieInWatchedList', isMovieInWatchedList);
+
+            const isJoined = isMovieInWatchedList[0].is_joined;
             if (isJoined) {
                 return res
                     .status(400)
                     .json({ message: 'User already joined the forum' });
             }
 
-            const joinForum = await dbPost.joinForum(isMovieInWatchedList.id);
+            const joinForum = await dbPost.joinForum(isMovieInWatchedList[0].id);
             if (!joinForum) {
                 return res
                     .status(500)
@@ -186,6 +188,41 @@ const postController = {
             }
 
             res.status(201).json({
+                success: true,
+            });
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    leaveForum: async (req, res) => {
+        try {
+            if (!req.user)
+                return res.status(401).json({ message: 'Unauthorized' });
+
+            const userId = req.user.id;
+            const forumId = req.params.forumId;
+
+            const isJoined = await dbPost.isJoinedForumByForumId(
+                userId,
+                forumId
+            );
+
+            if (!isJoined) {
+                return res
+                    .status(400)
+                    .json({ message: 'User not joined the forum' });
+            }
+
+            const leaveForum = await dbPost.leaveForum(userId, forumId);
+            if (!leaveForum) {
+                return res
+                    .status(500)
+                    .json({ message: 'Failed to leave the forum' });
+            }
+
+            res.status(200).json({
                 success: true,
             });
         } catch (error) {
@@ -667,7 +704,7 @@ const postController = {
     try {
             if (!req.user)
                 return res.status(401).json({ message: 'Unauthorized' });
-  const userId = req.user.id;
+            const userId = req.user.id;
             const postId = req.params.postId;
             const forumId = req.params.forumId;
             const isJoined = await dbPost.isJoinedForumByForumId(

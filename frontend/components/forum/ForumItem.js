@@ -98,7 +98,7 @@ const ForumItemButtonMembersSection = ({
           onJoinOrLeaveForum(Forum, isJoined);
         }}
       >
-        {isJoined ? "Unsubscribe" : "Subscribe"}
+        {isJoined ? "Leave Forum" : "Join Forum"}
       </Button>
     </Stack>
   );
