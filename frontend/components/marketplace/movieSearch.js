@@ -1,16 +1,16 @@
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { Input, InputGroup, InputLabel } from './input'
+import { Input, InputGroup, InputLabel } from '@components/input'
 import SearchIcon from '@components/icons/search.svg'
 import TimesIcon from '@components/icons/times.svg'
 import clsx from 'clsx'
 
 import React, { useEffect } from 'react'
-import useKeyboardNavigation from '../hooks/useKeyboardNavigation'
+import useKeyboardNavigation from '../../hooks/useKeyboardNavigation'
 
 import debounce from 'lodash.debounce'
 
-export default function Search({ forwardedRef }) {
+export default function Search({ forwardedRef, ...props}) {
   const ref = useRef(null)
   const router = useRouter()
   const [value, setValue] = useState(router.query.query || '')
@@ -23,16 +23,11 @@ export default function Search({ forwardedRef }) {
 
   const fetchResults = async () => {
     if (!value) return setFilteredData([])
-    const limit = 10
-    const response = await fetch(
-      `http://localhost:4000/v1/search?query=${value}&limit=${limit}`
-    )
-    if (response.ok) {
-      const data = await response.json()
-      setFilteredData(data)
-    } else {
-      console.error('Failed to fetch search results')
-    }
+    const limit = 5
+    const data = await fetch(
+      `http://localhost:4000/v1/movies?title=${value}&limit=${limit}`
+    ).then((res) => res.json())
+    setFilteredData(data)
   }
 
   const debouncedFetchResults = debounce(fetchResults, 300)
@@ -63,26 +58,12 @@ export default function Search({ forwardedRef }) {
     setDropdownVisible(true)
   }
 
-  const handleSelection = (record) => {
-    setValue(record.title ? record.title : record.name)
+  const handleSelection = (title, movieId) => {
+    setValue(title)
     setDropdownVisible(false) // Close the dropdown after selection
     // ref.current.focus(); // Focus the search input after selection
-    // if (record.type === 'movie') {
-    //   router.push(`/movie/${record.id}`)
-    // } else if (record.type === 'moviePerson') {
-    //   router.push(`/moviePerson/${record.id}`)
-    // } else if (record.type === 'user') {
-    //   router.push(`/profile/${record.username}`)
-    // }
-
-    // enforce server-side navigation
-    if (record.type === 'movie') {
-      window.location.href = `/movie/${record.id}`
-    } else if (record.type === 'moviePerson') {
-      window.location.href = `/moviePerson/${record.id}`
-    } else if (record.type === 'user') {
-      window.location.href = `/profile/${record.username}`
-    }
+    // router.push(`/movie/${movieId}`)
+    props.onMovieSelect(movieId)
   }
 
   const handleContainerBlur = (event) => {
@@ -132,42 +113,36 @@ export default function Search({ forwardedRef }) {
             hasIcon
             required
           />
-          <InputLabel>Search Movies, Movie Persons, Users... </InputLabel>
+          <InputLabel>Search Movies </InputLabel>
           {dropdownVisible && (
             <div
               ref={resultElementRef}
-              className="absolute mx-10 z-50 bg-black-100 shadow-lg rounded-md max-h-60 overflow-y-auto"
+              className="absolute mx-10 z-50 bg-white shadow-lg rounded-md max-h-60 overflow-y-auto"
             >
               {filteredData.length > 0 ? (
-                filteredData.map((record, index) => (
+                filteredData.map((movie, index) => (
                   <div
                     key={index}
                     className="flex w-80 overflow-hidden items-center p-2 border-b cursor-pointer hover:bg-primary-600 hover:bg-opacity-70"
-                    onClick={() => handleSelection(record)} // Adjusted to use movie.id for redirection
+                    onClick={() => handleSelection(movie.title, movie.id)} // Adjusted to use movie.id for redirection
                     style={{
                       backgroundColor:
-                        index === focusedIndex ? 'rgba(255,255,255,0.1)' : '',
+                        index === focusedIndex ? 'rgba(0,0,0,0.1)' : '',
                     }}
                   >
                     {/* Poster Image */}
                     <div className="flex-shrink-0">
                       <img
-                        src={record.imageUrl}
-                        alt={record.title ? record.title : record.name}
+                        src={movie.poster_url}
+                        alt={movie.title}
                         className="h-20 w-14 object-cover"
                       />
                     </div>
                     {/* Title and Release Date */}
                     <div className="flex-grow ml-4">
-                      <div className="text-lg font-semibold">
-                        {record.title ? record.title : record.name}
-                      </div>
+                      <div className="text-lg font-semibold">{movie.title}</div>
                       <div className="text-sm text-gray-500">
-                        {record.release_date
-                          ? record.release_date
-                          : record.username
-                          ? record.username
-                          : ''}
+                        {movie.release_date}
                       </div>
                     </div>
                   </div>
@@ -202,6 +177,3 @@ text-lg font-semibold and text-sm text-gray-500: These classes are for the title
     </div>
   )
 }
-
-
-
