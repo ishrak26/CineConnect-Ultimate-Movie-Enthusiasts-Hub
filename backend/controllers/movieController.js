@@ -639,6 +639,33 @@ const moviesController = {
         }
     },
 
+    addDirector: async (req, res) => {
+        // if (!req.user || req.user.role !== 'moderator') {
+        //     return res.status(403).json({ message: 'Unauthorized' });
+        // }
+
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+        const directorId = req.body.directorId; // Extract directorId from request body
+
+        try {
+            const result = await db_movie.addDirectorToMovie(
+                movieId,
+                directorId
+            );
+            if (result) {
+                res.status(201).json({
+                    message: 'Director added successfully',
+                });
+            } else {
+                res.status(404).json({
+                    message: 'Movie or director not found',
+                });
+            }
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 

@@ -725,6 +725,20 @@ const fetchMovieImages = async (movieId, limit, offset) => {
     return data;
 };
 
+async function addDirectorToMovie(movieId, directorId) {
+    const { data, error } = await supabase
+        .from('movie_has_director')
+        .insert([{ movie_id: movieId, movie_person_id: directorId }])
+        .select('id');
+
+    if (error) {
+        console.error('Error adding director to movie:', error);
+        throw error;
+    }
+
+    return data.length === 1;
+}
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -747,4 +761,5 @@ module.exports = {
     fetchMovieRatingById,
     fetchMovieRatingByUser,
     fetchMovieImages,
+    addDirectorToMovie,
 };

@@ -100,4 +100,7 @@ router.get('/v1/movie/:movieId/images', movieController.getMovieImages);
 // Router to get search results for movies, moviePersons, users
 router.get('/v1/search', movieController.searchAllTypes);
 
+// Router to add director to a movie
+router.post('/v1/movie/:movieId/director', movieController.addDirector);
+
 module.exports = router;
