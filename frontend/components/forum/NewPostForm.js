@@ -61,7 +61,7 @@ const NewPostForm = ({ user, currentForum }) => {
     setLoading(true)
 
     try {
-      console.log(cookie)
+      // console.log(cookie)
       const response = await fetch(
         `http://localhost:4000/v1/forum/${forumId}/submit`,
         {
@@ -69,7 +69,6 @@ const NewPostForm = ({ user, currentForum }) => {
           headers: {
             'Content-Type': 'application/json',
             // ...(cookie ? { Cookie: cookie } : {}),
-            
           },
           credentials: 'include',
           body: JSON.stringify(newPost),
