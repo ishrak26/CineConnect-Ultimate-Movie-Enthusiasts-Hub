@@ -444,6 +444,20 @@ export default function Home({ data, type, casts }) {
                       <span className="text-sm text-white-30">Type</span>
                       <span className="block mt-2">Movie</span>
                     </p>
+
+                    {casts.directors && (
+                      <p>
+                        <span className="text-sm text-white-30">
+                          Directed by
+                        </span>
+                        <span className="block mt-2">
+                          {casts.directors
+                            .map((director) => director.name)
+                            .join(', ')}
+                        </span>
+                      </p>
+                    )}
+
                     {data.release_date && (
                       <p>
                         <span className="text-sm text-white-30">
@@ -859,6 +873,8 @@ export async function getServerSideProps(context) {
     ).then((res) => res.json())
     casts = response
   }
+
+  console.log('casts:', casts)
 
   return {
     props: {
