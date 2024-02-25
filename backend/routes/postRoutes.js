@@ -9,6 +9,9 @@ router.post('/:forumId/submit', postController.createNewForumPost); // **//
 // Route for joining a forum
 router.post('/:forumId/join', postController.joinNewForum); // **//
 
+// Route for leaving a forum
+router.delete('/:forumId/leave', postController.leaveForum); // **//
+
 // Route for checking if a user is member of a forum
 router.get('/:forumId/joined', postController.checkUserJoinedForum); // **//
 

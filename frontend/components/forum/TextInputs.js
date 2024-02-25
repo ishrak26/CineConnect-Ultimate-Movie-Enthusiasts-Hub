@@ -33,6 +33,7 @@ const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
         onChange={onChange}
         fontSize="10pt"
         height="120px"
+        color={"white"}
         borderRadius={10}
         _placeholder={{ color: 'gray.500' }}
         _hover={{

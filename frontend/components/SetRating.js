@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { FaStar } from 'react-icons/fa'
 
 const Rating = ({ onRating, defaultRating }) => {
+  // console.log('defaultRating', defaultRating)
   const [rating, setRating] = useState(defaultRating)
   // setRating(defaultRating)
 

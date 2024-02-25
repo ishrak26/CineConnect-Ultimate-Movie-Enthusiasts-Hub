@@ -18,7 +18,7 @@ const CommentItem = ({ comment, onDeleteComment, loadingDelete, userId }) => {
         <Stack spacing={1}>
           <Stack direction="row" align="center" fontSize="8pt">
             <Text color="gray.500" fontWeight={600}>
-              {comment.author.username}
+              {comment.author?.username}
             </Text>
             {/* Timestamp conversion logic to display createdAtString can be added here */}
             {loadingDelete && <Spinner size="sm" />}
@@ -33,8 +33,8 @@ const CommentItem = ({ comment, onDeleteComment, loadingDelete, userId }) => {
             color="gray.500"
           >
             {console.log('userId', userId)}
-            {console.log('comment.author.id', comment.author.id)}
-            {userId.userId === comment.author.id && (
+            {/* {console.log('comment.author.id', comment.author.id)} */}
+            {userId.userId === comment.author?.id && (
               <>
                 {/* If Edit functionality is not implemented, this can be commented out or removed */}
                 <Text fontSize="10pt" _hover={{ color: '#FBC02D' }}>

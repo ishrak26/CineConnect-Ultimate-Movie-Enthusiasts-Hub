@@ -312,7 +312,7 @@ export default function Home({ data, type, casts }) {
       <Navbar />
 
       <div className="container pb-12 mt-10">
-        {type !== 'cast' && (
+        {type !== 'moviePerson' && (
           <div className="w-full relative">
             <img
               // src={backdropData.img.src}
@@ -335,7 +335,7 @@ export default function Home({ data, type, casts }) {
         <div
           className={clsx(
             'p-8 md:p-10 rounded-[40px] bg-grey-900 bg-opacity-80 backdrop-blur-md max-w-xl relative',
-            type !== 'cast' && '-top-16 lg:ml-20 -mb-16'
+            type !== 'moviePerson' && '-top-16 lg:ml-20 -mb-16'
           )}
         >
           <Breadcrumb
@@ -351,7 +351,7 @@ export default function Home({ data, type, casts }) {
                     ? 'Movies'
                     : type === 'tv'
                     ? 'TV Shows'
-                    : type === 'cast'
+                    : type === 'moviePerson'
                     ? 'Person'
                     : 'Collection',
               },
@@ -666,12 +666,12 @@ export default function Home({ data, type, casts }) {
           </div>
         )} */}
 
-        {data && type === 'cast' && (
+        {data && type === 'moviePerson' && (
           <div>
             <div
               className={clsx(
                 'flex my-5 gap-12 md:gap-20 lg:flex-row',
-                type === 'cast' ? 'flex-col' : 'flex-col-reverse'
+                type === 'moviePerson' ? 'flex-col' : 'flex-col-reverse'
               )}
             >
               <div className="lg:w-1/2">
@@ -845,7 +845,7 @@ export async function getServerSideProps(context) {
       },
       credentials: 'include',
     }).then((res) => res.json())
-  } else if (params.type === 'cast') {
+  } else if (params.type === 'moviePerson') {
     response = await fetch(
       `http://localhost:4000/v1/moviePerson/${params.id}`,
       {

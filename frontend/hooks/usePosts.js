@@ -6,9 +6,7 @@ import { authModalState } from '@/context/authModalContext'
 import { postState } from '@/context/postContext'
 import { useState, useEffect } from 'react'
 
-
 const usePosts = (cookie) => {
- 
   const [postStateValue, setPostStateValue] = useRecoilState(postState) // get and set single post
   //   const currentCommunity = useRecoilValue(communityState).currentCommunity;  // get current community
   const setAuthModalState = useSetRecoilState(authModalState)
@@ -19,37 +17,55 @@ const usePosts = (cookie) => {
 
   // function for getting user
 
- const getUser = async () => {
-  const userId = await fetch(`http://localhost:4000/v1/forum/user`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(cookie ? { Cookie: cookie } : {}),
-    },
-    credentials: 'include',
-  })
-  return userId
-}
+  const getUser = async () => {
+    const userId = await fetch(`http://localhost:4000/v1/forum/user`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(cookie ? { Cookie: cookie } : {}),
+      },
+      credentials: 'include',
+    })
+    return userId
+  }
 
-  const updateVote = async (postId, vote, forumId) => {
+  const updateVote = async (postId, vote, forumId, isVoted) => {
+    const type = vote
 
-    const type = vote;
+    let response = null
 
-    const response = await fetch(
-      `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
-        },
-        credentials: 'include',
-        body: JSON.stringify({ type }),
-      }
-    )
+    if (!isVoted) {
+      response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify({ type }),
+        }
+      )
+    } else {
+      response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify({ type }),
+        }
+      )
+    }
+
     if (!response.ok) {
       throw new Error('Failed to update vote')
     }
+
     return await response.json()
   }
 
@@ -57,15 +73,16 @@ const usePosts = (cookie) => {
     setLoading(true)
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/posts`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
-        },
-        credentials: 'include',
-      }
-     )
+        `http://localhost:4000/v1/forum/${forumId}/posts`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
       if (!response.ok) {
         throw new Error('Failed to fetch posts')
       }
@@ -82,9 +99,8 @@ const usePosts = (cookie) => {
     }
   }
 
-  const onVote = async (event, postId, vote, forumId) => {
+  const onVote = async (event, postId, vote, forumId, isVoted) => {
     event.stopPropagation()
-
 
     const user = getUser()
     if (!user) {
@@ -95,31 +111,17 @@ const usePosts = (cookie) => {
     try {
       if (vote === 1) {
         const voteType = 'upvote'
-        const upvote = await updateVote(postId, voteType, forumId)
+        const upvote = await updateVote(postId, voteType, forumId, isVoted)
       } else if (vote === -1) {
         const voteType = 'downvote'
-        const downvote = await updateVote(postId, voteType, forumId)
+        const downvote = await updateVote(postId, voteType, forumId, isVoted)
       }
       // Optionally, refetch all posts to update the UI
       const updatedPost = await fetchPosts(forumId)
       setPosts((prevPosts) =>
         prevPosts.map((post) => (post.postId === postId ? updatedPost : post))
       )
-
-      // setPostStateValue((prev) => ({
-      //   ...prev,
-      //   posts: updatedPosts,
-      //   postVotes: updatedPostVotes,
-      // })) // update posts and post votes state on the ui
-
-      // // allow voting when a post is currently selected
-      // if (postStateValue.selectedPost) {
-      //   setPostStateValue((prev) => ({
-      //     ...prev,
-      //     selectedPost: updatedPost,
-      //   })) // update selected post
-      }
-     catch (error) {
+    } catch (error) {
       showToast({
         title: 'Could not Vote',
         description: error.message || 'There was an error voting on the post',
@@ -218,7 +220,6 @@ const usePosts = (cookie) => {
 }
 
 export async function getServerSideProps(context) {
-
   const cookie = context.req.headers.cookie
   console.log(cookie)
 

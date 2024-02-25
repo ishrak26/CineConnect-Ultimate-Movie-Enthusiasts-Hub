@@ -16,10 +16,6 @@ const CommentInput = ({
       {user ? (
         // If the user is logged in, display the comment input box
         <>
-          {/* <ProfileModal
-            handleClose={() => setProfileModalOpen(false)}
-            open={isProfileModalOpen}
-          /> */}
           <Stack direction="row" align="center" spacing={1} mb={2}>
             <Text color="gray.50">Comment as</Text>
             <Text
@@ -41,6 +37,7 @@ const CommentInput = ({
             onChange={(event) => setCommentText(event.target.value)}
             placeholder="Comment"
             fontSize="10pt"
+            color={'gray.50'}
             borderRadius={10}
             minHeight="140px"
             padding={4}

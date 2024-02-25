@@ -63,19 +63,18 @@ const NewPostForm = ({ user, currentForum, cookie }) => {
 
     try {
       // console.log(cookie)
-      // const response = await fetch(
-      //   `http://localhost:4000/v1/forum/${forumId}/submit`,
-      //   {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       // ...(cookie ? { Cookie: cookie } : {}),
-
-      //     },
-      //     credentials: 'include',
-      //     body: JSON.stringify(newPost),
-      //   }
-      // )
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/submit`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify(newPost),
+        }
+      )
       // const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);
       if (selectedFile) {
         // console.log('selectedFile', selectedFile)

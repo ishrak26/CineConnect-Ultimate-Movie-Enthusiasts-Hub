@@ -6,7 +6,7 @@ const moviesController = {
     getMovies: async (req, res) => {
         const limit = req.query.limit || 10; // Default limit to 10 if not specified
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
-        console.log('user: ', req.user);
+        // console.log('user: ', req.user);
         try {
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(
@@ -17,7 +17,7 @@ const moviesController = {
 
             res.json(movies || []);
         } catch (error) {
-            console.log('in catch: ', error.message);
+            console.error('in catch: ', error.message);
             res.status(500).json({ message: error.message });
         }
     },
@@ -79,7 +79,7 @@ const moviesController = {
 
     getMoviePersonById: async (req, res) => {
         const moviePersonId = req.params.moviePersonId;
-        console.log(req.params);
+        // console.log(req.params);
         try {
             const moviePersonData = await db_movie.fetchMoviePersonsById(
                 moviePersonId
@@ -511,6 +511,46 @@ const moviesController = {
             }
         } catch (error) {
             console.error('Error in getUserInfoForMovie:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    searchAllTypes: async (req, res) => {
+        try {
+            const query = req.query.query; // Extract query from request query parameters
+            const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not specified
+            const offset = parseInt(req.query.offset) || 0; // Default offset to 0 if not specified
+            const searchResults = await db_movie.searchAllTypes(
+                query,
+                offset,
+                limit
+            );
+
+            const data = [];
+            searchResults.forEach((result) => {
+                const record = {
+                    id: result.id,
+                    type: result.record_type,
+                    imageUrl: result.image_url,
+                };
+                if (result.record_type === 'movie') {
+                    record.title = result.title_or_full_name;
+                    record.release_date = result.username_or_release_date;
+                } else if (result.record_type === 'movie_person') {
+                    record.type = 'moviePerson';
+                    record.name = result.title_or_full_name;
+                } else if (result.record_type === 'user') {
+                    record.username = result.username_or_release_date;
+                    record.name = result.title_or_full_name;
+                } else {
+                    throw error;
+                }
+                data.push(record);
+            });
+            // console.log('searchResults:', data);
+            res.status(200).json(data);
+        } catch (error) {
+            console.error('Error in searchAllTypes:', error);
             res.status(500).json({ message: 'Internal server error' });
         }
     },

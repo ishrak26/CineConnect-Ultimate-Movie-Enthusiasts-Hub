@@ -1,0 +1,45 @@
+.cinefellowsContainer {
+  display: flex;
+  flex-wrap: nowrap; /* Prevents wrapping */
+  overflow-x: auto; /* Allows horizontal scrolling */
+  gap: 20px; /* Space between items */
+  padding: 10px 5px; 
+}
+
+.cinefellowItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.cinefellowItem:hover .profilePhoto {
+  transform: scale(1.05); /* Zooms in the photo */
+  border: 4px solid rgb(252, 198, 2); /* Changes the border to yellow on hover */
+}
+
+.cinefellowItem:hover .cinefellowName {
+  font-weight: bold; /* Makes the name bolder */
+}
+
+.profilePhoto {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  margin-right: 32px;
+  object-fit: cover;
+  transition: transform 0.3s ease, border 0.3s ease; /* Updated to include border transition */
+  border: 4px solid transparent; /* Default state with a transparent border */
+}
+
+
+.cinefellowName {
+  margin-top: 8px; /* Adjust spacing between photo and name as needed */
+  transition: font-weight 0.3s ease; /* Smooth transition for font weight */
+}
+
+.cinefellowLink {
+  text-decoration: none;
+  color: inherit; /* Ensures link color matches the surrounding text */
+}

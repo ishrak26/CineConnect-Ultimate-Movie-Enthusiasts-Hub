@@ -546,6 +546,7 @@ async function isMovieInWatchedlist(userId, movieId) {
         return null;
     }
 
+    // console.log('isMovieInWatchedlist:', data);
     return data;
 }
 
@@ -677,6 +678,23 @@ const fetchUserWatchInfoForMovie = async (userId, movieId) => {
     return ret;
 };
 
+async function searchAllTypes(searchText, offset, limit) {
+    // Call the RPC (Remote Procedure Call) function
+    const { data, error } = await supabase.rpc('search_all_types_with_rank', {
+        search_text: searchText,
+        limit_val: limit,
+        offset_val: offset,
+    });
+
+    if (error) {
+        console.error('Error fetching search results:', error);
+        throw error;
+    }
+
+    // console.log('Returning from searchAllTypes', data);
+    return data;
+}
+
 const fetchMovieRatingByUser = async (userId, movieId) => {
     const { data, error } = await supabase
         .from('movie_has_user_rating')
@@ -724,6 +742,7 @@ module.exports = {
     deleteRating,
     fetchTotalMovieCount,
     isMovieInWatchedlist,
+    searchAllTypes,
     fetchUserWatchInfoForMovie,
     fetchMovieRatingById,
     fetchMovieRatingByUser,

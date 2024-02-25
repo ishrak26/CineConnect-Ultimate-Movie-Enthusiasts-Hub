@@ -1,16 +1,16 @@
 // import usePosts from "@/hooks/usePosts";
-import { Stack } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import PostItem from "./PostItem";
-import PostLoader from "./PostLoader";
-import useCustomToast from "../../hooks/useCustomToast";
-import usePosts from "../../hooks/usePosts";
+import { Stack } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import PostItem from './PostItem'
+import PostLoader from './PostLoader'
+import useCustomToast from '../../hooks/useCustomToast'
+import usePosts from '../../hooks/usePosts'
 
 const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
   // const [user] = useAuthState(auth);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const {
     // postStateValue,
@@ -18,8 +18,8 @@ const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
     onVote,
     onDeletePost,
     onSelectPost,
-  } = usePosts();
-  const showToast = useCustomToast();
+  } = usePosts()
+  const showToast = useCustomToast()
 
   // setPostStateValue((prev) => ({
   //   ...prev,
@@ -28,7 +28,7 @@ const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
 
   const postStateValue = {
     posts: ForumData,
-  };
+  }
 
   // const getPosts = async () => {
   //   try {
@@ -71,7 +71,7 @@ const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
               key={item.postId}
               post={item}
               forumId={ForumAbout.forumId}
-              userIsCreator={user === item.author.id}
+              userIsCreator={user.userId === item.author.id}
               onVote={onVote}
               onSelectPost={onSelectPost}
               onDeletePost={onDeletePost}
@@ -81,6 +81,6 @@ const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
         </Stack>
       )}
     </>
-  );
-};
-export default Posts;
+  )
+}
+export default Posts

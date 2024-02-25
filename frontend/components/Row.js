@@ -25,7 +25,7 @@ function Row({ movies, title, isMain }) {
             rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
         }
     };
-
+    
     return (
         <div className={`${isMain && "pb-30"}`}>
             <div

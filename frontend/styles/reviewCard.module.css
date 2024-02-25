@@ -1,0 +1,243 @@
+/* ReviewCard.module.css */
+.reviewCard {
+    display: absolute;  /*flex makes the children of the container flexible in size and position*/
+    margin-bottom: 20px; /* Space between cards */
+    padding: 10px;
+    background: #21242D;
+    border-radius: 5px; 
+  }
+  
+  .movieInfo {
+    display: absolute;
+    align-items: center;
+    margin-right: 20px; /* Space between movie info and review content */
+  }
+  
+  .movieImage {
+    position: flex;
+    width: 142px;
+    height: 164px;  
+    border-radius: 5px;
+  }
+  
+  .movieDetails {
+    margin-left: 10px;
+  }
+  
+  .movieName {
+    font-size: 1.2rem;
+    color: #ffbd06; /* Movie name color */
+  }
+  
+  /* .rating {
+    // Styling for rating 
+  } */
+  
+  .reviewContent {
+    flex-grow: 1; /* Review content takes up remaining space */
+  }
+  
+  .timestamp {
+    font-size: 0.8rem;
+    color: #777;
+    margin-bottom: 5px;
+  }
+  
+  .snippetReview {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Number of lines to show */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* .fullReview {
+    // Full review may have similar styles without the text clamping
+  } */
+  
+  .seeMoreButton {
+    background-color: #171616;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .seeMoreButton:hover {
+    background-color: #FFD700; /* Yellow color on hover */
+  }
+  
+
+
+
+/*
+Group 1
+
+position: absolute;
+width: 736px;
+height: 178px;
+
+
+
+Rectangle 22
+
+position: absolute;
+width: 736px;
+height: 178px;
+
+background: #21242D;
+border-radius: 5px;
+
+
+Rectangle 23
+
+position: absolute;
+width: 142px;
+height: 164px;
+
+background: url(.jpg);
+border-radius: 5px;
+
+
+Rectangle 2
+
+position: absolute;
+width: 136px;
+height: 39px;
+
+background: rgba(255, 255, 255, 0.59);
+border-radius: 5px;
+
+
+La La Land
+
+position: absolute;
+width: 71px;
+height: 18px;
+
+font-family: 'Lato';
+font-style: normal;
+font-weight: 500;
+font-size: 15px;
+line-height: 18px;
+
+identical to box height
+
+color: #000000;
+
+
+
+5.0
+
+position: absolute;
+width: 20px;
+height: 17px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 300;
+font-size: 14px;
+line-height: 17px;
+
+identical to box height
+
+color: #000000;
+
+
+
+Romance, Drama
+
+position: absolute;
+width: 84px;
+height: 14px;
+
+font-family: 'Lato';
+font-style: italic;
+font-weight: 300;
+font-size: 12px;
+line-height: 14px;
+
+color: #000000;
+
+
+
+"I guess I'll see you in the movies". Back in 2014, there was a film called "Whiplash" that blew everyone away, including me. It was my 2nd favorite movie of that year and I had my eye out for the director next project. Wasn't very long until Damien Chazelle next film in was in post-production and was already a serious Oscar contender. I think "La La Land" and "Silence" was my most anticipated movies of 2016/17. And let me tell you, it did not disappoint. "La La Land" is one of the best musicals I've seen since ...MORE 
+
+position: absolute;
+width: 558px;
+height: 118px;
+
+font-family: 'Lato';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 14px;
+
+color: #FFFFFF;
+
+
+
+Arrow 1
+
+box-sizing: border-box;
+
+position: absolute;
+width: 19px;
+height: 19px;
+
+border: 2px solid #2CA1E3;
+
+
+November 29 at 2:23 AM
+
+position: absolute;
+width: 107px;
+height: 12px;
+
+font-family: 'Lato';
+font-style: italic;
+font-weight: 400;
+font-size: 10px;
+line-height: 12px;
+
+identical to box height
+
+color: #898787;
+
+
+
+🦆 icon "star"
+
+position: absolute;
+width: 13px;
+height: 13.36px;
+
+
+
+Group
+
+position: absolute;
+width: 13px;
+height: 13.36px;
+
+
+
+Vector
+
+position: absolute;
+width: 13px;
+height: 13.36px;
+
+background: #F8B319;
+
+
+Vector
+
+position: absolute;
+width: 11.88px;
+height: 12.69px;
+
+background: #F8B319;
+
+*/

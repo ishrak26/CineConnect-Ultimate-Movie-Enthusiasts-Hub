@@ -17,13 +17,23 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '@theme/theme'
 import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
+import { number } from 'sharp/lib/is'
 
-const PostPage = ({ postData, postComments, votes, user , ForumAbout , forumId, members}) => {
-  const { 
-    // postStateValue, 
-    // setPostStateValue, 
-    onDeletePost, 
-    onVote } = usePosts()
+const PostPage = ({
+  postData,
+  postComments,
+  votes,
+  user,
+  ForumAbout,
+  forumId,
+  members,
+}) => {
+  const {
+    // postStateValue,
+    // setPostStateValue,
+    onDeletePost,
+    onVote,
+  } = usePosts()
 
   //   const { ForumStateValue } = useForumData();
   //   const [user] = useAuthState(auth);
@@ -32,53 +42,11 @@ const PostPage = ({ postData, postComments, votes, user , ForumAbout , forumId, 
   const [hasFetched, setHasFetched] = useState(false)
   const [postExists, setPostExists] = useState(true)
   const [postLoading, setPostLoading] = useState(false)
-
+  const [numberOfComments, setCommentCount] = useState(postComments.length)
 
   const postStateValue = {
     selectedPost: postData,
   }
-
-//   const fetchPost = async (postId) => {
-//     setPostLoading(true)
-//     try {
-//       setHasFetched(false)
-//       const postDocRef = doc(firestore, 'posts', postId)
-//       const postDoc = await getDoc(postDocRef)
-
-//       if (postDoc.exists()) {
-//         setPostStateValue((prev) => ({
-//           ...prev,
-//           selectedPost: { id: postDoc.id, ...postDoc.data() },
-//         }))
-//         setPostExists(true)
-//       } else {
-//         setPostExists(false)
-//       }
-//     } catch (error) {
-//       console.log('Error: fetchPost', error)
-//       showToast({
-//         title: 'Could not Find Posts',
-//         description: 'There was an error finding posts',
-//         status: 'error',
-//       })
-//       setPostExists(false)
-//     } finally {
-//       setHasFetched(true)
-//       setPostLoading(false)
-//     }
-//   }
-
-//   useEffect(() => {
-//     const { pid } = router.query
-
-//     if (pid && !postStateValue.selectedPost) {
-//       fetchPost(pid)
-//     }
-
-//     if (hasFetched && !postExists) {
-//       router.push('/404')
-//     }
-//   }, [postStateValue.selectedPost, router.query, hasFetched, postExists])
 
   return (
     <ChakraProvider theme={theme}>
@@ -107,19 +75,15 @@ const PostPage = ({ postData, postComments, votes, user , ForumAbout , forumId, 
                   {postStateValue.selectedPost && (
                     <PostItem
                       post={postStateValue.selectedPost}
+                      forumId={forumId}
                       onVote={onVote}
                       onDeletePost={onDeletePost}
-                      userVoteValue={
-                        // postStateValue.postVotes.find(
-                        //   (vote) =>
-                        //     vote.postId === postStateValue.selectedPost?.id
-                        // )?.voteValue
-                        votes
-                      }
+                      userVoteValue={votes}
                       userIsCreator={
-                        user === postStateValue.selectedPost?.author.id
+                        user.userId === postStateValue.selectedPost?.author.id
                       }
                       showForumImage={true}
+                      numberOfComments={numberOfComments}
                     />
                   )}
 
@@ -128,14 +92,16 @@ const PostPage = ({ postData, postComments, votes, user , ForumAbout , forumId, 
                     selectedPost={postStateValue.selectedPost}
                     ForumId={forumId}
                     Comments={postComments}
+                    updateCommentCount={() =>
+                      setCommentCount((prevCount) => prevCount + 1)
+                    }
                   />
                 </Stack>
               </>
             )}
           </>
-          
-         <About ForumData={ForumAbout} members={members}/>
-          
+
+          <About ForumData={ForumAbout} members={members} />
         </PageContent>
       </BaseLayout>
     </ChakraProvider>
@@ -185,11 +151,21 @@ export async function getServerSideProps(context) {
     //   `http://localhost:4000/v1/forum/${forumId}`
     // )
 
-    const postData = await fetchData(`http://localhost:4000/v1/forum/${forumId}/post/${postId}`)
-    const postComments = await fetchData(`http://localhost:4000/v1/forum/${forumId}/post/${postId}/comments/`)
-    const votes = await fetchData(`http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions/`)
-    const ForumAbout = await fetchData(`http://localhost:4000/v1/forum/${forumId}`)
-    const members = await fetchData(`http://localhost:4000/v1/forum/${forumId}/totalMembers`)
+    const postData = await fetchData(
+      `http://localhost:4000/v1/forum/${forumId}/post/${postId}`
+    )
+    const postComments = await fetchData(
+      `http://localhost:4000/v1/forum/${forumId}/post/${postId}/comments/`
+    )
+    const votes = await fetchData(
+      `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions/`
+    )
+    const ForumAbout = await fetchData(
+      `http://localhost:4000/v1/forum/${forumId}`
+    )
+    const members = await fetchData(
+      `http://localhost:4000/v1/forum/${forumId}/totalMembers`
+    )
 
     console.log('postData', postData)
     console.log('comments', postComments)
