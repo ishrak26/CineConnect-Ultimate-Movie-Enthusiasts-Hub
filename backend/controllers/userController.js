@@ -540,8 +540,12 @@ const userController = {
 
     getProfileById : async (req, res) => {
       try {
-          const userId = req.params.id;
-          const profileInfo = await db_user.fetchUserById({ userId });
+          // console.log('userId:', req.params.id);
+          const id = req.params.id;
+          const profileInfo = await db_user.fetchUserById({ id });
+
+          console.log('profileInfo:', profileInfo);
+          
           if(profileInfo) res.status(200).json({ profileInfo });
           else res.status(404).json({ message: 'User not found.' });
       } catch (error) {

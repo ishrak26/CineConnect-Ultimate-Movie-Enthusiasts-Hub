@@ -594,6 +594,8 @@ const getProfileDetails = async ({ username }) => {
 }
 
 async function fetchUserById({ id }) {
+
+    // console.log('In fetchUserById', id);
     const { data, error } = await supabase
         .from('user_info')
         .select('id, username, role, image_url')

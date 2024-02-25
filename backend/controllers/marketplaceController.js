@@ -224,6 +224,7 @@ const marketplaceController = {
     getProductImages: async (req, res) => {
         try {
             const productId = req.params.id;
+            console.log(productId);
             const limit = parseInt(req.query.limit) || 5;
             const offset = parseInt(req.query.offset) || 0;
             const images = await dbProduct.fetchProductImages(

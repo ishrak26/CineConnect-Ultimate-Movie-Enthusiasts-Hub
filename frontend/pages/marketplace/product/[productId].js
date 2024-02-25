@@ -15,12 +15,35 @@ export default function Product({
   dataImages,
   dataFeatures,
   dataTags,
+  cookie,
 }) {
   const [selectedSize, setSelectedSize] = useState(0)
   // const dispatch = useDispatch();
   const [imgSelected, setImgSelected] = useState(0)
 
   // if (!dataItem) return <NotFound />
+
+  const getOwner = async (ownerId) => {
+    // console.log('ownerId', ownerId)
+    const response = await fetch(
+      `http://localhost:4000/v1/profile/${ownerId}/profile`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+      }
+    )
+
+    if (response.ok) {
+      const data = await response.json()
+      return data.profileInfo
+    }
+
+    return null
+  }
 
   return (
     <>
@@ -101,12 +124,22 @@ export default function Product({
                 {dataItem?.productName}
               </h1>
 
+              <p className="py-2 text-base text-gray-400">Designed By </p>
+              <p className="font-semibold text-lg text-cusblack pb-4">
+                {getOwner(dataItem?.owner.id)}
+              </p>
+
+              <p className="py-2 text-base text-gray-400">Price:</p>
+              <p className="font-semibold text-lg text-cusblack pb-4">
+                Tk {dataItem?.price}
+              </p>
+
               <p className="py-2 text-base text-gray-400">Tags:</p>
               <div className="flex flex-wrap gap-2 pb-4">
                 {dataTags?.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 text-black-100 bg-primary-600 rounded-full"
+                    className="px-2 py-1 text-sm text-black-100 bg-primary-600 rounded-full"
                   >
                     {tag}
                   </span>
@@ -118,17 +151,13 @@ export default function Product({
                 {dataItem.colors?.map((color, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 text-black-100 bg-primary-600 rounded-full"
+                    className="px-2 py-1 text-sm text-black-100 bg-primary-600 rounded-full"
                   >
                     {color}
                   </span>
                 ))}
               </div>
 
-              <p className="py-2 text-base text-gray-400">Price:</p>
-              <p className="font-semibold text-lg text-cusblack pb-4">
-                Tk {dataItem?.price}
-              </p>
               <div className="sizes text-base text-gray-400">
                 <p className="mb-2">Select size</p>
                 <div className="flex">
@@ -263,6 +292,8 @@ export async function getServerSideProps(context) {
     `http://localhost:4000/v1/marketplace/product/${productId}/tags`
   )
 
+  console.log('dataItem', dataItem)
+
   // const dataItem = {
   //   name: 'Interstellar Notebook',
   //   price: '200',
@@ -287,6 +318,7 @@ export async function getServerSideProps(context) {
       dataImages,
       dataFeatures,
       dataTags,
+      cookie,
     },
   }
 }
