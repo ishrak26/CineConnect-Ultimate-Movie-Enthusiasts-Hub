@@ -58,4 +58,13 @@ router.get('/profile/:username/', userController.getProfileDetails);
 router.get('/:id/profile', userController.getProfileById);
 module.exports = router;
 
+// Route to fetch current user information for edit-profile form
+router.get('/profile/:username/edit-profile', userController.getCurrentUserFullProfile);
+
+// Route to check username availability
+router.get('/username/check', userController.checkUsernameAvailability);
+
+// Route to update profile information
+router.post('/profile/:username/update-profile', userController.updateUserProfile);
+
 // http://localhost:4000/v1/profile/

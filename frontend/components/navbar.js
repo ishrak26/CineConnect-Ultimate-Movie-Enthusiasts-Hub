@@ -101,9 +101,11 @@ export default function Navbar() {
             </button>
           )}
           {loggedIn && (
-            <button className="profile-button">
-              <img src={userInfo.image_url} alt="Profile" className="profile" />
-            </button>
+            <a href={`/profile/${userInfo.username}`}>
+              <button className="profile-button">
+                <img src={userInfo.image_url} alt="Profile" className="profile" />
+              </button>
+            </a>
           )}
           {loggedIn && (
             <button className="icon-button">

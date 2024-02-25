@@ -684,7 +684,7 @@ const getProfileDetails = async ({ username }) => {
             .select('id, username, full_name, image_url, role')
             .eq('username', username);
 
-        console.log('In getProfileDetails', data);
+        // console.log('In getProfileDetails', data);
 
         if (error) throw error;
 
@@ -732,6 +732,67 @@ async function fetchUserPhotoById({ id }) {
     return data[0];
 }
 
+async function fetchUserProfileForUpdate({ username }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, full_name, image_url, gender, date_of_birth, email')
+        .eq('username', username);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data.length !== 1) {
+        return null;
+    }
+    return data[0];
+}
+
+async function checkIfUsernameIsTaken({ newUsername }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id')
+        .eq('username', newUsername);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data.length > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+const updateByUsername = async (username, updateFields) => {
+    console.log('Inside updateByUsername model function:', username, updateFields);
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .update(updateFields)
+            .select('id')
+            .eq('username', username);
+
+        if (error) {
+            throw error;
+        }
+        if (data && data.length > 0) {
+            console.log(`User ${username} updated successfully.`);
+            return { success: true, data: data[0] };
+        } else {
+            console.log(`User ${username} not found or no changes made.`);
+            return { success: false, message: 'User not found or no changes made.' };
+        }
+    } catch (error) {
+        console.error(`Error updating user ${username}:`, error.message);
+        return { success: false, message: error.message };
+    }
+};
+
+
 module.exports = {
     createUser,
     findOne,
@@ -764,4 +825,7 @@ module.exports = {
     getProfileDetails,
     fetchUserById,
     fetchUserPhotoById,
+    fetchUserProfileForUpdate,
+    checkIfUsernameIsTaken,
+    updateByUsername,
 };
