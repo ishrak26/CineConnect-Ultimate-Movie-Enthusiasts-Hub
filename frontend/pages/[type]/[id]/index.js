@@ -25,7 +25,8 @@ export default function Home({ data, type, casts }) {
   const [isWatchlisted, setIsWatchlisted] = useState(false)
   const [userRating, setUserRating] = useState(0)
   const [isWatched, setIsWatched] = useState(false)
-  const [movieRating, setMovieRating] = useState(0)
+  const [movieRating, setMovieRating] = useState(0.0)
+  const [totalRatingCount, setTotalRatingCount] = useState(0)
   const [isJoined, setIsJoined] = useState(false)
   const [movieImages, setMovieImages] = useState(null)
 
@@ -34,7 +35,7 @@ export default function Home({ data, type, casts }) {
   useEffect(() => {
     const getRating = async () => {
       const ratingResponse = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/rated`,
+        `http://localhost:4000/v1/movie/${data.id}/rating`,
         {
           method: 'GET',
           headers: {
@@ -49,11 +50,13 @@ export default function Home({ data, type, casts }) {
       if (ratingResponse.ok) {
         // If the response is successful (status in the range 200-299)
         const ratingData = await ratingResponse.json() // Now it's safe to parse JSON
-        if (!ratingData.rating) {
+        if (!ratingData.user_rating) {
           setUserRating(0)
         } else {
-          setUserRating(ratingData.rating)
+          setUserRating(ratingData.user_rating)
         }
+        setMovieRating(ratingData.average_rating)
+        setTotalRatingCount(ratingData.total_ratings)
       } else {
         // If the response is not successful, log or handle the error
         console.error(
@@ -175,7 +178,6 @@ export default function Home({ data, type, casts }) {
       }
     }
 
-    setMovieRating(data.rating)
     getWatchData()
     getRating()
     getJoinedData()
@@ -260,27 +262,18 @@ export default function Home({ data, type, casts }) {
           }),
         }
       )
+
       if (response.ok) {
-        setUserRating(rate)
-        const response2 = await fetch(
-          `http://localhost:4000/v1/movie/${data.id}/rating`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        )
-        if (response2.ok) {
-          const ratingData = await response2.json()
-          setMovieRating(ratingData.rating)
+        if (userRating === 0) {
+          setTotalRatingCount(totalRatingCount + 1)
+          setMovieRating((movieRating + rate) / totalRatingCount)
         } else {
-          console.error(
-            'Error with request:',
-            response2.status,
-            response2.statusText
+          setMovieRating(
+            (movieRating * totalRatingCount - userRating + rate) /
+              totalRatingCount
           )
         }
+        setUserRating(rate)
       } else {
         console.error(
           'Error with request:',
@@ -434,7 +427,11 @@ export default function Home({ data, type, casts }) {
                 />
 
                 {/* <Rating average={data.vote_average} /> */}
-                <Rating average={movieRating} />
+                <Rating
+                  average={movieRating}
+                  count={totalRatingCount}
+                  inMoviePage={true}
+                />
 
                 {type === 'movie' && (
                   <div className="space-y-6">

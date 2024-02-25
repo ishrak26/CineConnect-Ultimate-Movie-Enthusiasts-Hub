@@ -26,7 +26,7 @@ const moviesController = {
         try {
             // console.log(req.params);
             const movieId = req.params.movieId;
-            const movie = await db_movie.fetchMoviesById(movieId, req.user);
+            const movie = await db_movie.fetchMoviesById(movieId);
             if (movie && movie.length > 0) {
                 res.json(movie[0]);
             } else {
@@ -555,50 +555,21 @@ const moviesController = {
         }
     },
 
-    getUserRatingForMovie: async (req, res) => {
-        if (!req.user) {
-            return res.status(200).json({ rated: false });
-        }
-
-        const movieId = req.params.movieId; // Extract movieId from request parameters
-        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
-
-        try {
-            const rating = await db_movie.fetchMovieRatingByUser(
-                userId,
-                movieId
-            );
-            if (rating === null) {
-                return res.status(500).json({
-                    message: 'Internal server error',
-                });
-            }
-
-            if (rating.length > 0) {
-                res.status(200).json({ rated: true, rating: rating[0].rating });
-            } else {
-                res.status(200).json({
-                    rated: false,
-                });
-            }
-        } catch (error) {
-            console.error('Error in getMovieRatingByUser:', error);
-            res.status(500).json({ message: 'Internal server error' });
-        }
-    },
-
     getMovieRating: async (req, res) => {
         const movieId = req.params.movieId; // Extract movieId from request parameters
 
         try {
-            const rating = await db_movie.fetchMovieRatingById(movieId);
+            const rating = await db_movie.getMovieRatingInfo(
+                movieId,
+                req.user?.id
+            );
             if (!rating) {
                 return res.status(500).json({
                     message: 'Internal server error',
                 });
             }
 
-            res.status(200).json({ rating });
+            res.status(200).json(rating);
         } catch (error) {
             console.error('Error in getMovieRating:', error);
             res.status(500).json({ message: 'Internal server error' });

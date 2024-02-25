@@ -1,7 +1,13 @@
 import clsx from 'clsx'
 import Star from '@components/icons/star.svg'
 
-export default function Rating({ average, className, ...props }) {
+export default function Rating({
+  average,
+  count,
+  inMoviePage = false,
+  className,
+  ...props
+}) {
   return (
     <div
       className={clsx(
@@ -12,7 +18,17 @@ export default function Rating({ average, className, ...props }) {
     >
       <Star />
       {/* <span className="ml-2">{average.toFixed(1)}</span> */}
-      <span className="ml-2">{average}</span>
+      {inMoviePage && (
+        <div>
+          <span className="ml-2">{average}/10</span>
+          <span className="ml-2">({count} votes)</span>
+        </div>
+      )}
+      {!inMoviePage && (
+        <div>
+          <span className="ml-2">{average}</span>
+        </div>
+      )}
     </div>
   )
 }

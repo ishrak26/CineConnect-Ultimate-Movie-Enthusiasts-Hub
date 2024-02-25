@@ -13,6 +13,9 @@ router.get('/v1/movie/:movieId', movieController.getMovieById); // **//
 // Route for editing a specific movie
 router.put('/v1/movie/:movieId', movieController.updateMovie);
 
+// Route for getting all rating info of a specific movie
+router.get('/v1/movie/:movieId/rating', movieController.getMovieRating);
+
 // Route for submitting a rating for a movie
 router.post('/v1/movie/:movieId/rate', movieController.submitMovieRating);
 
@@ -87,12 +90,6 @@ router.get(
     '/v1/movie/:movieId/watchInfo',
     movieController.getUserWatchInfoForMovie
 );
-
-// Router to check if user rated this movie
-router.get('/v1/movie/:movieId/rated', movieController.getUserRatingForMovie);
-
-// Router to get movie rating
-router.get('/v1/movie/:movieId/rating', movieController.getMovieRating);
 
 // Router to get movie images
 router.get('/v1/movie/:movieId/images', movieController.getMovieImages);
