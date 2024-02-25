@@ -5,7 +5,8 @@ import styles from '../styles/cinefellowRequestCard.module.css';
 // Import buttons from cinefellowRequestButtons.js
 import { AcceptCinefellowRequestButton, DeclineCinefellowRequestButton } from '@components/cinefellowRequestButtons'; 
 
-const CinefellowRequestCard = ({ requestorPhoto, requestorUsername, commonForumsCount, onAccept, onReject }) => {
+const CinefellowRequestCard = ({ requestorPhoto, requestedAt, requestorUsername, onAccept, onReject, status }) => {
+  let commonForumsCount = 19; // To be dynamically fetched - commonForumsCount 
   return (
     <div className={styles.card}>
       <div className={styles.requestorInfo}>
@@ -13,11 +14,20 @@ const CinefellowRequestCard = ({ requestorPhoto, requestorUsername, commonForums
         <div className={styles.userInfo}>
           <div className={styles.username}>{requestorUsername}</div>
           <div className={styles.commonForums}>Common Forums: {commonForumsCount}</div>
+          <div className={styles.requestedAt}>{requestedAt}</div>
         </div>
       </div>
       <div className={styles.actions}>
-        <AcceptCinefellowRequestButton onClick={onAccept} />
-        <DeclineCinefellowRequestButton onClick={onReject} />
+        {status === 'pending' ? (
+          <>
+            <AcceptCinefellowRequestButton onClick={onAccept} />
+            <DeclineCinefellowRequestButton onClick={onReject} />
+          </>
+        ) : status === 'accepted' ? (
+          <div className={styles.acceptedMessage}>Request accepted!</div>
+        ) : (
+          <div className={styles.rejectedMessage}>Request rejected!</div>
+        )}
       </div>
     </div>
   );
