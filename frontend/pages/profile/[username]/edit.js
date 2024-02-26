@@ -20,7 +20,10 @@ const createSchema = (currentUsername) => {
     image_url: yup.string().url('Must be a valid URL').required('Image URL is required'),
     gender: yup.string().oneOf(['male', 'female', 'other'], 'Invalid gender').required('Gender is required'),
     date_of_birth: yup.date().max(new Date(), 'Date of birth cannot be in the future').required('Date of birth is required'),
-    password: yup.string().min(8).matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, 'Password must contain at least 8 characters, one letter and one number').required('Password is required'),
+    password: yup.string()
+      .min(8, 'Password must be at least 8 characters long')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/, 'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character')
+      .required('Password is required'),
     confirm_password: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match').required('Confirm password is required'),
     username: yup.string().test('is-unique', 'Username is already taken', async (username) => {
       // Check username availability. Adjust the URL as needed.
@@ -62,10 +65,11 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
   useEffect(() => {
     if (oldProfileData) {
       setValue('full_name', oldProfileData.full_name);
-      setValue('image_url', oldProfileData.image_url);
-      setValue('gender', oldProfileData.gender);
+      setValue('image_url', oldProfileData.image_url || '');
+      setValue('gender', oldProfileData.gender || '');
       // console.log('oldProfileData.date_of_birth', oldProfileData.date_of_birth);
-      setValue('date_of_birth', oldProfileData.date_of_birth.split('T')[0]);
+      if(oldProfileData.date_of_birth !== null && oldProfileData.date_of_birth !== undefined)
+        setValue('date_of_birth', oldProfileData.date_of_birth.split('T')[0]);
       // Don't set password and username by default for security reasons
     }
   }, [setValue, oldProfileData]);
@@ -95,7 +99,12 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
         });
       console.log('Profile update requested successfully')
       console.log('New profile username: ', data.username);
-      router.push(`/profile/${data.username}`); // Redirect to the profile page after successful update
+      if(data.username === '' || data.username === undefined || data.username === null) {
+        router.push(`/profile/${username}`); // Redirect to the profile page after successful update
+      }
+      else {
+        router.push(`/profile/${data.username}`); // Redirect to the profile page after successful update
+      }
     } catch (err) {
       console.error('Error updating profile:', err);
       setError('Failed to update profile.');
