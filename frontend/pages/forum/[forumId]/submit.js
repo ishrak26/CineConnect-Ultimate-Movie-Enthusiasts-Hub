@@ -16,7 +16,7 @@ import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
 
 // Post submission page where the user can create a new post.
-const SubmitPostPage = ({ user, ForumAbout, members }) => {
+const SubmitPostPage = ({ user, ForumAbout, members, cookie }) => {
   //   const [user] = useAuthState(auth);
   // Access Forum data using custom hook
   //   const { ForumStateValue } = useForumData();
@@ -51,7 +51,7 @@ const SubmitPostPage = ({ user, ForumAbout, members }) => {
                 user={user}
                 // ForumImageURL={ForumStateValue.currentForum?.image_url}
                 currentForum={ForumAbout}
-                // cookie={cookie}
+                cookie={cookie}
               />
             ) : (
               <Stack
@@ -112,7 +112,7 @@ export async function getServerSideProps(context) {
     )
     const user = await fetchData(`http://localhost:4000/v1/forum/user`)
 
-    console.log('ForumAbout', ForumAbout)
+    // console.log('ForumAbout', ForumAbout)
 
     // if (response.status === 404) {
     //   return {
@@ -136,6 +136,7 @@ export async function getServerSideProps(context) {
         user: user,
         ForumAbout: ForumAbout,
         members: members,
+        cookie,
         //   query,
       },
     }

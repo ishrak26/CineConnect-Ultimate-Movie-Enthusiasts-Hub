@@ -19,6 +19,7 @@ import { MdOutlineArrowBackIos } from 'react-icons/md'
 import ImageUpload from './ImageUpload'
 import TextInputs from './TextInputs'
 import TabItem from './TabItem'
+import getFileExtensionFromDataURL from '../../utils/getFileExtensionFromDataURL'
 
 const formTabs = [
   {
@@ -31,7 +32,7 @@ const formTabs = [
   },
 ]
 
-const NewPostForm = ({ user, currentForum }) => {
+const NewPostForm = ({ user, currentForum, cookie }) => {
   const router = useRouter()
   const [selectedTab, setSelectedTab] = useState(formTabs[0].title)
   const [textInputs, setTextInputs] = useState({
@@ -69,7 +70,6 @@ const NewPostForm = ({ user, currentForum }) => {
           headers: {
             'Content-Type': 'application/json',
             // ...(cookie ? { Cookie: cookie } : {}),
-            
           },
           credentials: 'include',
           body: JSON.stringify(newPost),
@@ -77,6 +77,27 @@ const NewPostForm = ({ user, currentForum }) => {
       )
       // const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);
       if (selectedFile) {
+        // console.log('selectedFile', selectedFile)
+        const fileExtension = getFileExtensionFromDataURL(selectedFile)
+        // console.log('fileExtension', fileExtension) // Output: jpg, png, gif, etc., or 'unknown'
+
+        const imageUrlResponse = await fetch(
+          `http://localhost:4000/v1/forum/${forumId}/submitImageUrl`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(cookie ? { Cookie: cookie } : {}),
+            },
+            credentials: 'include',
+            body: JSON.stringify({ extension: fileExtension }),
+          }
+        )
+        if (imageUrlResponse.ok) {
+          const imageUrl = await imageUrlResponse.json()
+          console.log('imageUrl', imageUrl)
+        }
+
         // const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
         // await uploadString(imageRef, selectedFile, 'data_url');
         // const downloadURL = await getDownloadURL(imageRef);
@@ -84,7 +105,7 @@ const NewPostForm = ({ user, currentForum }) => {
         //   imageURL: downloadURL,
         // });
       }
-      router.push(ForumLink)
+      // router.push(ForumLink)
     } catch (error) {
       console.error('Error creating post: ', error)
       showToast({

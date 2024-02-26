@@ -63,4 +63,7 @@ router.get('/:forumId', postController.getForumById); // **//
 // Route to check if user voted to a post
 router.get('/:forumId/post/:postId/voted', postController.checkUserVotedPost); // **//
 
+// Route to get a signed-url for a post image
+router.post('/:forumId/submitImageUrl', postController.getPostImageUrl); // **//
+
 module.exports = router;

@@ -18,15 +18,23 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
 import { FaPlus, FaCheck, FaLock, FaArrowCircleRight } from 'react-icons/fa'
+import { RiDeleteBin6Line } from 'react-icons/ri'
 import SetRating from '@components/SetRating'
 import { useRouter } from 'next/router'
 
 export default function Home({ data, type, casts }) {
-  const [isWatchlisted, setIsWatchlisted] = useState(false)
+  const [movieRating, setMovieRating] = useState(0.0)
+  const [totalRatingCount, setTotalRatingCount] = useState(0)
   const [userRating, setUserRating] = useState(0)
+
+  const [totalWatchCount, setTotalWatchCount] = useState(0)
+  const [isWatchlisted, setIsWatchlisted] = useState(false)
+
+  const [totalWatchedCount, setTotalWatchedCount] = useState(0)
   const [isWatched, setIsWatched] = useState(false)
-  const [movieRating, setMovieRating] = useState(0)
+
   const [isJoined, setIsJoined] = useState(false)
+
   const [movieImages, setMovieImages] = useState(null)
 
   const router = useRouter()
@@ -34,7 +42,7 @@ export default function Home({ data, type, casts }) {
   useEffect(() => {
     const getRating = async () => {
       const ratingResponse = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/rated`,
+        `http://localhost:4000/v1/movie/${data.id}/rating`,
         {
           method: 'GET',
           headers: {
@@ -49,11 +57,13 @@ export default function Home({ data, type, casts }) {
       if (ratingResponse.ok) {
         // If the response is successful (status in the range 200-299)
         const ratingData = await ratingResponse.json() // Now it's safe to parse JSON
-        if (!ratingData.rating) {
+        if (!ratingData.user_rating) {
           setUserRating(0)
         } else {
-          setUserRating(ratingData.rating)
+          setUserRating(ratingData.user_rating)
         }
+        setMovieRating(ratingData.average_rating)
+        setTotalRatingCount(ratingData.total_ratings)
       } else {
         // If the response is not successful, log or handle the error
         console.error(
@@ -80,29 +90,29 @@ export default function Home({ data, type, casts }) {
         }
       )
 
-      // Check the response status code before proceeding to parse the JSON
       if (watchResponse.ok) {
-        // If the response is successful (status in the range 200-299)
-        const watchData = await watchResponse.json() // Now it's safe to parse JSON
-        // Process your watchData here
-        if (!watchData.in_watchlist) {
+        const watchData = await watchResponse.json()
+
+        setTotalWatchCount(watchData.watchlist_count)
+        setTotalWatchedCount(watchData.watched_count)
+
+        if (!watchData.user_in_watchlist) {
           setIsWatchlisted(false)
         } else {
           setIsWatchlisted(true)
         }
-        if (!watchData.in_watchedlist) {
+
+        if (!watchData.user_has_watched) {
           setIsWatched(false)
         } else {
           setIsWatched(true)
         }
       } else {
-        // If the response is not successful, log or handle the error
         console.error(
           'Error with request:',
           watchResponse.status,
           watchResponse.statusText
         )
-        // Optionally, you can still read and log the response body
         const responseBody = await watchResponse.text()
         console.log('Response Body:', responseBody)
       }
@@ -121,26 +131,19 @@ export default function Home({ data, type, casts }) {
         }
       )
 
-      // Check the response status code before proceeding to parse the JSON
       if (joinedResponse.ok) {
-        // If the response is successful (status in the range 200-299)
-        const joinedData = await joinedResponse.json() // Now it's safe to parse JSON
-        // Process your watchData here
+        const joinedData = await joinedResponse.json()
         if (!joinedData.joined) {
           setIsJoined(false)
         } else {
           setIsJoined(true)
         }
       } else {
-        // If the response is not successful, log or handle the error
         console.error(
           'Error with request:',
           joinedResponse.status,
           joinedResponse.statusText
         )
-        // Optionally, you can still read and log the response body
-        // const responseBody = await joinedResponse.text()
-        // console.log('Response Body:', responseBody)
       }
     }
 
@@ -155,27 +158,19 @@ export default function Home({ data, type, casts }) {
         }
       )
 
-      // Check the response status code before proceeding to parse the JSON
       if (imageResponse.ok) {
-        // If the response is successful (status in the range 200-299)
-        const imageData = await imageResponse.json() // Now it's safe to parse JSON
-        // Process your watchData here
-        console.log('imageData', imageData)
+        const imageData = await imageResponse.json()
+        // console.log('imageData', imageData)
         setMovieImages(imageData.images)
       } else {
-        // If the response is not successful, log or handle the error
         console.error(
           'Error with request:',
           imageResponse.status,
           imageResponse.statusText
         )
-        // Optionally, you can still read and log the response body
-        // const responseBody = await joinedResponse.text()
-        // console.log('Response Body:', responseBody)
       }
     }
 
-    setMovieRating(data.rating)
     getWatchData()
     getRating()
     getJoinedData()
@@ -196,6 +191,11 @@ export default function Home({ data, type, casts }) {
         }
       )
       if (response.ok) {
+        if (!isWatchlisted) {
+          setTotalWatchCount(totalWatchCount + 1)
+        } else {
+          setTotalWatchCount(totalWatchCount - 1)
+        }
         setIsWatchlisted(!isWatchlisted)
       } else {
         console.error(
@@ -204,14 +204,6 @@ export default function Home({ data, type, casts }) {
           response.statusText
         )
       }
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const handleClickForum = async () => {
-    try {
-      router.push(`/forum/${data.id}`)
     } catch (err) {
       console.error(err)
     }
@@ -231,6 +223,11 @@ export default function Home({ data, type, casts }) {
         }
       )
       if (response.ok) {
+        if (!isWatched) {
+          setTotalWatchedCount(totalWatchedCount + 1)
+        } else {
+          setTotalWatchedCount(totalWatchedCount - 1)
+        }
         setIsWatched(!isWatched)
       } else {
         console.error(
@@ -260,30 +257,89 @@ export default function Home({ data, type, casts }) {
           }),
         }
       )
+
       if (response.ok) {
-        setUserRating(rate)
-        const response2 = await fetch(
-          `http://localhost:4000/v1/movie/${data.id}/rating`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        )
-        if (response2.ok) {
-          const ratingData = await response2.json()
-          setMovieRating(ratingData.rating)
+        if (userRating === 0) {
+          const newTotalRating = totalRatingCount + 1
+          setTotalRatingCount(newTotalRating)
+          setMovieRating((movieRating + rate) / newTotalRating)
         } else {
-          console.error(
-            'Error with request:',
-            response2.status,
-            response2.statusText
+          setMovieRating(
+            (movieRating * totalRatingCount - userRating + rate) /
+              totalRatingCount
           )
         }
+        setUserRating(rate)
       } else {
         console.error(
           'Error with request:',
+          response.status,
+          response.statusText
+        )
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleClickRemoveRating = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/rate`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      if (response.ok) {
+        setMovieRating(
+          (movieRating * totalRatingCount - userRating) / (totalRatingCount - 1)
+        )
+        setTotalRatingCount(totalRatingCount - 1)
+        setUserRating(0)
+      } else {
+        console.error(
+          'Error with request for handleClickRemoveRating:',
+          response.status,
+          response.statusText
+        )
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleClickEnterForum = async () => {
+    try {
+      router.push(`/forum/${data.id}`)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleClickJoinForum = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${data.id}/join`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+
+      if (response.ok) {
+        setIsJoined(true)
+      } else {
+        console.error(
+          'Error with request for handleClickJoinForum:',
           response.status,
           response.statusText
         )
@@ -413,6 +469,9 @@ export default function Home({ data, type, casts }) {
                     </>
                   )}
                 </button>
+                <span className="ml-2">
+                  Added by {totalWatchCount} user{totalWatchCount > 1 && 's'}
+                </span>
                 <button
                   onClick={handleClickWatched}
                   className="flex items-center justify-center button button-primary"
@@ -427,14 +486,37 @@ export default function Home({ data, type, casts }) {
                     </>
                   )}
                 </button>
+                <span className="ml-2">
+                  Marked by {totalWatchedCount} user
+                  {totalWatchedCount > 1 && 's'}
+                </span>
 
                 <SetRating
                   onRating={handleClickRating}
                   defaultRating={userRating}
+                  userRated={userRating !== 0}
                 />
 
+                {userRating !== 0 && (
+                  <button
+                    onClick={handleClickRemoveRating}
+                    className="flex items-center justify-center button button-primary"
+                  >
+                    <>
+                      <RiDeleteBin6Line className="mr-2" /> Remove rating
+                    </>
+                  </button>
+                )}
+
                 {/* <Rating average={data.vote_average} /> */}
-                <Rating average={movieRating} />
+                <div className="text-xl text-primary-700 mr-8">
+                  CineConnect Rating:{' '}
+                  <Rating
+                    average={movieRating}
+                    count={totalRatingCount}
+                    inMoviePage={true}
+                  />
+                </div>
 
                 {type === 'movie' && (
                   <div className="space-y-6">
@@ -477,21 +559,29 @@ export default function Home({ data, type, casts }) {
                         {data.genres.map((genre) => genre.name).join(', ')}
                       </span>
                     </p>
-                    <button
-                      className="flex items-center justify-center button button-primary"
-                      onClick={handleClickForum}
-                    >
-                      {!isJoined ? (
-                        <>
-                          <FaLock className="mr-2" /> Join Discussion Forum
-                        </>
-                      ) : (
-                        <>
-                          <FaArrowCircleRight className="mr-2" /> Go to
-                          Discussion Forum
-                        </>
+                    <div>
+                      {isJoined && (
+                        <button
+                          className="flex items-center justify-center button button-primary"
+                          onClick={handleClickEnterForum}
+                        >
+                          <>
+                            <FaArrowCircleRight className="mr-2" /> Go to
+                            Discussion Forum
+                          </>
+                        </button>
                       )}
-                    </button>
+                      {!isJoined && (
+                        <button
+                          className="flex items-center justify-center button button-primary"
+                          onClick={handleClickJoinForum}
+                        >
+                          <>
+                            <FaLock className="mr-2" /> Join Discussion Forum
+                          </>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
