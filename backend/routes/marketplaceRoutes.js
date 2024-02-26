@@ -117,6 +117,9 @@ router.post('/product', marketplaceController.createProduct); // **//
     See the request body format in the snippet from marketplaceController.createProduct
 */
 
+// Route for editing an existing product
+router.put('/product/:id', marketplaceController.editProduct); // **//
+
 // Route for updating product quantity
 router.put(
     '/product/:id/quantity',

@@ -211,6 +211,32 @@ async function createNewProduct(product) {
     return data; // This will be the UUID of the newly inserted product
 }
 
+async function updateProduct(product) {
+    const { data, error } = await supabase.rpc('update_product', {
+        _product_id: product.id,
+        _name: product.name,
+        _price: product.price,
+        _owner_id: product.ownerId,
+        _sizes: product.sizes,
+        _colors: product.colors,
+        _available_qty: product.availableQty,
+        _thumbnail_url: product.thumbnailUrl,
+        _movie_id: product.movieId,
+        _features: product.features,
+        _tags: product.tags,
+        _images: product.images,
+        _category: product.category,
+    });
+
+    if (error) {
+        console.error('Error updating product:', error);
+        throw error;
+    }
+
+    // console.log('Returning from updateProduct:', data);
+    return data; // This will be the UUID of the newly inserted product
+}
+
 async function updateProductQuantity(productId, newQuantity) {
     const { data, error } = await supabase
         .from('product')
@@ -366,4 +392,5 @@ module.exports = {
     fetchProductsByUsername,
     rateProduct,
     updateRating,
+    updateProduct,
 };
