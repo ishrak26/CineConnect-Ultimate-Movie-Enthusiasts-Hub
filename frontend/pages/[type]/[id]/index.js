@@ -313,9 +313,37 @@ export default function Home({ data, type, casts }) {
     }
   }
 
-  const handleClickForum = async () => {
+  const handleClickEnterForum = async () => {
     try {
       router.push(`/forum/${data.id}`)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleClickJoinForum = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${data.id}/join`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+
+      if (response.ok) {
+        setIsJoined(true)
+      } else {
+        console.error(
+          'Error with request for handleClickJoinForum:',
+          response.status,
+          response.statusText
+        )
+      }
     } catch (err) {
       console.error(err)
     }
@@ -531,21 +559,29 @@ export default function Home({ data, type, casts }) {
                         {data.genres.map((genre) => genre.name).join(', ')}
                       </span>
                     </p>
-                    <button
-                      className="flex items-center justify-center button button-primary"
-                      onClick={handleClickForum}
-                    >
-                      {!isJoined ? (
-                        <>
-                          <FaLock className="mr-2" /> Join Discussion Forum
-                        </>
-                      ) : (
-                        <>
-                          <FaArrowCircleRight className="mr-2" /> Go to
-                          Discussion Forum
-                        </>
+                    <div>
+                      {isJoined && (
+                        <button
+                          className="flex items-center justify-center button button-primary"
+                          onClick={handleClickEnterForum}
+                        >
+                          <>
+                            <FaArrowCircleRight className="mr-2" /> Go to
+                            Discussion Forum
+                          </>
+                        </button>
                       )}
-                    </button>
+                      {!isJoined && (
+                        <button
+                          className="flex items-center justify-center button button-primary"
+                          onClick={handleClickJoinForum}
+                        >
+                          <>
+                            <FaLock className="mr-2" /> Join Discussion Forum
+                          </>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
