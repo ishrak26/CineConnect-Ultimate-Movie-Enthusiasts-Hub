@@ -130,6 +130,35 @@ const authController = {
             return res.status(500).json({ errors: err });
         }
     },
+
+    matchPassword: async (req, res) => {
+        const { username } = req.params;
+        const { password } = req.body; // Getting password from the request body
+    
+        try {
+            const { hashedPassword, error } = await getHashedPasswordByUsername(username);
+    
+            if (error) {
+                return res.status(500).json({ message: 'Internal server error' });
+            }
+    
+            if (!hashedPassword) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+    
+            // Compare provided password with hashed password
+            const isMatch = await bcrypt.compare(password, hashedPassword);
+    
+            if (isMatch) {
+                res.json({ message: 'Password matches' });
+            } else {
+                res.status(401).json({ message: 'Password does not match' });
+            }
+        } catch (error) {
+            console.error('Error in matchPassword controller:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
 };
 
 module.exports = authController;

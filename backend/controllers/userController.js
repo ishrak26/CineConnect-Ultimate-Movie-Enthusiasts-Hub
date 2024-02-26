@@ -790,17 +790,29 @@ const userController = {
                 }
             }
             // console.log('Inside updateUserProfile controller: DEBUG_CHECKPOINT_2');
-            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
-            // console.log('Inside updateUserProfile controller: DEBUG_CHECKPOINT_3');
-            // Update user in database. Only update fields that are provided and valid
-            await db_user.updateByUsername(username, {
-                username: newUsername || username,
-                full_name,
-                image_url,
-                gender,
-                date_of_birth,
-                password: hashedPassword,
-            });
+            if(password === '' || password === undefined || password === null) {
+                // console.log('Inside updateUserProfile controller: DEBUG_CHECKPOINT_2.1');
+                await db_user.updateByUsername(username, {
+                    username: newUsername || username,
+                    full_name,
+                    image_url,
+                    gender,
+                    date_of_birth,
+                });
+            }
+            else {
+                const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+                // console.log('Inside updateUserProfile controller: DEBUG_CHECKPOINT_3');
+                // Update user in database. Only update fields that are provided and valid
+                await db_user.updateByUsername(username, {
+                    username: newUsername || username,
+                    full_name,
+                    image_url,
+                    gender,
+                    date_of_birth,
+                    password: hashedPassword,
+                });
+            }
             // console.log('Inside updateUserProfile controller: DEBUG_CHECKPOINT_4');
             res.status(200).send({ message: "Profile updated successfully" });
         } catch (error) {

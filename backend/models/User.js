@@ -723,7 +723,7 @@ async function fetchUserById({ id }) {
     }
 
     return data[0];
-}
+};
 
 async function fetchUserPhotoById({ id }) {
     const { data, error } = await supabase
@@ -740,7 +740,7 @@ async function fetchUserPhotoById({ id }) {
         return null;
     }
     return data[0];
-}
+};
 
 async function fetchUserProfileForUpdate({ username }) {
     const { data, error } = await supabase
@@ -757,7 +757,7 @@ async function fetchUserProfileForUpdate({ username }) {
         return null;
     }
     return data[0];
-}
+};
 
 async function checkIfUsernameIsTaken({ newUsername }) {
     const { data, error } = await supabase
@@ -775,7 +775,7 @@ async function checkIfUsernameIsTaken({ newUsername }) {
     }
 
     return false;
-}
+};
 
 const updateByUsername = async (username, updateFields) => {
     // console.log(
@@ -806,6 +806,26 @@ const updateByUsername = async (username, updateFields) => {
     } catch (error) {
         console.error(`Error updating user ${username}:`, error.message);
         return { success: false, message: error.message };
+    }
+};
+
+const getHashedPasswordByUsername = async (username) => {
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .select('password')
+            .eq('username', username)
+            .single(); // Assuming username is unique and will return a single record
+
+        if (error) {
+            console.error('Error fetching user hashed password:', error);
+            return { error };
+        }
+
+        return { hashedPassword: data.password };
+    } catch (error) {
+        console.error('Error in getHashedPasswordByUsername:', error);
+        return { error };
     }
 };
 
@@ -844,4 +864,5 @@ module.exports = {
     fetchUserProfileForUpdate,
     checkIfUsernameIsTaken,
     updateByUsername,
+    getHashedPasswordByUsername,
 };
