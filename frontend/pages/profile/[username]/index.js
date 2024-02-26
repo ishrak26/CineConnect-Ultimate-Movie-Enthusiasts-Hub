@@ -24,12 +24,12 @@ export default function Profile({ watchedMovies, watchlist, reviews, forums, cin
   // 1 - user's own profile, 2 - cinefellow, 3 - request sent by profileholder, 
   // 4 - request received from profileholder, 5 - non-cinefellow, 6 - unauthenticated
   // Assuming we have the user data for now as static content
-  console.log('Inside Profile: forums', forums);
+  // console.log('Inside Profile: forums', forums);
   const [profileOwnerState, setProfileOwnerState] = useState(userType);
   useEffect(() => {
     // Function to fetch updated profile information based on new state
     const fetchUpdatedProfileInfo = async () => {
-      console.log('Fetching updated profile information');
+      // console.log('Fetching updated profile information');
     };
 
     fetchUpdatedProfileInfo();
@@ -361,11 +361,11 @@ export async function getServerSideProps(context) {
     // console.log('user', user)
     // console.log('fellow', profileInfo)
     // console.log('usertype', userType)
-    console.log('watchedMovies', watchedMovies)
+    // console.log('watchedMovies', watchedMovies)
     // console.log('cineFellows', cineFellows)
     // console.log('watchlist', watchlist)
     // console.log('reviews', reviews)
-    console.log('forums', forums)
+    // console.log('forums', forums)
     // console.log('userType', userType)
     // console.log('profileInfo', profileInfo)
     // console.log('cinefellowCount', cinefellowCount)

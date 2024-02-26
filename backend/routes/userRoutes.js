@@ -84,7 +84,7 @@ router.get(
 // Route to get the profile of a user by username
 router.get("/profile/:username/", userController.getProfileDetails);
 
-// // Route to get the profile of a user by id
+// Route to get the profile of a user by id
 router.get("/:id/profile", userController.getProfileById);
 module.exports = router;
 
