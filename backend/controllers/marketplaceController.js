@@ -380,6 +380,36 @@ const marketplaceController = {
         }
     },
 
+    deleteProduct: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+
+            const owner_id = await dbProduct.fetchProductOwner(productId);
+            if (!owner_id) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+            if (owner_id !== userId) {
+                return res.status(403).json({ message: 'Forbidden' });
+            }
+
+            const deleted = await dbProduct.deleteProduct(productId);
+            if (!deleted) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(200).json({ success: true });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     updateProductQuantity: async (req, res) => {
         try {
             if (!req.user) {

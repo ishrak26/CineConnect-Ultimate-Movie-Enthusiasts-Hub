@@ -237,6 +237,22 @@ async function updateProduct(product) {
     return data; // This will be the UUID of the newly inserted product
 }
 
+async function deleteProduct(productId) {
+    const { data, error } = await supabase
+        .from('product')
+        .delete()
+        .eq('id', productId)
+        .select('id');
+
+    if (error) {
+        console.error('Error deleting product:', error);
+        throw error;
+    }
+
+    // console.log('Returning from deleteProduct:', data);
+    return data;
+}
+
 async function updateProductQuantity(productId, newQuantity) {
     const { data, error } = await supabase
         .from('product')
@@ -393,4 +409,5 @@ module.exports = {
     rateProduct,
     updateRating,
     updateProduct,
+    deleteProduct,
 };
