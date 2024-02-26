@@ -1,5 +1,6 @@
 const e = require('express');
 const supabase = require('../config/supabaseConfig');
+const { randomUUID } = require('crypto');
 
 /*
     returns a specific post given the postId
@@ -364,6 +365,22 @@ async function fetchForumById(forumId) {
     return data;
 }
 
+async function getSignedUrlForPostImage(folder, extension) {
+    const randomFileName = `${randomUUID()}.${extension}`;
+    const filePath = `forum/${folder}/${randomFileName}`;
+    console.log('filePath', filePath);
+    const { signedURL, error } = await supabase.storage
+        .from('forum')
+        .createSignedUrl(filePath, 60); // URL expires in 60 seconds
+
+    if (error) {
+        console.error('Error in getSignedUrForPostImage:', error.message);
+        throw error;
+    }
+
+    return signedURL;
+}
+
 module.exports = {
     createNewPost,
     updatePost,
@@ -382,6 +399,7 @@ module.exports = {
     fetchPostReactionCount,
     fetchCommentsByPostId,
     fetchForumById,
+    getSignedUrlForPostImage,
     fetchPostAuthorByPostId,
     removePost,
 };
