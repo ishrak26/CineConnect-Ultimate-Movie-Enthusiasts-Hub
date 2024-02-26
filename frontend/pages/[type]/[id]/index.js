@@ -17,7 +17,13 @@ import Card from '@components/card'
 import Link from 'next/link'
 import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
-import { FaPlus, FaCheck, FaLock, FaArrowCircleRight } from 'react-icons/fa'
+import {
+  FaPlus,
+  FaCheck,
+  FaLock,
+  FaArrowCircleRight,
+  FaExternalLinkAlt,
+} from 'react-icons/fa'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 import SetRating from '@components/SetRating'
 import { useRouter } from 'next/router'
@@ -424,6 +430,19 @@ export default function Home({ data, type, casts }) {
           <div className="mt-8 md:m-12 md:mt-8 xl:m-20 xl:mt-8">
             {/* {data.credits?.cast.length > 0 && <Cast cast={data.credits.cast} />} */}
 
+            <strong className="heading block mb-2">Top Casts</strong>
+            <div className="mr-2 text-right">
+              <Link
+                href={`/movie/${data.id}/casts`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mr-2 text-primary-600 hover:text-primary-700"
+                passHref
+              >
+                See all
+                {/* <FaExternalLinkAlt /> */}
+              </Link>
+            </div>
             {casts && <Cast casts={casts} />}
 
             <div className="flex flex-col-reverse my-5 gap-12 md:gap-20 lg:flex-row">
@@ -538,7 +557,7 @@ export default function Home({ data, type, casts }) {
                               {index > 0 ? ', ' : ''}
                               <Link
                                 href={`/moviePerson/${director.id}`}
-                                className="text-blue-500 hover:text-blue-800"
+                                className="text-primary-600 hover:text-primary-700"
                               >
                                 {director.name}
                               </Link>
