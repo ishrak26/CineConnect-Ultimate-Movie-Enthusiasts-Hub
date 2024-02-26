@@ -18,6 +18,7 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
 import { FaPlus, FaCheck, FaLock, FaArrowCircleRight } from 'react-icons/fa'
+import { RiDeleteBin6Line } from 'react-icons/ri'
 import SetRating from '@components/SetRating'
 import { useRouter } from 'next/router'
 
@@ -259,8 +260,9 @@ export default function Home({ data, type, casts }) {
 
       if (response.ok) {
         if (userRating === 0) {
-          setTotalRatingCount(totalRatingCount + 1)
-          setMovieRating((movieRating + rate) / totalRatingCount)
+          const newTotalRating = totalRatingCount + 1
+          setTotalRatingCount(newTotalRating)
+          setMovieRating((movieRating + rate) / newTotalRating)
         } else {
           setMovieRating(
             (movieRating * totalRatingCount - userRating + rate) /
@@ -271,6 +273,37 @@ export default function Home({ data, type, casts }) {
       } else {
         console.error(
           'Error with request:',
+          response.status,
+          response.statusText
+        )
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleClickRemoveRating = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/rate`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      if (response.ok) {
+        setMovieRating(
+          (movieRating * totalRatingCount - userRating) / (totalRatingCount - 1)
+        )
+        setTotalRatingCount(totalRatingCount - 1)
+        setUserRating(0)
+      } else {
+        console.error(
+          'Error with request for handleClickRemoveRating:',
           response.status,
           response.statusText
         )
@@ -435,6 +468,17 @@ export default function Home({ data, type, casts }) {
                   defaultRating={userRating}
                   userRated={userRating !== 0}
                 />
+
+                {userRating !== 0 && (
+                  <button
+                    onClick={handleClickRemoveRating}
+                    className="flex items-center justify-center button button-primary"
+                  >
+                    <>
+                      <RiDeleteBin6Line className="mr-2" /> Remove rating
+                    </>
+                  </button>
+                )}
 
                 {/* <Rating average={data.vote_average} /> */}
                 <div className="text-xl text-primary-700 mr-8">

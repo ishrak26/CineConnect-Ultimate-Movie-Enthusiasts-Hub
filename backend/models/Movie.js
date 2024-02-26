@@ -432,42 +432,24 @@ const addMovieToWatchlist = async (userId, movieId) => {
         return null;
     }
 
-    return data;
+    return data[0];
 };
 
 async function removeMovieFromWatchlist(userId, movieId) {
-    // checking if the movie is in the user's watchlist
-    let { data: watchlistData, error: watchlistError } = await supabase // watchlistData is an array of json objects, and
-        // watchlistError is an error object or null
-        .from('watch_list')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('movie_id', movieId)
-        .single(); // single() returns only one row
-
-    if (watchlistError) {
-        console.error('Error fetching from watchlist:', watchlistError);
-        throw new Error('Error checking watchlist');
-    }
-
-    // If the movie is not in the watchlist, we can't remove it
-    if (!watchlistData) {
-        return { error: 'Movie not found in watchlist' }; // returns a json object with error field
-    }
-
-    // If the movie is in the watchlist, proceed to delete it
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('watch_list')
         .delete()
-        .match({ id: watchlistData.id });
+        .eq('user_id', userId)
+        .eq('movie_id', movieId)
+        .select('id');
 
     if (error) {
         console.error('Error removing from watchlist:', error);
-        throw new Error('Error removing from watchlist');
+        throw error;
     }
 
     // Return a success response
-    return { message: 'Movie successfully removed from watchlist' };
+    return data[0];
 }
 
 async function addMovieToWatchedlist(userId, movieId) {
@@ -554,7 +536,7 @@ async function deleteRating(userId, movieId) {
         throw error;
     }
 
-    return data;
+    return data[0];
 }
 
 const fetchTopCastsIdsByMovieId = async (movieId, offset = 0, limit = 5) => {
