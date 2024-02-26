@@ -13,6 +13,6 @@ router.post('/login/', authController.login); // /v1/auth/login
 router.get('/isLoggedIn/', authController.isLoggedIn); // /v1/auth/isLoggedIn
 
 // Route to match password and confirm password
-router.post('/:username/matchPassword/', authController.matchPassword); // /v1/auth/matchPassword
+router.post('/:username/matchPassword/', authController.matchPassword); // /v1/auth/:username/matchPassword
 
 module.exports = router;

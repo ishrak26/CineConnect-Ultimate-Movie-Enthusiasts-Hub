@@ -136,7 +136,7 @@ const authController = {
         const { password } = req.body; // Getting password from the request body
     
         try {
-            const { hashedPassword, error } = await getHashedPasswordByUsername(username);
+            const { hashedPassword, error } = await userModel.getHashedPasswordByUsername(username);
     
             if (error) {
                 return res.status(500).json({ message: 'Internal server error' });
