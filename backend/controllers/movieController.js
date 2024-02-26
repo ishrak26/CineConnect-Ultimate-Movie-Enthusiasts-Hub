@@ -329,7 +329,7 @@ const moviesController = {
 
     getMovieCasts: async (req, res) => {
         const movieId = req.params.movieId;
-        const limit = req.query.limit || 10; // Default limit to 10 if not specified
+        const limit = req.query.limit || 6; // Default limit to 10 if not specified
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
 
         try {
@@ -553,21 +553,16 @@ const moviesController = {
                 limit,
                 offset
             );
-            console.log('In getMovieImages: images', images);
-            if (!images) {
-                return res.status(500).json({
-                    message: 'Internal server error',
-                });
-            }
+            // console.log('In getMovieImages: images', images);
             const data = { posters: [], backdrops: [] };
             for (let image of images) {
-                if (image.image_type === 'poster') {
-                    data.posters.push(image.image_url);
-                } else {
-                    data.backdrops.push(image.image_url);
+                if (image._image_type === 'poster') {
+                    data.posters.push(image._image_url);
+                } else if (image._image_type === 'backdrop') {
+                    data.backdrops.push(image._image_url);
                 }
             }
-            console.log('In getMovieImages: data', data);
+            // console.log('In getMovieImages: data', data);
 
             res.status(200).json({ images: data });
         } catch (error) {
