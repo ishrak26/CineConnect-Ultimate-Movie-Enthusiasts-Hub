@@ -16,12 +16,15 @@ export default function Rating({
       )}
       {...props}
     >
-      <Star />
       {/* <span className="ml-2">{average.toFixed(1)}</span> */}
+
+      <Star />
       {inMoviePage && (
         <div>
           <span className="ml-2">{average}/10</span>
-          <span className="ml-2">({count} votes)</span>
+          <span className="ml-2">
+            ({count} vote{count > 1 && 's'})
+          </span>
         </div>
       )}
       {!inMoviePage && (

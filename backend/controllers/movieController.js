@@ -489,21 +489,15 @@ const moviesController = {
     },
 
     getUserWatchInfoForMovie: async (req, res) => {
-        if (!req.user) {
-            return res.status(200).json({ message: 'No user info found' });
-        }
-
-        const movieId = req.params.movieId; // Extract movieId from request parameters
-        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
-
         try {
-            const userInfo = await db_movie.fetchUserWatchInfoForMovie(
-                userId,
-                movieId
+            const movieId = req.params.movieId;
+            const watchInfo = await db_movie.fetchMovieWatchDetails(
+                movieId,
+                req.user?.id
             );
 
-            if (userInfo) {
-                res.status(200).json(userInfo);
+            if (watchInfo) {
+                res.status(200).json(watchInfo);
             } else {
                 res.status(404).json({
                     message: 'No movie found for the provided movieId',

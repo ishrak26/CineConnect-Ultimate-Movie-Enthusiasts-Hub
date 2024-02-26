@@ -22,12 +22,18 @@ import SetRating from '@components/SetRating'
 import { useRouter } from 'next/router'
 
 export default function Home({ data, type, casts }) {
-  const [isWatchlisted, setIsWatchlisted] = useState(false)
-  const [userRating, setUserRating] = useState(0)
-  const [isWatched, setIsWatched] = useState(false)
   const [movieRating, setMovieRating] = useState(0.0)
   const [totalRatingCount, setTotalRatingCount] = useState(0)
+  const [userRating, setUserRating] = useState(0)
+
+  const [totalWatchCount, setTotalWatchCount] = useState(0)
+  const [isWatchlisted, setIsWatchlisted] = useState(false)
+
+  const [totalWatchedCount, setTotalWatchedCount] = useState(0)
+  const [isWatched, setIsWatched] = useState(false)
+
   const [isJoined, setIsJoined] = useState(false)
+
   const [movieImages, setMovieImages] = useState(null)
 
   const router = useRouter()
@@ -83,29 +89,29 @@ export default function Home({ data, type, casts }) {
         }
       )
 
-      // Check the response status code before proceeding to parse the JSON
       if (watchResponse.ok) {
-        // If the response is successful (status in the range 200-299)
-        const watchData = await watchResponse.json() // Now it's safe to parse JSON
-        // Process your watchData here
-        if (!watchData.in_watchlist) {
+        const watchData = await watchResponse.json()
+
+        setTotalWatchCount(watchData.watchlist_count)
+        setTotalWatchedCount(watchData.watched_count)
+
+        if (!watchData.user_in_watchlist) {
           setIsWatchlisted(false)
         } else {
           setIsWatchlisted(true)
         }
-        if (!watchData.in_watchedlist) {
+
+        if (!watchData.user_has_watched) {
           setIsWatched(false)
         } else {
           setIsWatched(true)
         }
       } else {
-        // If the response is not successful, log or handle the error
         console.error(
           'Error with request:',
           watchResponse.status,
           watchResponse.statusText
         )
-        // Optionally, you can still read and log the response body
         const responseBody = await watchResponse.text()
         console.log('Response Body:', responseBody)
       }
@@ -124,26 +130,19 @@ export default function Home({ data, type, casts }) {
         }
       )
 
-      // Check the response status code before proceeding to parse the JSON
       if (joinedResponse.ok) {
-        // If the response is successful (status in the range 200-299)
-        const joinedData = await joinedResponse.json() // Now it's safe to parse JSON
-        // Process your watchData here
+        const joinedData = await joinedResponse.json()
         if (!joinedData.joined) {
           setIsJoined(false)
         } else {
           setIsJoined(true)
         }
       } else {
-        // If the response is not successful, log or handle the error
         console.error(
           'Error with request:',
           joinedResponse.status,
           joinedResponse.statusText
         )
-        // Optionally, you can still read and log the response body
-        // const responseBody = await joinedResponse.text()
-        // console.log('Response Body:', responseBody)
       }
     }
 
@@ -158,23 +157,16 @@ export default function Home({ data, type, casts }) {
         }
       )
 
-      // Check the response status code before proceeding to parse the JSON
       if (imageResponse.ok) {
-        // If the response is successful (status in the range 200-299)
-        const imageData = await imageResponse.json() // Now it's safe to parse JSON
-        // Process your watchData here
-        console.log('imageData', imageData)
+        const imageData = await imageResponse.json()
+        // console.log('imageData', imageData)
         setMovieImages(imageData.images)
       } else {
-        // If the response is not successful, log or handle the error
         console.error(
           'Error with request:',
           imageResponse.status,
           imageResponse.statusText
         )
-        // Optionally, you can still read and log the response body
-        // const responseBody = await joinedResponse.text()
-        // console.log('Response Body:', responseBody)
       }
     }
 
@@ -198,6 +190,11 @@ export default function Home({ data, type, casts }) {
         }
       )
       if (response.ok) {
+        if (!isWatchlisted) {
+          setTotalWatchCount(totalWatchCount + 1)
+        } else {
+          setTotalWatchCount(totalWatchCount - 1)
+        }
         setIsWatchlisted(!isWatchlisted)
       } else {
         console.error(
@@ -206,14 +203,6 @@ export default function Home({ data, type, casts }) {
           response.statusText
         )
       }
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const handleClickForum = async () => {
-    try {
-      router.push(`/forum/${data.id}`)
     } catch (err) {
       console.error(err)
     }
@@ -233,6 +222,11 @@ export default function Home({ data, type, casts }) {
         }
       )
       if (response.ok) {
+        if (!isWatched) {
+          setTotalWatchedCount(totalWatchedCount + 1)
+        } else {
+          setTotalWatchedCount(totalWatchedCount - 1)
+        }
         setIsWatched(!isWatched)
       } else {
         console.error(
@@ -281,6 +275,14 @@ export default function Home({ data, type, casts }) {
           response.statusText
         )
       }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleClickForum = async () => {
+    try {
+      router.push(`/forum/${data.id}`)
     } catch (err) {
       console.error(err)
     }
@@ -406,6 +408,9 @@ export default function Home({ data, type, casts }) {
                     </>
                   )}
                 </button>
+                <span className="ml-2">
+                  Added by {totalWatchCount} user{totalWatchCount > 1 && 's'}
+                </span>
                 <button
                   onClick={handleClickWatched}
                   className="flex items-center justify-center button button-primary"
@@ -420,18 +425,26 @@ export default function Home({ data, type, casts }) {
                     </>
                   )}
                 </button>
+                <span className="ml-2">
+                  Marked by {totalWatchedCount} user
+                  {totalWatchedCount > 1 && 's'}
+                </span>
 
                 <SetRating
                   onRating={handleClickRating}
                   defaultRating={userRating}
+                  userRated={userRating !== 0}
                 />
 
                 {/* <Rating average={data.vote_average} /> */}
-                <Rating
-                  average={movieRating}
-                  count={totalRatingCount}
-                  inMoviePage={true}
-                />
+                <div className="text-xl text-primary-700 mr-8">
+                  CineConnect Rating:{' '}
+                  <Rating
+                    average={movieRating}
+                    count={totalRatingCount}
+                    inMoviePage={true}
+                  />
+                </div>
 
                 {type === 'movie' && (
                   <div className="space-y-6">

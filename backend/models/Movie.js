@@ -595,37 +595,19 @@ const fetchTotalMovieCount = async () => {
     return count;
 };
 
-const fetchUserWatchInfoForMovie = async (userId, movieId) => {
-    const ret = {};
+async function fetchMovieWatchDetails(movieId, userId = null) {
+    const { data, error } = await supabase.rpc('fetch_movie_watch_details', {
+        mid: movieId,
+        uid: userId,
+    });
 
-    const { data: watchlistData, error: watchlistError } = await supabase
-        .from('watch_list')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('movie_id', movieId);
-
-    if (watchlistError || watchlistData.length > 1) {
-        console.error('Error fetching watchlist for movie', watchlistError);
-        return null;
+    if (error) {
+        console.error('Error fetching movie watch details:', error);
+        throw error;
     }
 
-    ret.in_watchlist = watchlistData.length === 1;
-
-    const { data: watchedlistData, error: watchedlistError } = await supabase
-        .from('watched_list')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('movie_id', movieId);
-
-    if (watchedlistError || watchedlistData.length > 1) {
-        console.error('Error fetching watchedlist for movie', watchedlistError);
-        return null;
-    }
-
-    ret.in_watchedlist = watchedlistData.length === 1;
-
-    return ret;
-};
+    return data[0];
+}
 
 async function searchAllTypes(searchText, offset, limit) {
     // Call the RPC (Remote Procedure Call) function
@@ -692,8 +674,8 @@ module.exports = {
     fetchTotalMovieCount,
     isMovieInWatchedlist,
     searchAllTypes,
-    fetchUserWatchInfoForMovie,
     fetchMovieRatingById,
     fetchMovieImages,
     getMovieRatingInfo,
+    fetchMovieWatchDetails,
 };
