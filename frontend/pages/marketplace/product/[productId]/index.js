@@ -16,6 +16,7 @@ import SetRating from '@components/marketplace/SetRating'
 import { set } from 'react-nprogress'
 import BaseLayout from '@components/BaseLayout'
 import { data } from 'autoprefixer'
+import Router from 'next/router'
 
 export default function Product({
   productId,
@@ -92,7 +93,8 @@ export default function Product({
 
   const handleEditClick = () => {
     // Redirect to the edit page
-    window.location.href = `/marketplace/product/${productId}/edit`
+    // window.location.href = `/marketplace/product/${productId}/edit`
+    Router.push(`/marketplace/product/${productId}/edit`)
   }
 
   // Save the updated stock to the database (implementation depends on your backend)
@@ -291,7 +293,7 @@ export default function Product({
                   <div>
                     <img
                       className=" h-90 object-cover w-full md:rounded-2xl"
-                      src={dataImages[imgSelected].imageUrl}
+                      src={dataImages[imgSelected]?.imageUrl}
                       alt=""
                     />
                   </div>
@@ -613,24 +615,6 @@ export async function getServerSideProps(context) {
   )
 
   console.log('dataItem', dataItem)
-
-  // const dataItem = {
-  //   name: 'Interstellar Notebook',
-  //   price: '200',
-  //   color: 'White',
-  //   type: { name: 'Notebook' },
-  //   category: { name: 'Stationary' },
-  //   prop: [
-  //     {
-  //       size: ['S', 'M', 'L'],
-  //       image: [
-  //         'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-  //         'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-  //         'https://ih1.redbubble.net/image.3103823573.8682/sn,x1000-pad,750x1000,f8f8f8.jpg',
-  //       ],
-  //     },
-  //   ],
-  // }
 
   return {
     props: {

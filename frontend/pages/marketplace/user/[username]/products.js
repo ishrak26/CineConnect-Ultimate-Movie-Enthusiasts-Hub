@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import Header from '@/components/marketplace/header'
-import WishProduct from '@/components/marketplace/wishproduct'
-// import { selectWishItems } from "../slices/wishlistSlice";
+import Product from '@/components/marketplace/productown'
 import Head from 'next/head'
+import Pagination from '@components/pagination'
 
-function WishList({ username, cookie, offset }) {
+function ProductList({ username, cookie, offset, totalProducts, currentPage }) {
   // const data = useSelector(selectWishItems);
   const [items, setItems] = useState([])
+  const limit = 9
+  const totalPages = Math.ceil(totalProducts.count / (limit || 1))
 
-  const fetchWishlist = async () => {
-
-    const limit = 9
+  const fetchProductlist = async () => {
     const response = await fetch(
-      `http://localhost:4000/v1/profile/${username}/product/wishlist?limit=${limit}&offset=${offset}`,
+      `http://localhost:4000/v1/marketplace/user/${username}/products?limit=${limit}&offset=${offset}`,
       {
         method: 'GET',
         headers: {
@@ -30,22 +30,22 @@ function WishList({ username, cookie, offset }) {
     const data = await response.json()
 
     setItems(data)
-  };
+  }
 
   useEffect(() => {
-    fetchWishlist()
+    fetchProductlist()
   }, [])
 
-  const handleRemoveFromWishlist = (id) => {
+  const handleRemoveFromProductlist = (id) => {
     // removeFromWishlist(id).then(() => {
-      fetchWishlist(); 
+    fetchProductlist()
     // });
-  };
+  }
 
   return (
     <>
       <Head>
-        <title>CineConnect | Wishlist</title>
+        <title>CineConnect | Productlist</title>
       </Head>
       <div className="w-full min-h-screen relative bg-cusgray pb-10">
         <Header />
@@ -55,11 +55,16 @@ function WishList({ username, cookie, offset }) {
               {/* {console.log('items', items.length)} */}
               {items ? (
                 items?.map((item, idx) => (
-                  <WishProduct item={item} key={item.id} idx={idx} onRemove={handleRemoveFromWishlist} />
+                  <Product
+                    item={item}
+                    key={item.id}
+                    idx={idx}
+                    onRemove={handleRemoveFromProductlist}
+                  />
                 ))
               ) : (
                 <div className="text-sm text-gray-400 col-span-2 md:col-span-3 lg:col-span-4 flex justify-center place-items-center">
-                  Your wishlist is empty
+                  Your productlist is empty
                 </div>
               )}
             </div>
@@ -67,7 +72,7 @@ function WishList({ username, cookie, offset }) {
             <div className="overflow-hidden md:pl-10 row-start-1 md:col-start-3 mb-6 md:mb-0 h-48 md:h-full">
               <div className="relative">
                 <div className="text-primary-600 flex justify-center place-items-center text-2xl absolute w-full rounded-xl bg-gray-600 ml-10 bg-opacity-60 font-bold right-0 top-0 h-48 md:h-full">
-                  <h1>WISHLIST</h1>
+                  <h1>PRODUCT LIST</h1>
                 </div>
                 <img
                   src="https://i.pinimg.com/originals/84/d8/2d/84d82d33c5cc2a0dcb9dfe87e8666702.gif"
@@ -78,6 +83,11 @@ function WishList({ username, cookie, offset }) {
             </div>
           </div>
         </div>
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          className="mt-8"
+        />
       </div>
     </>
   )
@@ -123,13 +133,21 @@ export async function getServerSideProps(context) {
 
   const offset = (context.query.page - 1) * 9 || 0
 
+  const totalProducts = await fetchData(
+    `http://localhost:4000/v1/marketplace/user/${username}/products/count`
+  )
+
+  const currentPage = context.query.page || 1
+
   return {
     props: {
       username,
       cookie,
       offset,
+      totalProducts,
+      currentPage,
     },
   }
 }
 
-export default WishList
+export default ProductList

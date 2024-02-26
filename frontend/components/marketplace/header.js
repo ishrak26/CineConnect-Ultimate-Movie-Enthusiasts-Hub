@@ -228,7 +228,7 @@ function Header() {
                 )}
 
                 {isLoggedIn && (
-                  <Link href="/my-products">
+                  <Link href="/marketplace/user/[username]/products" as={`/marketplace/user/${userInfo.username}/products`}>
                     <div className="hover:bg-gray-800 flex items-center justify-end rounded-lg p-3 text-cusblack">
                       <svg
                         width="24"

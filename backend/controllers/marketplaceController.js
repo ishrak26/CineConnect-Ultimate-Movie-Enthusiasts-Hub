@@ -368,7 +368,7 @@ const marketplaceController = {
                 images: images ? images : [],
             };
 
-            const productIdNew = await dbProduct.editProduct(product);
+            const productIdNew = await dbProduct.updateProduct(product);
             if (productId !== productIdNew) {
                 return res
                     .status(500)
