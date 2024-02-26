@@ -191,7 +191,7 @@ async function getCineFellowCount({ userId }) {
         // Combine the counts from both queries
         const totalCount = count1 + count2;
 
-        console.log(totalCount);
+        // console.log(totalCount);
 
         return totalCount;
     } catch (error) {
@@ -455,11 +455,11 @@ const acceptCineFellowRequest = async ({ userId, requestorId }) => {
 
 const rejectCineFellowRequest = async ({ userId, requestorId }) => {
     try {
-        console.log(
-            'DHUKLAM Inside rejectCineFellowRequest model function : ',
-            userId,
-            requestorId
-        );
+        // console.log(
+        //     'DHUKLAM Inside rejectCineFellowRequest model function : ',
+        //     userId,
+        //     requestorId
+        // );
         // First, retrieve the request to get from_id and to_id
         const { data: requestData, error: requestError } = await supabase
             .from('cinefellow_request')
@@ -470,10 +470,10 @@ const rejectCineFellowRequest = async ({ userId, requestorId }) => {
             .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
             .limit(1); // Limit to only the most recent one
 
-        console.log(
-            'Inside rejectCineFellowRequest model function, the fetched requestData: ',
-            requestData[0]
-        );
+        // console.log(
+        //     'Inside rejectCineFellowRequest model function, the fetched requestData: ',
+        //     requestData[0]
+        // );
 
         if (requestError) throw requestError;
         if (!requestData) throw new Error('Request not found.');
@@ -668,7 +668,7 @@ const searchProfilesByUsername = async ({ username, limit, offset }) => {
 
 async function fetchJoinedForums(userId, limit, offset) {
     try {
-        console.log('Fetching joined forums:', userId, limit, offset);
+        // console.log('Fetching joined forums:', userId, limit, offset);
 
         const { data, error } = await supabase.rpc('get_joined_forums', {
             uid: userId,
@@ -778,11 +778,11 @@ async function checkIfUsernameIsTaken({ newUsername }) {
 }
 
 const updateByUsername = async (username, updateFields) => {
-    console.log(
-        'Inside updateByUsername model function:',
-        username,
-        updateFields
-    );
+    // console.log(
+    //     'Inside updateByUsername model function:',
+    //     username,
+    //     updateFields
+    // );
     try {
         const { data, error } = await supabase
             .from('user_info')
@@ -794,10 +794,10 @@ const updateByUsername = async (username, updateFields) => {
             throw error;
         }
         if (data && data.length > 0) {
-            console.log(`User ${username} updated successfully.`);
+            // console.log(`User ${username} updated successfully.`);
             return { success: true, data: data[0] };
         } else {
-            console.log(`User ${username} not found or no changes made.`);
+            // console.log(`User ${username} not found or no changes made.`);
             return {
                 success: false,
                 message: 'User not found or no changes made.',

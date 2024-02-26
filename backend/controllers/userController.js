@@ -759,7 +759,7 @@ const userController = {
             newUsername,
         } = req.body;
         console.log(
-            "Inside updateUserProfile controller: Username: ",
+            "Inside updateUserProfile controller:\n", "Username: ",
             username
         );
         console.log("Full Name: ", full_name);

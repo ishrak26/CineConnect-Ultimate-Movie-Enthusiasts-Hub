@@ -15,12 +15,16 @@ import Head from 'next/head'
 
 // Validation schema
 const createSchema = (currentUsername) => {
-  return yup.object({ // Each field in the form will have corresponding validations defined within this object.
+  return yup.object({
     full_name: yup.string().required('Full name is required'),
-    image_url: yup.string().url('Must be a valid URL').required('Image URL is required'),
+    image_url: yup.string().url('Must be a valid URL'),
     gender: yup.string().oneOf(['male', 'female', 'other'], 'Invalid gender').required('Gender is required'),
     date_of_birth: yup.date().max(new Date(), 'Date of birth cannot be in the future').required('Date of birth is required'),
-    password: yup.string().min(8).matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, 'Password must contain at least 8 characters, one letter and one number').required('Password is required'),
+    password: yup.string()
+      .min(8, 'Password must be at least 8 characters long')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/, 'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character')
+      .required('Password is required'),
+    confirm_password: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match').required('Confirm password is required'),
     username: yup.string().test('is-unique', 'Username is already taken', async (username) => {
       // Check username availability. Adjust the URL as needed.
       try {
@@ -28,12 +32,12 @@ const createSchema = (currentUsername) => {
         if (username === currentUsername) {
           return true;
         }
-        const response = await fetch(`http://localhost:4000/v1/username/check`, {
+        const response = await fetch(`http://localhost:4000/v1/username/check?newUsername=${encodeURIComponent(username)}`, {
           method: "GET",
           headers: { 'Content-Type': 'application/json' },
         });
         const data = await response.json();
-        console.log('Response from the username check inside schema: ', data);
+        console.log('1. Response from the username check inside schema: ', data);
         return data.message === 'Username is available';
       } catch (error) {
         console.error('Error checking username availability:', error);
@@ -44,8 +48,10 @@ const createSchema = (currentUsername) => {
   }).required();
 };
 
+
 const EditProfile = ({ username, oldProfileData, cookie }) => {
   const schema = createSchema(username);
+  // console.log('Inside Edit Profile, client side, validation schema: ', schema)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -54,23 +60,27 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
     resolver: yupResolver(schema),
   });
 
-  console.log('oldProfileData inside the client side: ', oldProfileData);
+  // console.log('oldProfileData inside the client side: ', oldProfileData);
 
   useEffect(() => {
     if (oldProfileData) {
       setValue('full_name', oldProfileData.full_name);
-      setValue('image_url', oldProfileData.image_url);
-      setValue('gender', oldProfileData.gender);
-      console.log('oldProfileData.date_of_birth', oldProfileData.date_of_birth);
-      setValue('date_of_birth', oldProfileData.date_of_birth.split('T')[0]);
+      setValue('image_url', oldProfileData.image_url || '');
+      setValue('gender', oldProfileData.gender || '');
+      // console.log('oldProfileData.date_of_birth', oldProfileData.date_of_birth);
+      if(oldProfileData.date_of_birth !== null && oldProfileData.date_of_birth !== undefined)
+        setValue('date_of_birth', oldProfileData.date_of_birth.split('T')[0]);
       // Don't set password and username by default for security reasons
     }
   }, [setValue, oldProfileData]);
 
   const onSubmit = async (data) => {
-    console.log('Data submitted: ', data);
+    // console.log('2. Inside onSubmit, Data submitted: ', data);
     const dob = new Date(data.date_of_birth); // Example date
     dob.setMinutes(dob.getMinutes() - dob.getTimezoneOffset()); // Adjust for timezone
+    // const formattedDate1 = dob.getDate().toString().padStart(2, '0') + '/' +
+    //                   (dob.getMonth() + 1).toString().padStart(2, '0') + '/' +
+    //                   dob.getFullYear().toString();
     const formattedDate = dob.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
     setLoading(true);
     try {
@@ -84,11 +94,17 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
                 gender: data.gender,
                 date_of_birth: formattedDate,
                 password: data.password,
-                newUsername: username,
+                newUsername: data.username || username,
             })
         });
       console.log('Profile update requested successfully')
-      router.push(`/profile/${username}`); // Redirect to the profile page after successful update
+      console.log('New profile username: ', data.username);
+      if(data.username === '' || data.username === undefined || data.username === null) {
+        router.push(`/profile/${username}`); // Redirect to the profile page after successful update
+      }
+      else {
+        router.push(`/profile/${data.username}`); // Redirect to the profile page after successful update
+      }
     } catch (err) {
       console.error('Error updating profile:', err);
       setError('Failed to update profile.');
@@ -121,11 +137,11 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4">
           <label>Full Name
             <input {...register('full_name')} placeholder="Full Name" className="input"/>
-            <p>{errors.full_name?.message}</p>
+            <p style={{ color: 'red' }}>{errors.full_name?.message}</p>
           </label>
           <label>Image URL
             <input {...register('image_url')} placeholder="Image URL" className="input"/>
-            <p>{errors.image_url?.message}</p>
+            <p style={{ color: 'red' }}>{errors.image_url?.message}</p>
           </label>
           <label> Gender
             <select {...register('gender')} className="input">
@@ -133,20 +149,24 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
               <option value="female">Female</option>
               <option value="other">Other</option>
             </select>
-            <p>{errors.gender?.message}</p>
+            <p style={{ color: 'red' }}>{errors.gender?.message}</p>
           </label>
           <label>Date of Birth
             <input className="input" type="date" {...register('date_of_birth')} />
-            <p>{errors.date_of_birth?.message}</p>
+            <p style={{ color: 'red' }}>{errors.date_of_birth?.message}</p>
           </label>
           <label>Password
             <input type="password" {...register('password')} placeholder="Password" className="input" />
-            <p>{errors.password?.message}</p>
+            <p style={{ color: 'red' }}>{errors.password?.message}</p>
           </label>
-          {/* <label>Username
+          <label>Confirm Password
+            <input type="password" {...register('confirm_password')} placeholder="Confirm Password" className="input" />
+            <p style={{ color: 'red' }}>{errors.confirm_password?.message}</p>
+          </label>
+          <label>Username
             <input {...register('username')} placeholder="Username" className="input" />
-            <p>{errors.username?.message}</p>
-          </label> */}
+            <p style={{ color: 'red' }}>{errors.username?.message}</p>
+          </label>
           <button className={`${styles.btn}`} type="submit" disabled={loading}>Update Profile</button>
         </form>
       </div>
