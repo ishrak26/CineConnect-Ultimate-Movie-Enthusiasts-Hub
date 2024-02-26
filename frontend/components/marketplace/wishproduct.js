@@ -1,12 +1,11 @@
 import Link from "next/link";
 import React from "react";
 import NumberFormat from "react-number-format";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 // import { removeFromWishlist } from "../slices/wishlistSlice";
 import { motion } from "framer-motion";
 
 function WishProduct({ item, idx }) {
-  const dispatch = useDispatch();
   return (
     <div className="mb-4 overflow-hidden">
       <motion.div

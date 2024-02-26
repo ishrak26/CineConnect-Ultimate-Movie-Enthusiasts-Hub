@@ -327,7 +327,7 @@ const marketplaceController = {
 
             const { quantity } = req.body;
 
-            if (!quantity) {
+            if (quantity===null || quantity===undefined || quantity<0) {
                 return res.status(400).json({ message: 'Bad request' });
             }
 

@@ -544,7 +544,7 @@ const userController = {
           const id = req.params.id;
           const profileInfo = await db_user.fetchUserById({ id });
 
-          console.log('profileInfo:', profileInfo);
+          // console.log('profileInfo:', profileInfo);
           
           if(profileInfo) res.status(200).json({ profileInfo });
           else res.status(404).json({ message: 'User not found.' });
