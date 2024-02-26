@@ -87,7 +87,7 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
   const schema = createSchema(username)
   // console.log('Inside Edit Profile, client side, validation schema: ', schema)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setErrorState] = useState('')
   const [startDate, setStartDate] = useState(new Date())
   const router = useRouter()
 
@@ -97,6 +97,7 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
     handleSubmit,
     formState: { errors },
     setValue,
+    setError,
   } = useForm({
     resolver: yupResolver(schema),
   })
@@ -128,37 +129,57 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
     const formattedDate = dob.toISOString().split('T')[0] // Convert to YYYY-MM-DD format
     setLoading(true)
     try {
-      console.log('Data submitted: ', data)
 
-      const response = await fetch(
-        `http://localhost:4000/v1/profile/${username}/update-profile`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            full_name: data.full_name,
-            image_url: data.image_url,
-            gender: data.gender,
-            date_of_birth: formattedDate,
-            password: data.new_password,
-            newUsername: data.username || username,
-          }),
+      const { old_password } = data;
+
+      // Step 1: Call your backend endpoint to validate old_password
+      const response1 = await fetch(`http://localhost:4000/v1/auth/${username}/matchPassword/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: old_password }),
+      });
+      const result = await response1.json();
+
+      console.log('Data submitted: ', data)
+      if (response1.ok) {
+        const response = await fetch(
+          `http://localhost:4000/v1/profile/${username}/update-profile`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              full_name: data.full_name,
+              image_url: data.image_url,
+              gender: data.gender,
+              date_of_birth: formattedDate,
+              password: data.new_password,
+              newUsername: data.username || username,
+            }),
+          }
+        )
+        console.log('Profile update requested successfully')
+        console.log('New profile username: ', data.username)
+        if (
+          data.username === '' ||
+          data.username === undefined ||
+          data.username === null
+        ) {
+          router.push(`/profile/${username}`) // Redirect to the profile page after successful update
+        } else {
+          router.push(`/profile/${data.username}`) // Redirect to the profile page after successful update
         }
-      )
-      console.log('Profile update requested successfully')
-      console.log('New profile username: ', data.username)
-      if (
-        data.username === '' ||
-        data.username === undefined ||
-        data.username === null
-      ) {
-        router.push(`/profile/${username}`) // Redirect to the profile page after successful update
       } else {
-        router.push(`/profile/${data.username}`) // Redirect to the profile page after successful update
+          // Set a form error for old_password using setError from React Hook Form
+          setError('old_password', {
+            type: 'manual',
+            message: 'Password does not match the current password',
+          });
       }
     } catch (err) {
       console.error('Error updating profile:', err)
-      setError('Failed to update profile.')
+      setErrorState('Failed to update profile.')
     } finally {
       setLoading(false)
     }
@@ -238,6 +259,11 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
                 )}
               />
               <p style={{ color: 'red' }}>{errors.date_of_birth?.message}</p>
+            </label>
+            <label>
+              Old Password
+              <input type="password" {...register("old_password")} placeholder="Old Password" className="input"/>
+              {errors.old_password && <p style={{ color: 'red' }}>{errors.old_password.message}</p>}
             </label>
             <label>
               New Password
