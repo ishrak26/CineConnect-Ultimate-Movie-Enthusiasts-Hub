@@ -17,7 +17,7 @@ import Head from 'next/head'
 const createSchema = (currentUsername) => {
   return yup.object({
     full_name: yup.string().required('Full name is required'),
-    image_url: yup.string().url('Must be a valid URL').required('Image URL is required'),
+    image_url: yup.string().url('Must be a valid URL'),
     gender: yup.string().oneOf(['male', 'female', 'other'], 'Invalid gender').required('Gender is required'),
     date_of_birth: yup.date().max(new Date(), 'Date of birth cannot be in the future').required('Date of birth is required'),
     password: yup.string()
