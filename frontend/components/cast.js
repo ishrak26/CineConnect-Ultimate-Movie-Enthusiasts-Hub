@@ -5,11 +5,10 @@ export default function Cast({ casts }) {
   return (
     <ScrollContent className="space-x-4 pb-4">
       {casts.casts?.map((person) => (
-
         <Link
           // key={person.cast_id || person.credit_id}
           key={person.id}
-          href={`/cast/${person.id}`}
+          href={`/moviePerson/${person.id}`}
         >
           <div className="flex items-center">
             <div className="aspect-square relative w-16 shrink-0">

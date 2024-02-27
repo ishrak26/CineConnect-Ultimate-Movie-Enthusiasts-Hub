@@ -9,6 +9,9 @@ router.post('/:forumId/submit', postController.createNewForumPost); // **//
 // Route for joining a forum
 router.post('/:forumId/join', postController.joinNewForum); // **//
 
+// Route for leaving a forum
+router.delete('/:forumId/leave', postController.leaveForum); // **//
+
 // Route for checking if a user is member of a forum
 router.get('/:forumId/joined', postController.checkUserJoinedForum); // **//
 
@@ -51,8 +54,6 @@ router.get(
     postController.getReactionsByPostId
 ); // **//
 
-
-
 // Route for getting userId from request
 router.get('/user', postController.getUserId); // **//
 
@@ -62,5 +63,7 @@ router.get('/:forumId', postController.getForumById); // **//
 // Route to check if user voted to a post
 router.get('/:forumId/post/:postId/voted', postController.checkUserVotedPost); // **//
 
+// Route to get a signed-url for a post image
+router.post('/:forumId/submitImageUrl', postController.getPostImageUrl); // **//
 
 module.exports = router;

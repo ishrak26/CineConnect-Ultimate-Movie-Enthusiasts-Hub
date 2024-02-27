@@ -8,7 +8,7 @@ import Gallery from './gallery'
 import ScrollContent from './scroll-content'
 
 export default function Media({ videos, posters, backdrops }) {
-  const [tab, setTab] = useState('videos')
+  const [tab, setTab] = useState('posters')
 
   return (
     <div>
@@ -16,10 +16,10 @@ export default function Media({ videos, posters, backdrops }) {
       <Segmented
         callback={(val) => setTab(val)}
         segments={[
-          {
-            value: 'videos',
-            label: <Label label="Videos" count={videos.length} />,
-          },
+          // {
+          //   value: 'videos',
+          //   label: <Label label="Videos" count={videos.length} />,
+          // },
           {
             value: 'posters',
             label: <Label label="Posters" count={posters.length} />,
@@ -104,10 +104,10 @@ function Backdrops({ backdrops }) {
     <>
       <ScrollContent className="py-4 w-full gap-8">
         {backdrops.map((backdrop, index) => (
-          <div key={backdrop.file_path} className="aspect-video h-96">
+          <div key={index} className="aspect-video h-96">
             <img
               className="w-full h-full rounded-xl cursor-zoom-in"
-              src={`https://image.tmdb.org/t/p/w780${backdrop.file_path}`}
+              src={`${backdrop}`}
               width={780}
               height={240}
               alt="backdrop"
@@ -126,9 +126,9 @@ function Backdrops({ backdrops }) {
         }}
         setIsOpen={setIsOpen}
         images={backdrops.map((backdrop) => ({
-          src: `https://image.tmdb.org/t/p/original${backdrop.file_path}`,
-          w: backdrop.width,
-          h: backdrop.height,
+          src: `${backdrop}`,
+          w: 720,
+          h: 280,
         }))}
       />
     </>

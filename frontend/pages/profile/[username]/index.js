@@ -24,11 +24,12 @@ export default function Profile({ watchedMovies, watchlist, reviews, forums, cin
   // 1 - user's own profile, 2 - cinefellow, 3 - request sent by profileholder, 
   // 4 - request received from profileholder, 5 - non-cinefellow, 6 - unauthenticated
   // Assuming we have the user data for now as static content
+  // console.log('Inside Profile: forums', forums);
   const [profileOwnerState, setProfileOwnerState] = useState(userType);
   useEffect(() => {
     // Function to fetch updated profile information based on new state
     const fetchUpdatedProfileInfo = async () => {
-      console.log('Fetching updated profile information');
+      // console.log('Fetching updated profile information');
     };
 
     fetchUpdatedProfileInfo();
@@ -81,6 +82,10 @@ export default function Profile({ watchedMovies, watchlist, reviews, forums, cin
       </Typography>
     </Box>
   );
+
+  const handleEditProfile = () => {
+    router.push(`/profile/${user.username}/edit`);
+  }
 
   const handleUnfollow = async (user, fellow) => {
     console.log("Inside handleUnfollow, user:", user, "fellow:", fellow);
@@ -244,7 +249,7 @@ const handleWithdrawRequest = async (user, fellow) => {
                 <p className="text-gray-400 italic mt-4">{userData.bio}</p>
               </div>
               {profileOwnerState === 1 ? ( // If the user is the owner of the profile
-                <EditButton />
+                <EditButton onClick={() => handleEditProfile()}/>
               ) : profileOwnerState === 2 ? (  // If the user is a cinefellow of the profile owner
                 <RemoveCinefellowButton onClick={() => handleUnfollow(user, profileInfo)} />
               ) : profileOwnerState === 3 ? (  // If the user has been sent a request by the profile owner
@@ -284,7 +289,9 @@ const handleWithdrawRequest = async (user, fellow) => {
 
             {/* Discussion Forums Section */}
             <SectionHeader title="Discussion Forums"/>
-            <Row movies={forums} isMain={true} />
+            <div className={`${sectionMargin}`}>
+              <Row movies={forums.watchedMovies} isMain={true} />
+            </div>
 
             {/* cineFellows Section */}
             <SectionHeader title="Cinefellows"/>
@@ -343,17 +350,17 @@ export async function getServerSideProps(context) {
       fetchData(`http://localhost:4000/v1/profile/${username}/watched/`), 
       fetchData(`http://localhost:4000/v1/profile/${username}/cinefellows/`),
       fetchData(`http://localhost:4000/v1/profile/${username}/watchlist/`),
-      fetchData(`http://localhost:4000/v1/movies/`),  // dummy, will need to change to fetch top few reviews
-      fetchData(`http://localhost:4000/v1/movies/`),  // dummy, will need to change to fetch top forums
+      fetchData(`http://localhost:4000/v1/movies/`), // dummy, will need to change to fetch top few reviews
+      fetchData(`http://localhost:4000/v1/profile/${username}/watched/`), // dummy, will need to change to fetch top forums
       fetchData(`http://localhost:4000/v1/profile/${username}/identify-profile`),
       fetchData(`http://localhost:4000/v1/profile/${username}/`),
       fetchData(`http://localhost:4000/v1/profile/${username}/cinefellows/count/`), 
       fetchData(`http://localhost:4000/v1/auth/isLoggedIn`)
     ]);
     
-    console.log('user', user)
+    // console.log('user', user)
     // console.log('fellow', profileInfo)
-    console.log('usertype', userType)
+    // console.log('usertype', userType)
     // console.log('watchedMovies', watchedMovies)
     // console.log('cineFellows', cineFellows)
     // console.log('watchlist', watchlist)

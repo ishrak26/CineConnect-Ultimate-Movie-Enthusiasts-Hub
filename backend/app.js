@@ -47,7 +47,7 @@ app.use(cookieParser());
 // app.use('/', adminRouter);
 app.use(auth);
 app.use('/v1/auth/', authRouter);
-app.use('/v1/profile/', userRouter);
+app.use('/v1/', userRouter);
 app.use('/v1/forum/', postRouter);
 app.use('/v1/marketplace/', marketplaceRouter);
 app.use('/', movieRouter);

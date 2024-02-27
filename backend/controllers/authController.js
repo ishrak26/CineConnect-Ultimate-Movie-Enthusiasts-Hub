@@ -6,17 +6,17 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 const authController = {
     register: async (req, res) => {
-        console.log('req.body', req.body);
+        // console.log('req.body', req.body);
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log('errors', errors);
+            console.error('errors', errors);
             return res.status(422).send({ errors: errors.array() });
         }
 
         try {
             const { username, email, password, full_name } = req.body;
 
-            console.log('req.body', req.body);
+            // console.log('req.body', req.body);
 
             // check conflicts
             // check if email exists
@@ -34,7 +34,7 @@ const authController = {
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
-            console.log('hashedPassword', hashedPassword);
+            // console.log('hashedPassword', hashedPassword);
 
             const user = await userModel.createUser({
                 username,
@@ -61,13 +61,13 @@ const authController = {
             const user = await userModel.findOne({ username });
 
             if (!user) {
-                console.log('user not found');
+                console.error('user not found');
                 return res
                     .status(401)
                     .json({ errors: 'Username or password is incorrect' });
             }
 
-            console.log('user', user);
+            // console.log('user', user);
 
             // console.log('hashedPassword', hashedPassword);
             // console.log('user.password', user.password);
@@ -128,6 +128,35 @@ const authController = {
         } catch (err) {
             console.error(err);
             return res.status(500).json({ errors: err });
+        }
+    },
+
+    matchPassword: async (req, res) => {
+        const { username } = req.params;
+        const { password } = req.body; // Getting password from the request body
+    
+        try {
+            const { hashedPassword, error } = await userModel.getHashedPasswordByUsername(username);
+    
+            if (error) {
+                return res.status(500).json({ message: 'Internal server error' });
+            }
+    
+            if (!hashedPassword) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+    
+            // Compare provided password with hashed password
+            const isMatch = await bcrypt.compare(password, hashedPassword);
+    
+            if (isMatch) {
+                res.json({ message: 'Password matches' });
+            } else {
+                res.status(401).json({ message: 'Password does not match' });
+            }
+        } catch (error) {
+            console.error('Error in matchPassword controller:', error);
+            res.status(500).json({ message: 'Internal server error' });
         }
     },
 };

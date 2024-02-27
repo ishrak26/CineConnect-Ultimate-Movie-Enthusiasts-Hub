@@ -6,7 +6,7 @@ const moviesController = {
     getMovies: async (req, res) => {
         const limit = req.query.limit || 10; // Default limit to 10 if not specified
         const offset = req.query.offset || 0; // Default offset to 0 if not specified
-        console.log('user: ', req.user);
+        // console.log('user: ', req.user);
         try {
             const title = req.query.title || ''; // if title is not provided, use empty string
             const movies = await db_movie.fetchMoviesByTitle(
@@ -14,10 +14,10 @@ const moviesController = {
                 offset,
                 limit
             );
-            
+
             res.json(movies || []);
         } catch (error) {
-            console.log('in catch: ', error.message);
+            console.error('in catch: ', error.message);
             res.status(500).json({ message: error.message });
         }
     },
@@ -26,7 +26,7 @@ const moviesController = {
         try {
             // console.log(req.params);
             const movieId = req.params.movieId;
-            const movie = await db_movie.fetchMoviesById(movieId, req.user);
+            const movie = await db_movie.fetchMoviesById(movieId);
             if (movie && movie.length > 0) {
                 res.json(movie[0]);
             } else {
@@ -79,7 +79,7 @@ const moviesController = {
 
     getMoviePersonById: async (req, res) => {
         const moviePersonId = req.params.moviePersonId;
-        console.log(req.params);
+        // console.log(req.params);
         try {
             const moviePersonData = await db_movie.fetchMoviePersonsById(
                 moviePersonId
@@ -147,9 +147,9 @@ const moviesController = {
                 return res.status(403).json({ message: 'Unauthorized' });
             }
 
-            const userId = req.user.id; // Assuming user ID is available from request object
-            const movieId = req.params.movieId; // Extract movieId from request parameters
-            const rating = req.body.rating; // Extract movieId and rating from request body
+            const userId = req.user.id;
+            const movieId = req.params.movieId;
+            const rating = req.body.rating;
 
             const result = await db_movie.submitRating(userId, movieId, rating);
             if (!result) {
@@ -159,9 +159,9 @@ const moviesController = {
                 message: 'Rating submitted successfully',
             });
         } catch (error) {
+            console.error('Error submitting rating: ', error);
             res.status(500).json({
                 message: 'Internal server error',
-                error: error.message,
             });
         }
     },
@@ -184,12 +184,11 @@ const moviesController = {
             }
             res.status(200).json({
                 message: 'Rating updated successfully',
-                data: result,
             });
         } catch (error) {
+            console.error('Error in editing movie rating:', error);
             res.status(500).json({
                 message: 'Internal server error',
-                error: error.message,
             });
         }
     },
@@ -204,32 +203,29 @@ const moviesController = {
             const { movieId } = req.params; // Extract movieId from request parameters
 
             const result = await db_movie.deleteRating(userId, movieId);
-            if (result.length === 0) {
+            if (!result) {
                 return res
                     .status(404)
                     .json({ message: 'Rating not found or already deleted' });
             }
             res.status(200).json({
                 message: 'Rating deleted successfully',
-                data: result,
             });
         } catch (error) {
+            console.error('Error in deleteMovieRating:', error);
             res.status(500).json({
                 message: 'Internal server error',
-                error: error.message,
             });
         }
     },
 
     addToWatchlist: async (req, res) => {
-        // console.log(req.headers.authorization);
         if (!req.user) {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
         const movieId = req.params.movieId;
-
-        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
+        const userId = req.user.id;
 
         try {
             const result = await db_movie.addMovieToWatchlist(userId, movieId);
@@ -241,7 +237,8 @@ const moviesController = {
                 res.status(500).json({ message: 'Internal server error' });
             }
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            console.error('Error in addToWatchlist:', error.message);
+            res.status(500).json({ message: 'Internal server error' });
         }
     },
 
@@ -251,27 +248,25 @@ const moviesController = {
                 return res.status(403).json({ message: 'Unauthorized' });
             }
 
-            // Extract the movieId from the request parameters
             const movieId = req.params.movieId;
+            const userId = req.user.id;
 
-            const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
-
-            // Call the model function with the decoded user ID and movie ID
             const result = await db_movie.removeMovieFromWatchlist(
                 userId,
                 movieId
             );
 
-            if (result.error) {
-                return res.status(404).json({ message: result.error });
+            if (!result) {
+                return res.status(404).json({
+                    message: 'Movie previously not added to watchlist',
+                });
             }
-            return res.status(200).json({ message: result.message });
-        } catch (error) {
-            // Log the error and send a 500 response if an error occurred during the process
-            console.error('Error in removeFromWatchlist controller:', error);
             return res
-                .status(500)
-                .json({ message: 'Internal server error occurred' });
+                .status(200)
+                .json({ message: 'Movie successfully removed from watchlist' });
+        } catch (error) {
+            console.error('Error in removeFromWatchlist controller:', error);
+            return res.status(500).json({ message: 'Internal server error' });
         }
     },
 
@@ -281,32 +276,25 @@ const moviesController = {
         }
 
         const movieId = req.params.movieId;
-        const userId = req.user.id; 
+        const userId = req.user.id;
 
         try {
-            const alreadyWatched = await db_movie.isMovieInWatchedlist(
-                userId,
-                movieId
-            );
-            if (alreadyWatched.length === 1) {
-                return res
-                    .status(400)
-                    .json({ message: 'Movie already marked as watched' });
-            }
             const result = await db_movie.addMovieToWatchedlist(
                 userId,
                 movieId
             );
-            console.log('watched result', result);
             if (result) {
                 res.status(201).json({
                     message: 'Movie successfully added to watched-list',
                 });
             } else {
-                res.status(404).json({ message: 'Movie not found' });
+                res.status(404).json({
+                    message: 'Movie not found or previously marked as watched',
+                });
             }
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            console.error('Error in marking movie as watched:', error);
+            res.status(500).json({ message: 'Internal server error' });
         }
     },
 
@@ -316,7 +304,7 @@ const moviesController = {
         }
 
         const movieId = req.params.movieId;
-        const userId = req.user.id; // Assuming you have a way to get userId from the request
+        const userId = req.user.id;
 
         try {
             const result = await db_movie.removeMovieFromWatchedlist(
@@ -334,24 +322,8 @@ const moviesController = {
                 });
             }
         } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    },
-
-    getMovieAwards: async (req, res) => {
-        const movieId = req.params.movieId;
-
-        try {
-            const awardsData = await db_movie.fetchMovieAwards(movieId);
-            if (awardsData) {
-                res.status(200).json(awardsData);
-            } else {
-                res.status(404).json({
-                    message: 'No movie found for the provided movieId',
-                });
-            }
-        } catch (error) {
-            res.status(500).json({ message: error.message });
+            console.error('Error unmarking movie as watched:', error);
+            res.status(500).json({ message: 'Internal server error' });
         }
     },
 
@@ -488,22 +460,16 @@ const moviesController = {
         }
     },
 
-    getUserInfoForMovie: async (req, res) => {
-        if (!req.user) {
-            return res.status(200).json({ message: 'No user info found' });
-        }
-
-        const movieId = req.params.movieId; // Extract movieId from request parameters
-        const userId = req.user.id; // Assuming you have a way to get userId from the request (e.g., from a JWT token)
-
+    getUserWatchInfoForMovie: async (req, res) => {
         try {
-            const userInfo = await db_movie.fetchUserInfoForMovie(
-                userId,
-                movieId
+            const movieId = req.params.movieId;
+            const watchInfo = await db_movie.fetchMovieWatchDetails(
+                movieId,
+                req.user?.id
             );
 
-            if (userInfo) {
-                res.status(200).json(userInfo);
+            if (watchInfo) {
+                res.status(200).json(watchInfo);
             } else {
                 res.status(404).json({
                     message: 'No movie found for the provided movieId',
@@ -511,6 +477,101 @@ const moviesController = {
             }
         } catch (error) {
             console.error('Error in getUserInfoForMovie:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    searchAllTypes: async (req, res) => {
+        try {
+            const query = req.query.query; // Extract query from request query parameters
+            const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not specified
+            const offset = parseInt(req.query.offset) || 0; // Default offset to 0 if not specified
+            const searchResults = await db_movie.searchAllTypes(
+                query,
+                offset,
+                limit
+            );
+
+            const data = [];
+            searchResults.forEach((result) => {
+                const record = {
+                    id: result.id,
+                    type: result.record_type,
+                    imageUrl: result.image_url,
+                };
+                if (result.record_type === 'movie') {
+                    record.title = result.title_or_full_name;
+                    record.release_date = result.username_or_release_date;
+                } else if (result.record_type === 'movie_person') {
+                    record.type = 'moviePerson';
+                    record.name = result.title_or_full_name;
+                } else if (result.record_type === 'user') {
+                    record.username = result.username_or_release_date;
+                    record.name = result.title_or_full_name;
+                } else {
+                    throw error;
+                }
+                data.push(record);
+            });
+            // console.log('searchResults:', data);
+            res.status(200).json(data);
+        } catch (error) {
+            console.error('Error in searchAllTypes:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getMovieRating: async (req, res) => {
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+
+        try {
+            const rating = await db_movie.getMovieRatingInfo(
+                movieId,
+                req.user?.id
+            );
+            if (!rating) {
+                return res.status(500).json({
+                    message: 'Internal server error',
+                });
+            }
+
+            res.status(200).json(rating);
+        } catch (error) {
+            console.error('Error in getMovieRating:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getMovieImages: async (req, res) => {
+        const movieId = req.params.movieId; // Extract movieId from request parameters
+
+        try {
+            const limit = parseInt(req.query.limit) || 3;
+            const offset = parseInt(req.query.offset) || 0;
+            const images = await db_movie.fetchMovieImages(
+                movieId,
+                limit,
+                offset
+            );
+            console.log('In getMovieImages: images', images);
+            if (!images) {
+                return res.status(500).json({
+                    message: 'Internal server error',
+                });
+            }
+            const data = { posters: [], backdrops: [] };
+            for (let image of images) {
+                if (image.image_type === 'poster') {
+                    data.posters.push(image.image_url);
+                } else {
+                    data.backdrops.push(image.image_url);
+                }
+            }
+            console.log('In getMovieImages: data', data);
+
+            res.status(200).json({ images: data });
+        } catch (error) {
+            console.error('Error in getMovieRating:', error);
             res.status(500).json({ message: 'Internal server error' });
         }
     },
