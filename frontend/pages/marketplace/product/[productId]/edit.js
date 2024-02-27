@@ -5,6 +5,7 @@ import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
 import Head from 'next/head'
 import Search from '@components/marketplace/movieSearch'
+import { set } from 'react-nprogress'
 
 function ProductEdit({
   productId,
@@ -36,8 +37,9 @@ function ProductEdit({
 
   const [movieId, setMovieId] = useState('')
 
-  const [newImages, setNewImages] = useState([])
+  //   const [newImages, setNewImages] = useState([])
   const [existingImages, setExistingImages] = useState(dataImages)
+  const [files, setFiles] = useState([])
 
   useEffect(() => {
     setExistingImages(dataImages)
@@ -45,7 +47,16 @@ function ProductEdit({
 
   // Handle file selection
   const handleFileChange = (event) => {
-    setNewImages([...event.target.files])
+    // Create an array from the FileList
+    const newFiles = Array.from(event.target.files)
+    // Append new files to the existing list
+    setFiles((prevFiles) => [...prevFiles, ...newFiles])
+    // Clear the input after each selection
+    event.target.value = null
+  }
+
+  const removeFile = (index) => {
+    setFiles(files.filter((_, i) => i !== index))
   }
 
   // Handle existing image deletion
@@ -95,45 +106,75 @@ function ProductEdit({
     }
   }
 
+  const [shouldCallAPI, setShouldCallAPI] = useState(false)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const formData = new FormData()
-    Object.keys(product).forEach((key) => {
-      if (['sizes', 'colors', 'tags', 'features'].includes(key)) {
-        product[key].forEach((item) => formData.append(key + '[]', item))
-      } else if (key === 'images') {
-        product.images.forEach((image, index) =>
-          formData.append(`images[${index}]`, image)
-        )
-      } else {
-        formData.append(key, product[key])
-      }
-    })
 
-    try {
-      const response = await fetch(
-        'http://localhost:4000/v1/marketplace/product/' + productId,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(product),
-        }
-      )
+    // Prepare new images array
+    const newImages = existingImages.map((image) => ({
+      imageUrl: image.imageUrl,
+      caption: image.caption,
+    }))
 
-      //   console.log('product', product)
+    console.log('newImages', newImages)
 
-      if (response.ok) {
-        router.push(`/marketplace/product/` + productId)
-      } else {
-        console.error('Failed to upload product')
-      }
-    } catch (error) {
-      console.error('Error uploading product:', error)
-    }
+    // Update product state with new images
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      images: newImages,
+    }))
+
+    // Indicate that we're ready to make the API call
+    setShouldCallAPI(true)
   }
+
+  useEffect(() => {
+    if (!shouldCallAPI) return
+
+    const makeAPICall = async () => {
+      const formData = new FormData()
+
+      Object.keys(product).forEach((key) => {
+        if (['sizes', 'colors', 'tags', 'features'].includes(key)) {
+          product[key].forEach((item) => formData.append(`${key}[]`, item))
+        } else if (key !== 'images') {
+          formData.append(key, product[key])
+        }
+      })
+
+      product.images.forEach((image, index) => {
+        formData.append(`images[${index}][imageUrl]`, image.imageUrl)
+        formData.append(`images[${index}][caption]`, image.caption)
+      })
+
+      try {
+        const response = await fetch(
+          `http://localhost:4000/v1/marketplace/product/${productId}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(product),
+          }
+        )
+
+        if (response.ok) {
+          router.push(`/marketplace/product/${productId}`)
+        } else {
+          console.error('Failed to upload product')
+        }
+      } catch (error) {
+        console.error('Error uploading product:', error)
+      }
+
+      setShouldCallAPI(false)
+    }
+
+    makeAPICall()
+  }, [shouldCallAPI, product, productId])
 
   return (
     <div>
@@ -347,28 +388,66 @@ function ProductEdit({
             <div>
               <h2 className="my-5">Existing Images</h2>
 
-              {existingImages.map((image, index) => (
-                <div key={index}>
-                  <img
-                    src={image.imageUrl}
-                    alt={`Existing product`}
-                    style={{ width: '100px', height: '100px' }}
-                  />
-                  <button
-                    className="text-black-100 bg-primary-600 border border-cusblack py-1 text-xs w-24 rounded-lg"
-                    onClick={() => handleDeleteExistingImage(image)}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {existingImages.map((image, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
                   >
-                    Delete
+                    <img
+                      src={image.imageUrl}
+                      className="pb-2"
+                      alt={`Existing product`}
+                      style={{ width: '110px', height: '150px' }}
+                    />
+                    <button
+                      className="text-black-100 bg-primary-600 border border-cusblack py-2 text-xs w-24 rounded-lg"
+                      onClick={() => handleDeleteExistingImage(image)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="my-5">Upload New Images</h3>
+              <input type="file" onChange={handleFileChange} />
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {files.map((file, index) => (
+                <div key={index} style={{ textAlign: 'center' }}>
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="Preview"
+                    onLoad={() => URL.revokeObjectURL(file)} // Revoke URL to free memory
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      objectFit: 'cover',
+                    }}
+                  />
+                  <div>{file.name}</div>
+                  <button
+                    className="text-black-100 bg-primary-600 border border-cusblack py-2 text-xs w-24 rounded-lg"
+                    onClick={() => {
+                      URL.revokeObjectURL(file) // Revoke URL to free memory when file is removed
+                      removeFile(index)
+                    }}
+                  >
+                    Remove
                   </button>
                 </div>
               ))}
             </div>
-            <div>
-              <h3 className="my-5">Upload New Images</h3>
-              <input type="file" multiple onChange={handleFileChange} />
-            </div>
+
             <button className={`${styles.btn}`} type="submit">
-              Upload Product
+              Save Product
             </button>
           </form>
         </div>

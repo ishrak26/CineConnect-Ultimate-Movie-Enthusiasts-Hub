@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux'
 // import { recentCategory } from "../../slices/categorySlice";
 import Head from 'next/head'
 
+
 export async function getStaticProps() {
   //   const res = await fetch(process.env.NEXT_PUBLIC_APIURL + "/categories");
   const res = []
@@ -149,30 +150,33 @@ function Category({ data, dataItems, dataTypes }) {
 
   return (
     <>
+    
       <Head>
         <title>CineConnect | Shop</title>
       </Head>
-      <Layout categories={data} setSort={setSort} types={dataTypes}>
-        {!loading ? (
-          data_items.length < 1 ? (
-            <p className="col-span-full mx-auto text-sm text-gray-400">
-              No item found
-            </p>
+
+        <Layout categories={data} setSort={setSort} types={dataTypes}>
+          {!loading ? (
+            data_items.length < 1 ? (
+              <p className="col-span-full mx-auto text-sm text-gray-400">
+                No item found
+              </p>
+            ) : (
+              data_items.map((item) => (
+                <ProductCard key={item.slug} item={item} />
+              ))
+            )
           ) : (
-            data_items.map((item) => (
-              <ProductCard key={item.slug} item={item} />
-            ))
-          )
-        ) : (
-          <>
-            <CardSkeleton />
-            <CardSkeleton />
-            <CardSkeleton />
-            <CardSkeleton />
-            <CardSkeleton />
-          </>
-        )}
-      </Layout>
+            <>
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+            </>
+          )}
+        </Layout>
+
     </>
   )
 }
