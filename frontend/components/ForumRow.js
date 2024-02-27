@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { BiChevronLeftCircle, BiChevronRightCircle } from "react-icons/bi";
 import Container from "./Container";
 // import Card from "./card";
+import ForumCard from "./ForumCard";
 import dynamic from "next/dynamic";
 
 const Card = dynamic(() => import("./card"));
@@ -46,7 +47,7 @@ function ForumRow({ movies, title, isMain }) {
                                 <div className="flex items-center space-x-3 md:space-x-5">
                                     {movies?.map((movie) => (
 
-                                        <Card
+                                        <ForumCard
                                             className="w-40 md:w-48"
                                             key={movie.id}
                                             id={movie.id}
