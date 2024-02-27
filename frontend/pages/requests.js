@@ -116,7 +116,17 @@ const Requests = ({ User, initialRequests, pendingRequestCount, initialPage, tot
   return (
     <div>
       <Head>
-        <title>CineConnect</title>
+        <title>Pending Requests &mdash; CineConnect</title>
+        <meta
+          name="description"
+          content="Millions of movies, TV shows and people to discover. Explore now."
+        />
+        <meta
+          name="keywords"
+          content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
+        />
+
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </Head>
       <Navbar />
       <BaseLayout>
