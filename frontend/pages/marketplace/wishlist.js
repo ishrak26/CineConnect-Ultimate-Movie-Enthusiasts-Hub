@@ -13,7 +13,7 @@ function WishList({ username, cookie, offset }) {
 
     const limit = 9
     const response = await fetch(
-      `http://localhost:4000/v1/profile/${username}/product/wishlist?limit=${limit}&offset=${offset}`,
+      `http://localhost:4000/v1/${username}/product/wishlist?limit=${limit}&offset=${offset}`,
       {
         method: 'GET',
         headers: {

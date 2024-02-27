@@ -5,8 +5,18 @@ import SideCategory from './sidecategory'
 import TopCategory from './topcategory'
 import Search from './search'
 import BaseLayout from '@components/BaseLayout'
+import Breadcrumb from '@components/breadcrumb'
+import clsx from 'clsx'
 
-function Layout({ children, categories, types, setSort , setTag}) {
+function Layout({
+  children,
+  categories,
+  types,
+  setSort,
+  setTag,
+  movie,
+  isHome,
+}) {
   const [open, setOpen] = useState(false)
   const [grid, setGrid] = useState(4)
   const [sortOpen, setSortOpen] = useState(false)
@@ -33,20 +43,46 @@ function Layout({ children, categories, types, setSort , setTag}) {
         </svg>
       </button> */}
       <BaseLayout>
-        <div className="max-w-6xl mx-auto pt-24 md:px-0">
+        <div className="max-w-7xl mx-auto pt-24 md:px-0">
           {/* <TopCategory categories={categories} /> */}
           <Search />
+
           <div className="grid grid-cols-4 gap-x-6">
-            <div
-              onClick={() => setOpen(!open)}
-              className={`${
-                open ? `fixed` : `hidden`
-              } rounded-2xl lg:static lg:inline bg-grey-400 lg:bg-black bg-opacity-30 z-20 flex w-full justify-center place-items-center top-0 lg:p-4`}
-            >
-              <SideCategory typesData={types} setTag={setTag}/>
-            </div>
+            {!isHome && (
+              <div
+                onClick={() => setOpen(!open)}
+                className={`${
+                  open ? `fixed` : `hidden`
+                } rounded-2xl lg:static lg:inline bg-grey-400 lg:bg-black bg-opacity-30 z-20 flex w-full justify-center place-items-center top-0 lg:p-4`}
+              >
+                <SideCategory typesData={types} setTag={setTag} />
+              </div>
+            )}
+
             <div className="col-span-4 md:col-span-4 lg:col-span-3 flex flex-col py-4 mx-2 md:mx-0">
               <ShopCarousel />
+
+              <div className="my-5">
+                <Breadcrumb
+                  pages={[
+                    {
+                      href: '/',
+                      label: 'Home',
+                    },
+                    {
+                      href: '/marketplace',
+                      label: 'Marketplace',
+                    },
+                    {
+                      href: '##',
+                      label: movie,
+                    },
+                  ]}
+                />
+                {!isHome && <h1 className="heading-lg">{movie}</h1>}
+                {isHome && <h1 className="heading-lg">Select Your Movie</h1>}
+              </div>
+
               <div className="rounded-2xl overflow-hidden shadow-lg w-full bg-white mt-6 px-5 py-4">
                 <div className="mb-3">
                   <div className="flex justify-between place-items-center text-gray-600 text-sm relative">

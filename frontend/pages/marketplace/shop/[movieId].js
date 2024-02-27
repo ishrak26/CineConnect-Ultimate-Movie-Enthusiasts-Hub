@@ -21,6 +21,38 @@ function Category({
   const showToast = useCustomToast()
   const [tag, setTag] = useState('')
 
+  const [movie, setMovie] = useState('')
+  const [poster, setPoster] = useState([])
+
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/v1/movie/${movieId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(cookie ? { Cookie: cookie } : {}),
+            },
+            credentials: 'include',
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch movie')
+        }
+
+        const data = await response.json()
+        console.log('movie ', data)
+        setMovie(data)
+      } catch (error) {
+        showToast('Failed to fetch movie', 'error')
+      }
+    }
+
+    fetchMovie()
+  }, [movieId])
 
   const data_items = dataItems
     // .filter((item) => {
@@ -31,7 +63,6 @@ function Category({
     //   }
     // })
     .sort((a, b) => {
-
       if (sort === 2) {
         return a.price - b.price
       }
@@ -41,26 +72,43 @@ function Category({
       return true
     })
 
-
   return (
     <>
-      <Head> 
+      <Head>
         <title>CineConnect | Shop</title>
       </Head>
-      <Layout categories={data} setSort={setSort} types={dataTypes} setTag={setTag}>
-        {data_items ? (
-          data_items.map((item) => <ProductCard key={item.id} item={item} />)
-        ) : (
-          <p className="col-span-full mx-auto my-10 text-sm text-gray-400">
-            No item found
-          </p>
-        )}
-      </Layout>
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        className="mt-20"
-      />
+      {}
+      <div
+        style={{ display: 'flex', flexDirection: 'column', minHeight: '300vh' }}
+      >
+        <div style={{ flex: 1 }} className="my-10">
+          <Layout
+            categories={data}
+            setSort={setSort}
+            types={dataTypes}
+            setTag={setTag}
+            movie={movie.title}
+            isHome={false}
+          >
+            {data_items ? (
+              data_items.map((item) => (
+                <ProductCard key={item.id} item={item} />
+              ))
+            ) : (
+              <p className="col-span-full mx-auto my-10 text-sm text-gray-400">
+                No item found
+              </p>
+            )}
+          </Layout>
+        </div>
+        <div className="my-20">
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            className="mt-20"
+          />
+        </div>
+      </div>
     </>
   )
 }

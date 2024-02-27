@@ -53,7 +53,7 @@ function Header() {
 
   return (
     <nav className="w-full mx-auto fixed bg-cusgray z-30 py-2 md:px-0 duration-200">
-      <div className="navtop relative max-w-8xl mx-20 flex justify-between place-items-center py-1.5">
+      <div className="navtop relative max-w-7xl mx-20 flex justify-between place-items-center py-1.5">
         <div className="burger flex items-center">
           {/* <button onClick={handleOpen}>
             <svg
@@ -228,7 +228,10 @@ function Header() {
                 )}
 
                 {isLoggedIn && (
-                  <Link href="/marketplace/user/[username]/products" as={`/marketplace/user/${userInfo.username}/products`}>
+                  <Link
+                    href="/marketplace/user/[username]/products"
+                    as={`/marketplace/user/${userInfo.username}/products`}
+                  >
                     <div className="hover:bg-gray-800 flex items-center justify-end rounded-lg p-3 text-cusblack">
                       <svg
                         width="24"
