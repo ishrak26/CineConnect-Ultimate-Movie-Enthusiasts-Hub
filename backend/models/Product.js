@@ -29,7 +29,7 @@ async function fetchProductsByTagsAndMovies(
 
     // Call the stored procedure
     const { data, error } = await supabase.rpc(
-        'fetch_products_by_tags_movies_and_sort',
+        'fetch_products_by_tags_movies_and_sort_v2',
         {
             tag_names: tagNames,
             movie_titles: movieTitles,
