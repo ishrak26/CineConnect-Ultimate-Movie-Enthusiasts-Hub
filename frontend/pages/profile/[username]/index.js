@@ -1,4 +1,5 @@
 import React from 'react';
+import Head from 'next/head';
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
 import Sidebar from '@components/Sidebar';
@@ -232,6 +233,19 @@ const handleWithdrawRequest = async (user, fellow) => {
 
   return (
     <div>
+      <Head>
+        <title>Profile &mdash; CineConnect</title>
+        <meta
+          name="description"
+          content="Millions of movies, TV shows and people to discover. Explore now."
+        />
+        <meta
+          name="keywords"
+          content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
+        />
+
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+      </Head>
       <Navbar />
       <BaseLayout>
         <div className="container">
