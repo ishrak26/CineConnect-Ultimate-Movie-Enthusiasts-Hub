@@ -74,10 +74,10 @@ const createSchema = (currentUsername) => {
               }
             )
             const data = await response.json()
-            console.log(
-              '1. Response from the username check inside schema: ',
-              data
-            )
+            // console.log(
+            //   '1. Response from the username check inside schema: ',
+            //   data
+            // )
             return data.message === 'Username is available'
           } catch (error) {
             console.error('Error checking username availability:', error)
@@ -152,35 +152,39 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
           body: JSON.stringify({ password: old_password }),
         }
       )
-      const result = await response1.json()
 
       if (response1.ok) {
+        // const result = await response1.json()
         if (selectedFile) {
           const userId = oldProfileData.id // Retrieve this from your app's context or state
-          const filePath = `public/${selectedFile.name}`
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9)
+          const filePath = `public/${userId}/${selectedFile.name}`
+          const uniqueFileName = `${filePath}-${uniqueSuffix}`
+
           // console.log('filePath:', filePath)
           // console.log('selectedFile:', selectedFile)
 
           const { data: uploadData, error } = await supabase.storage
             .from('user_info')
-            .upload(filePath, selectedFile, {
-              cacheControl: '3600',
-              upsert: true,
-            })
+            .upload(uniqueFileName, selectedFile)
 
           if (error) {
             console.error('Error uploading file:', error)
-            return
+            throw error
           }
+
+          // console.log('uploadData', uploadData)
 
           // Assuming you have the URL, update your DB or state as necessary
           const { data: publicURL } = supabase.storage
             .from('user_info')
-            .getPublicUrl(filePath)
+            .getPublicUrl(uniqueFileName)
           // console.log('File uploaded:', publicURL)
           // Here you can proceed to update the user profile or perform other actions with the form data
           data.image_url = publicURL.publicUrl
         }
+
         const response = await fetch(
           `http://localhost:4000/v1/profile/${username}/update-profile`,
           {
@@ -196,8 +200,13 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
             }),
           }
         )
-        console.log('Profile update requested successfully')
-        console.log('New profile username: ', data.username)
+
+        if (!response.ok) {
+          throw new Error('Failed to update profile')
+        }
+
+        // console.log('Profile update requested successfully')
+        // console.log('New profile username: ', data.username)
         if (
           data.username === '' ||
           data.username === undefined ||
