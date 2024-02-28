@@ -144,7 +144,7 @@ function Category({
 }
 
 export async function getServerSideProps(context) {
-  const cookie = context.req.headers.cookie
+  // const cookie = context.req.headers.cookie
 
   // Helper function to fetch data
   async function fetchData(url, params) {
@@ -153,7 +153,7 @@ export async function getServerSideProps(context) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
+          // ...(cookie ? { Cookie: cookie } : {}),
         },
         credentials: 'include',
         ...params,
@@ -199,7 +199,7 @@ export async function getServerSideProps(context) {
       dataItems,
       dataTypes,
       totalPages,
-      cookie,
+      // cookie,
       currentPage,
     },
   }

@@ -7,6 +7,7 @@ import nookies from 'nookies'
 import { useRouter } from 'next/dist/client/router'
 import { destroyCookie } from 'nookies'
 import Logo from '../logo'
+// import { is } from 'immer/dist/internal'
 
 function Header() {
   const router = useRouter()
@@ -75,29 +76,31 @@ function Header() {
           </Link>
         </div>
         <div className="profile flex items-center place-items-center">
-          <Link href="/marketplace/product/upload">
-            <div className="w-8 relative flex items-center h-8 mr-1 rounded-full hover:bg-gray-500 active:bg-gray-300 cursor-pointer duration-200">
-              <svg
-                style={{ color: 'white' }}
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="currentColor"
-                class="bi bi-upload"
-                viewBox="0 0 16 16"
-              >
-                {' '}
-                <path
-                  d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"
-                  fill="white"
-                ></path>{' '}
-                <path
-                  d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"
-                  fill="white"
-                ></path>{' '}
-              </svg>
-            </div>
-          </Link>
+          {isLoggedIn && (
+            <Link href="/marketplace/product/upload">
+              <div className="w-8 relative flex items-center h-8 mr-1 rounded-full hover:bg-gray-500 active:bg-gray-300 cursor-pointer duration-200">
+                <svg
+                  style={{ color: 'white' }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="currentColor"
+                  class="bi bi-upload"
+                  viewBox="0 0 16 16"
+                >
+                  {' '}
+                  <path
+                    d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"
+                    fill="white"
+                  ></path>{' '}
+                  <path
+                    d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"
+                    fill="white"
+                  ></path>{' '}
+                </svg>
+              </div>
+            </Link>
+          )}
           <Link href="/marketplace/shop">
             <div className="w-8 relative flex items-center h-8 mr-1 rounded-full hover:bg-gray-500 active:bg-gray-300 cursor-pointer duration-200">
               <svg
@@ -145,34 +148,36 @@ function Header() {
               ""
             )}
           </div> */}
-          <Link href="/marketplace/wishlist">
-            <div className="w-8 relative flex items-center h-8 mr-1 rounded-full hover:bg-gray-500 active:bg-gray-300 cursor-pointer duration-200">
-              <svg
-                className="w-6 m-auto h-6 text-cusblack"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-              {wish.length > 0 ? (
-                <div
-                  className={`flex
-                absolute text-xs font-light justify-center text-white text-center w-4 h-4 bg-cusblack rounded-full bottom-0 right-0`}
+          {isLoggedIn && (
+            <Link href="/marketplace/wishlist">
+              <div className="w-8 relative flex items-center h-8 mr-1 rounded-full hover:bg-gray-500 active:bg-gray-300 cursor-pointer duration-200">
+                <svg
+                  className="w-6 m-auto h-6 text-cusblack"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  {wish.length}
-                </div>
-              ) : (
-                ''
-              )}
-            </div>
-          </Link>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
+                {wish.length > 0 ? (
+                  <div
+                    className={`flex
+                absolute text-xs font-light justify-center text-white text-center w-4 h-4 bg-cusblack rounded-full bottom-0 right-0`}
+                  >
+                    {wish.length}
+                  </div>
+                ) : (
+                  ''
+                )}
+              </div>
+            </Link>
+          )}
 
           {/* {cookie && (
             <div
