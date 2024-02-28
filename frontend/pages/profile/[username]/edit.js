@@ -154,15 +154,17 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
       )
       const result = await response1.json()
 
-      console.log('Data submitted: ', data)
       if (response1.ok) {
         if (selectedFile) {
           const userId = oldProfileData.id // Retrieve this from your app's context or state
-          const filePath = `${selectedFile.name}`
+          const filePath = `public/${selectedFile.name}`
+          // console.log('filePath:', filePath)
+          // console.log('selectedFile:', selectedFile)
 
-          const { data, error } = await supabase.storage
+          const { data: uploadData, error } = await supabase.storage
             .from('user_info')
             .upload(filePath, selectedFile, {
+              cacheControl: '3600',
               upsert: true,
             })
 
@@ -172,12 +174,12 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
           }
 
           // Assuming you have the URL, update your DB or state as necessary
-          const { publicURL } = supabase.storage
+          const { data: publicURL } = supabase.storage
             .from('user_info')
             .getPublicUrl(filePath)
-          console.log('File uploaded:', publicURL)
+          // console.log('File uploaded:', publicURL)
           // Here you can proceed to update the user profile or perform other actions with the form data
-          data.image_url = publicURL
+          data.image_url = publicURL.publicUrl
         }
         const response = await fetch(
           `http://localhost:4000/v1/profile/${username}/update-profile`,
