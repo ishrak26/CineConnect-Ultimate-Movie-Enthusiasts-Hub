@@ -708,6 +708,8 @@ const getProfileDetails = async ({ username }) => {
 };
 
 async function fetchUserById({ id }) {
+
+    // console.log('In fetchUserById', id);
     const { data, error } = await supabase
         .from('user_info')
         .select('id, username, role, image_url')
@@ -723,8 +725,30 @@ async function fetchUserById({ id }) {
     }
 
     return data[0];
-};
+}
 
+async function fetchProductWishlist(userId, limit, offset) {
+    const { data, error } = await supabase
+        .from('user_wishes_product')
+        .select(
+            `
+                product_id,
+                product:product_id (
+                    name,
+                    price,
+                    thumbnail_url
+                )
+            `
+        )
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false }) // Sorting by created_at in descending order
+        .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+
+    // console.log('Returning from fetchProductWishlist:', data);
+    return data;
+}
 async function fetchUserPhotoById({ id }) {
     const { data, error } = await supabase
         .from('user_info')
@@ -857,9 +881,9 @@ module.exports = {
     removeFromWatchlist,
     searchProfilesByUsername,
     fetchJoinedForums,
-
     getProfileDetails,
     fetchUserById,
+    fetchProductWishlist,
     fetchUserPhotoById,
     fetchUserProfileForUpdate,
     checkIfUsernameIsTaken,

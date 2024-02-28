@@ -66,6 +66,9 @@ router.get("/profile/:username/watched", userController.getWatchedMovies);
 // Route to get watchlist by username
 router.get("/profile/:username/watchlist", userController.getWatchlist);
 
+// Route to get product wishlist by username
+router.get('/:username/product/wishlist', userController.getWishlist);
+
 // Route for searching profiles by username
 router.get(
     "/profile/:username/search",

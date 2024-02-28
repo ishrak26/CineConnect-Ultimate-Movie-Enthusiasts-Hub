@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import CardSkeleton from '@/components/marketplace/cardskeleton'
 import Layout from '@/components/marketplace/layout'
-import MovieCard from '@/components/marketplace/moviecard'
+import ProductCard from '@/components/marketplace/productcard'
 // import { recentCategory } from '../../slices/categorySlice'
 import Head from 'next/head'
 import useCustomToast from '@/hooks/useCustomToast'
 import Pagination from '@components/pagination'
-import { tr } from 'date-fns/locale'
 
 function Category({
+  movieId,
   data,
   dataItems,
   dataTypes,
@@ -20,6 +20,39 @@ function Category({
   const [sort, setSort] = useState(0)
   const showToast = useCustomToast()
   const [tag, setTag] = useState('')
+
+  const [movie, setMovie] = useState('')
+  const [poster, setPoster] = useState([])
+
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/v1/movie/${movieId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(cookie ? { Cookie: cookie } : {}),
+            },
+            credentials: 'include',
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch movie')
+        }
+
+        const data = await response.json()
+        console.log('movie ', data)
+        setMovie(data)
+      } catch (error) {
+        showToast('Failed to fetch movie', 'error')
+      }
+    }
+
+    fetchMovie()
+  }, [movieId])
 
   const data_items = dataItems
     // .filter((item) => {
@@ -46,7 +79,7 @@ function Category({
       </Head>
       {}
       <div
-        style={{ display: 'flex', flexDirection: 'column', minHeight: '250vh' }}
+        style={{ display: 'flex', flexDirection: 'column', minHeight: '300vh' }}
       >
         <div style={{ flex: 1 }} className="my-10">
           <Layout
@@ -54,11 +87,12 @@ function Category({
             setSort={setSort}
             types={dataTypes}
             setTag={setTag}
-            isHome={true}
+            movie={movie.title}
+            isHome={false}
           >
             {data_items ? (
               data_items.map((item) => (
-                <MovieCard key={item.id} item={item} />
+                <ProductCard key={item.id} item={item} />
               ))
             ) : (
               <p className="col-span-full mx-auto my-10 text-sm text-gray-400">
@@ -109,14 +143,18 @@ export async function getServerSideProps(context) {
     }
   }
 
-  const limit = 12
+  const movieId = context.params.movieId
+
+  const limit = 9
   const offset = (context.query.page - 1) * limit || 0
 
   const dataItems = await fetchData(
-    `http://localhost:4000/v1/movies?limit=${limit}&offset=${offset}`
+    `http://localhost:4000/v1/marketplace/movie/${movieId}/products?limit=${limit}&offset=${offset}`
   )
 
-  const totalItems = await fetchData(`http://localhost:4000/v1/movies/count`)
+  const totalItems = await fetchData(
+    `http://localhost:4000/v1/marketplace/movie/${movieId}/products/count`
+  )
 
   const data = await fetchData('http://localhost:4000/v1/marketplace/tags')
   const dataTypes = data
@@ -126,6 +164,7 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
+      movieId,
       data,
       dataItems,
       dataTypes,

@@ -224,6 +224,7 @@ const marketplaceController = {
     getProductImages: async (req, res) => {
         try {
             const productId = req.params.id;
+            console.log(productId);
             const limit = parseInt(req.query.limit) || 5;
             const offset = parseInt(req.query.offset) || 0;
             const images = await dbProduct.fetchProductImages(
@@ -307,6 +308,109 @@ const marketplaceController = {
         }
     },
 
+    editProduct: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+
+            const owner_id = await dbProduct.fetchProductOwner(productId);
+            if (!owner_id) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+            if (owner_id !== userId) {
+                return res.status(403).json({ message: 'Forbidden' });
+            }
+
+            const {
+                name, // string
+                price, // numeric
+                category, // string
+                sizes, // array of strings
+                colors, // array of strings
+                availableQty, // numeric
+                thumbnailUrl, // string
+                movieId, // uuid (string)
+                tags, // array of strings
+                features, // array of strings
+                images, // array of objects, each having imageUrl and caption
+            } = req.body;
+
+            if (
+                !name ||
+                !price ||
+                !category ||
+                !availableQty ||
+                !thumbnailUrl ||
+                !movieId ||
+                !tags ||
+                !features
+            ) {
+                return res.status(400).json({ message: 'Bad request' });
+            }
+
+            const product = {
+                id: productId,
+                name,
+                price,
+                ownerId: userId,
+                sizes: sizes ? sizes : [],
+                colors: colors ? colors : [],
+                category,
+                availableQty,
+                thumbnailUrl,
+                movieId,
+                tags,
+                features,
+                images: images ? images : [],
+            };
+
+            const productIdNew = await dbProduct.updateProduct(product);
+            if (productId !== productIdNew) {
+                return res
+                    .status(500)
+                    .json({ message: 'Could not update product' });
+            }
+            res.status(201).json({ success: true });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    deleteProduct: async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const productId = req.params.id;
+            const userId = req.user.id;
+
+            const owner_id = await dbProduct.fetchProductOwner(productId);
+            if (!owner_id) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+            if (owner_id !== userId) {
+                return res.status(403).json({ message: 'Forbidden' });
+            }
+
+            const deleted = await dbProduct.deleteProduct(productId);
+            if (!deleted) {
+                return res
+                    .status(500)
+                    .json({ message: 'Internal server error' });
+            }
+            res.status(200).json({ success: true });
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     updateProductQuantity: async (req, res) => {
         try {
             if (!req.user) {
@@ -326,7 +430,7 @@ const marketplaceController = {
 
             const { quantity } = req.body;
 
-            if (!quantity) {
+            if (quantity===null || quantity===undefined || quantity<0) {
                 return res.status(400).json({ message: 'Bad request' });
             }
 

@@ -112,7 +112,7 @@ const authController = {
                 return res.status(200).json({ loggedIn: false });
             }
             const userInfo = await userModel.fetchUserById({ id: req.user.id });
-            console.log('userInfo', userInfo);
+
             if (!userInfo) {
                 return res.status(200).json({ loggedIn: false });
             }
