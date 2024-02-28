@@ -273,10 +273,10 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
               <p style={{ color: 'red' }}>{errors.full_name?.message}</p>
             </label>
             <label>
-              Image URL
+              Profile Picture
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg, image/png"
                 onChange={handleImageFileChange}
                 className="input"
               />
