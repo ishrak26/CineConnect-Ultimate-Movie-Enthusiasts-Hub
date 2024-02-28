@@ -12,7 +12,7 @@ import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
 import Head from 'next/head'
 // import '../../../styles/editProfile.css';
-// import { supabase } from '../utils/supabaseClient';
+import supabase from '../../../utils/supabaseClient'
 
 // Validation schema
 const createSchema = (currentUsername) => {
@@ -20,7 +20,7 @@ const createSchema = (currentUsername) => {
   return yup
     .object({
       full_name: yup.string().required('Full name is required'),
-      image_url: yup.string().url('Must be a valid URL'),
+      // image_url: yup.string().url('Must be a valid URL'),
       gender: yup
         .string()
         .oneOf(['male', 'female', 'other'], 'Invalid gender')
@@ -29,26 +29,32 @@ const createSchema = (currentUsername) => {
         .date()
         .max(new Date(), 'Date of birth cannot be in the future')
         .required('Date of birth is required'),
-      new_password: yup.string().test(
-        'password',
-        'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character',
-        value => !value || /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/.test(value)
-      ),
-        
+      new_password: yup
+        .string()
+        .test(
+          'password',
+          'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character',
+          (value) =>
+            !value ||
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/.test(value)
+        ),
+
       // confirm_password: yup.string().when('password', {
       //   is: val => val && val.length > 0, // only when the password has a positive length
       //   then: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match').required('Confirm password is required'),
       //   otherwise: yup.string().notRequired(),
       // }),
-      confirm_password: yup.string().test(
-        'confirm-password',
-        'Confirm Password must match the New Password',
-        function(value) {
-          // Only apply validation if confirm_password is not empty
-          return !value || value === this.parent.new_password;
-        }
-      ),
-      
+      confirm_password: yup
+        .string()
+        .test(
+          'confirm-password',
+          'Confirm Password must match the New Password',
+          function (value) {
+            // Only apply validation if confirm_password is not empty
+            return !value || value === this.parent.new_password
+          }
+        ),
+
       username: yup
         .string()
         .test('is-unique', 'Username is already taken', async (username) => {
@@ -68,10 +74,10 @@ const createSchema = (currentUsername) => {
               }
             )
             const data = await response.json()
-            console.log(
-              '1. Response from the username check inside schema: ',
-              data
-            )
+            // console.log(
+            //   '1. Response from the username check inside schema: ',
+            //   data
+            // )
             return data.message === 'Username is available'
           } catch (error) {
             console.error('Error checking username availability:', error)
@@ -89,6 +95,9 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
   const [loading, setLoading] = useState(false)
   const [error, setErrorState] = useState('')
   const [startDate, setStartDate] = useState(new Date())
+
+  const [selectedFile, setSelectedFile] = useState(null)
+
   const router = useRouter()
 
   const {
@@ -120,7 +129,7 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
   }, [setValue, oldProfileData])
 
   const onSubmit = async (data) => {
-    console.log('Inside onSubmit, Data submitted: ', data)
+    // console.log('Inside onSubmit, Data submitted: ', data)
     const dob = new Date(data.date_of_birth) // Example date
     dob.setMinutes(dob.getMinutes() - dob.getTimezoneOffset()) // Adjust for timezone
     // const formattedDate1 = dob.getDate().toString().padStart(2, '0') + '/' +
@@ -128,22 +137,54 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
     //                   dob.getFullYear().toString();
     const formattedDate = dob.toISOString().split('T')[0] // Convert to YYYY-MM-DD format
     setLoading(true)
-    try {
 
-      const { old_password } = data;
+    try {
+      const { old_password } = data
 
       // Step 1: Call your backend endpoint to validate old_password
-      const response1 = await fetch(`http://localhost:4000/v1/auth/${username}/matchPassword/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password: old_password }),
-      });
-      const result = await response1.json();
+      const response1 = await fetch(
+        `http://localhost:4000/v1/auth/${username}/matchPassword/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password: old_password }),
+        }
+      )
 
-      console.log('Data submitted: ', data)
       if (response1.ok) {
+        // const result = await response1.json()
+        if (selectedFile) {
+          const userId = oldProfileData.id // Retrieve this from your app's context or state
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9)
+          const filePath = `public/${userId}/${selectedFile.name}`
+          const uniqueFileName = `${filePath}-${uniqueSuffix}`
+
+          // console.log('filePath:', filePath)
+          // console.log('selectedFile:', selectedFile)
+
+          const { data: uploadData, error } = await supabase.storage
+            .from('user_info')
+            .upload(uniqueFileName, selectedFile)
+
+          if (error) {
+            console.error('Error uploading file:', error)
+            throw error
+          }
+
+          // console.log('uploadData', uploadData)
+
+          // Assuming you have the URL, update your DB or state as necessary
+          const { data: publicURL } = supabase.storage
+            .from('user_info')
+            .getPublicUrl(uniqueFileName)
+          // console.log('File uploaded:', publicURL)
+          // Here you can proceed to update the user profile or perform other actions with the form data
+          data.image_url = publicURL.publicUrl
+        }
+
         const response = await fetch(
           `http://localhost:4000/v1/profile/${username}/update-profile`,
           {
@@ -159,8 +200,13 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
             }),
           }
         )
-        console.log('Profile update requested successfully')
-        console.log('New profile username: ', data.username)
+
+        if (!response.ok) {
+          throw new Error('Failed to update profile')
+        }
+
+        // console.log('Profile update requested successfully')
+        // console.log('New profile username: ', data.username)
         if (
           data.username === '' ||
           data.username === undefined ||
@@ -171,17 +217,24 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
           router.push(`/profile/${data.username}`) // Redirect to the profile page after successful update
         }
       } else {
-          // Set a form error for old_password using setError from React Hook Form
-          setError('old_password', {
-            type: 'manual',
-            message: 'Password does not match the current password',
-          });
+        // Set a form error for old_password using setError from React Hook Form
+        setError('old_password', {
+          type: 'manual',
+          message: 'Password does not match the current password',
+        })
       }
     } catch (err) {
       console.error('Error updating profile:', err)
       setErrorState('Failed to update profile.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleImageFileChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      setSelectedFile(file) // Store the file in state for later
     }
   }
 
@@ -220,10 +273,11 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
               <p style={{ color: 'red' }}>{errors.full_name?.message}</p>
             </label>
             <label>
-              Image URL
+              Profile Picture
               <input
-                {...register('image_url')}
-                placeholder="Image URL"
+                type="file"
+                accept="image/jpeg, image/png"
+                onChange={handleImageFileChange}
                 className="input"
               />
               <p style={{ color: 'red' }}>{errors.image_url?.message}</p>
@@ -262,8 +316,15 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
             </label>
             <label>
               Old Password
-              <input type="password" {...register("old_password")} placeholder="Old Password" className="input"/>
-              {errors.old_password && <p style={{ color: 'red' }}>{errors.old_password.message}</p>}
+              <input
+                type="password"
+                {...register('old_password')}
+                placeholder="Old Password"
+                className="input"
+              />
+              {errors.old_password && (
+                <p style={{ color: 'red' }}>{errors.old_password.message}</p>
+              )}
             </label>
             <label>
               New Password

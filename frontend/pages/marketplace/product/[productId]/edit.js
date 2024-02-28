@@ -7,6 +7,8 @@ import Head from 'next/head'
 import Search from '@components/marketplace/movieSearch'
 import { set } from 'react-nprogress'
 
+import supabase from '../../../../utils/supabaseClient'
+
 function ProductEdit({
   productId,
   dataItem,
@@ -40,6 +42,7 @@ function ProductEdit({
   //   const [newImages, setNewImages] = useState([])
   const [existingImages, setExistingImages] = useState(dataImages)
   const [files, setFiles] = useState([])
+  const [thumbnailFile, setThumbnailFile] = useState(null)
 
   useEffect(() => {
     setExistingImages(dataImages)
@@ -106,6 +109,13 @@ function ProductEdit({
     }
   }
 
+  const handleThumbnailFileChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      setThumbnailFile(file) // Store the file in state for later
+    }
+  }
+
   const [shouldCallAPI, setShouldCallAPI] = useState(false)
 
   const handleSubmit = async (e) => {
@@ -117,7 +127,62 @@ function ProductEdit({
       caption: image.caption,
     }))
 
-    console.log('newImages', newImages)
+    // console.log('newImages', newImages)
+
+    // Upload thumbnail image
+    if (thumbnailFile) {
+      const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+      const filePath = `public/${product.movieId}/${uniquePrefix}-${thumbnailFile.name}`
+
+      // console.log('filePath:', filePath)
+      // console.log('selectedFile:', selectedFile)
+
+      const { data: uploadData, error } = await supabase.storage
+        .from('marketplace')
+        .upload(filePath, thumbnailFile)
+
+      if (error) {
+        console.error('Error uploading file:', error)
+        throw error
+      }
+
+      // console.log('uploadData', uploadData)
+
+      // Assuming you have the URL, update your DB or state as necessary
+      const { data: publicURL } = supabase.storage
+        .from('marketplace')
+        .getPublicUrl(filePath)
+      // console.log('File uploaded:', publicURL)
+      // Here you can proceed to update the user profile or perform other actions with the form data
+      product.thumbnailUrl = publicURL.publicUrl
+    }
+
+    // console.log('files.length', files.length)
+
+    // Upload new images
+    if (files.length > 0) {
+      for (let file of files) {
+        const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+        const filePath = `public/${product.movieId}/${uniquePrefix}-${file.name}`
+        const { data: uploadData, error } = await supabase.storage
+          .from('marketplace')
+          .upload(filePath, file)
+
+        if (error) {
+          console.error('Error uploading file:', file.name, error)
+          throw error
+        }
+
+        const { data: publicURL } = supabase.storage
+          .from('marketplace')
+          .getPublicUrl(filePath)
+
+        newImages.push({
+          imageUrl: publicURL.publicUrl,
+          caption: '',
+        })
+      }
+    }
 
     // Update product state with new images
     setProduct((prevProduct) => ({
@@ -341,13 +406,12 @@ function ProductEdit({
               />
             </label>
             <label>
-              Thumbnail URL
+              Thumbnail
               <input
-                type="text"
-                name="thumbnailUrl"
-                required
-                value={product.thumbnailUrl}
-                onChange={handleChange}
+                type="file"
+                accept="image/jpeg, image/png"
+                required={!product.thumbnailUrl}
+                onChange={handleThumbnailFileChange}
                 className="input my-5"
               />
             </label>

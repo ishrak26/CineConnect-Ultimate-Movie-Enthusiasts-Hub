@@ -609,15 +609,15 @@ async function searchAllTypes(searchText, offset, limit) {
 }
 
 const fetchMovieImages = async (movieId, limit, offset) => {
-    const { data, error } = await supabase
-        .from('movie_has_images')
-        .select('image_url, image_type')
-        .eq('movie_id', movieId)
-        .range(offset, offset + limit - 1);
+    const { data, error } = await supabase.rpc('fetch_images_per_type', {
+        mid: movieId,
+        image_limit: limit,
+        image_offset: offset,
+    });
 
     if (error) {
-        console.error('Error fetching movie images by movie id', error);
-        return null;
+        console.error('Error fetching movie images:', error);
+        throw error;
     }
 
     return data;
