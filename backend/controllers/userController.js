@@ -819,6 +819,30 @@ const userController = {
             res.status(500).send({ message: "Error updating user profile" });
         }
     },
+
+    // Controller function to get the list of movies whose discussion forums the user has joined
+    getJoinedForumsByUser: async (req, res) => {
+        const userId = req.user.id;
+        // console.log("User Id inside controller function getJoinedForumsByUser: ", userId);
+        if (!userId) {
+            return res.status(400).send({ message: "User ID is required" });
+        }
+    
+        try {
+            // console.log("Inside controller funtion getJoinedForumsByUser: TRY BLOCK");
+            const forums = await db_user.getJoinedForumsByUserId(userId);
+            console.log("Inside controller funtion getJoinedForumsByUser, after calling model function getJoinedForumsByUserId: forums -->", forums);
+
+            if (forums && forums.movies.length > 0) {
+                res.status(200).send(forums);
+            } else {
+                res.status(404).send({ message: "No forums joined by the user" });
+            }
+        } catch (error) {
+            console.error("Error fetching joined forums:", error);
+            res.status(500).send({ message: "Error fetching joined forums" });
+        }
+    },
 };
 
 module.exports = userController;
