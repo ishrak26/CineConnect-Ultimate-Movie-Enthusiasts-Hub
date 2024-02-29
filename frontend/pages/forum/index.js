@@ -1,267 +1,206 @@
-import CreatePostLink from "@components/forum/CreatePostLink";
-import PersonalHome from "@components/forum/PersonalHome";
-import Recommendations from "@components/forum/Recommendations";
-import PageContent from "@components/forum/PageContent";
-import PostLoader from "@components/forum/PostLoader";
-import PostItem from "@components/forum/PostItem";
-import { Stack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { ChakraProvider } from "@chakra-ui/react";
-import { theme } from "@theme/theme";
-import Navbar from "@components/navbar";
-import BaseLayout from "@components/BaseLayout";
+import ForumItem from '@/components/forum/ForumItem'
+import PersonalHome from '@/components/forum/PersonalHome'
+import PageContent from '@/components/forum/PageContent'
+import ForumLoader from '@/components/forum/ForumLoader'
+// import useForumData from "@/hooks/useForumData";
+import useCustomToast from '@/hooks/useCustomToast'
+import { Button, Flex, Stack } from '@chakra-ui/react'
+// import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
 import Head from 'next/head'
+import { ChakraProvider } from '@chakra-ui/react'
+import { theme } from '@theme/theme'
+import Navbar from '@components/navbar'
+import BaseLayout from '@components/BaseLayout'
+import ForumHeader from '@components/forum/ForumHeader'
 
+// Displays the forums page with the top 5 communities.
+// Pressing the "See More" button will display the next 5 communities.
+const Forums = ({ user, cookie }) => {
+  // const { communityStateValue, onJoinOrLeaveCommunity } = useCommunityData();
+  const [loading, setLoading] = useState(false)
+  const [forums, setForums] = useState([])
+  const router = useRouter()
+  const showToast = useCustomToast()
 
-export default function Home() {
-
-  const [loading, setLoading] = useState(false);
-//   const { communityStateValue } = useCommunity();
-  const { communityStateValue } = [];
-//   const { setPostStateValue, postStateValue, onSelectPost, onVote, onDeletePost } = usePosts();
-//   const showToast = useCustomToast();
-// const { setPostStateValue, postStateValue, onSelectPost, onVote, onDeletePost } = [];
-
-let posts = {
-  id: 1,
-  title: "Post Title",
-  body: "Post Body",
-  creatorId: 1,
-  communityId: 1,
-  voteStatus: 1,  
-}
-
-const postStateValue = {
-// create some mock data for postStateValue
-  posts: [posts],
-  postVotes: [],
-};
-
-const onSelectPost = () => {}
-
-const onVote = () => {}
-
-const onDeletePost = () => {}
-
-  const user = {
-    uid: 1,
-  }
-  
-
-  const buildUserHomeFeed = async () => {
-    setLoading(true);
-
+  // Gets the top 5 communities with the most members.
+  const getForums = async (numberOfExtraPosts) => {
+    setLoading(true)
     try {
-      if (communityStateValue.mySnippets.length) {
-        const myCommunityIds = communityStateValue.mySnippets.map(
-          (snippet) => snippet.communityId
-        ); // get all community ids that the user is a member of
-        const postQuery = query(
-          collection(firestore, "posts"),
-          where("communityId", "in", myCommunityIds),
-          // orderBy("voteStatus", "desc"),
-          limit(10)
-        ); // get all posts in community with certain requirements
-        const postDocs = await getDocs(postQuery);
-        const posts = postDocs.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })); // get all posts in community
+      const forumsResponse = await fetch(
+        `http://localhost:4000/v1/profile/${user.username}/forums?limit=${
+          5 + numberOfExtraPosts
+        }`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
 
-        setPostStateValue((prev) => ({
-          ...prev,
-          posts: posts,
-        })); // set posts in state
-      } else {
-        buildGenericHomeFeed();
-      }
+      const forumsData = await forumsResponse.json()
+      // console.log('forumsData', forumsData)
+      setForums(forumsData)
     } catch (error) {
-        console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const buildGenericHomeFeed = async () => {
-    setLoading(true);
-    try {
-      const postQuery = query(
-        collection(firestore, "posts"),
-        orderBy("voteStatus", "desc"),
-        limit(10)
-      ); // get all posts in community with certain requirements
-
-      const postDocs = await getDocs(postQuery); // get all posts in community
-      const posts = postDocs.docs.map((doc) => ({ id: doc.id, ...doc.data() })); // get all posts in community
-      setPostStateValue((prev) => ({
-        ...prev,
-        posts: posts,
-      })); // set posts in state
-    } catch (error) {
-      console.log("Error: buildGenericHomeFeed", error);
       showToast({
-        title: "Could not Build Home Feed",
-        description: "There was an error while building your home feed",
-        status: "error",
-      });
+        title: 'Could not Find Forums',
+        description: 'There was an error getting forums. Please try again.',
+        status: 'error',
+      })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const getUserPostVotes = async () => {
-    try {
-        const postIds = postStateValue.posts.map((post) => post.id); // get all post ids in home feed
-        const postVotesQuery = query(
-          collection(firestore, `users/${user?.uid}/postVotes`),
-          where("postId", "in", postIds)
-        ); // get all post votes for posts in home feed
-        const postVoteDocs = await getDocs(postVotesQuery);
-        const postVotes = postVoteDocs.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })); // get all post votes for posts in home feed
-  
-        setPostStateValue((prev) => ({
-          ...prev,
-          postVotes: postVotes,
-        })); // set post votes in state
-      } catch (error) {
-        console.log("Error: getUserPostVotes", error);
-        showToast({
-          title: "Could not Get Post Votes",
-          description: "There was an error while getting your post votes",
-          status: "error",
-        });
-      }
-  };
-
-  // useEffect(() => {
-  //   if (communityStateValue.mySnippets) {
-  //       buildUserHomeFeed();
-  //     }
-  // }, [communityStateValue.snippetFetched]);
-
-  // useEffect(() => {
-  //   if (!user && !loadingUser) {
-  //       buildGenericHomeFeed();
-  //     }
-  // }, [user, loadingUser]);
-
-  // useEffect(() => {
-  //   if (user && postStateValue.posts.length) {
-  //       getUserPostVotes();
-  
-  //       return () => {
-  //         setPostStateValue((prev) => ({
-  //           ...prev,
-  //           postVotes: [],
-  //         }));
-  //       };
-  //     }
-  // }, [user, postStateValue.posts]);
+  useEffect(() => {
+    getForums(0)
+  }, [])
 
   return (
-    
-    <ChakraProvider theme={theme}>
-     <Head>
-        <title>Forums &mdash; CineConnect</title>
-        <meta
-          name="description"
-          content="Millions of movies, TV shows and people to discover. Explore now."
-        />
-        <meta
-          name="keywords"
-          content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
-        />
+    <>
+      <ChakraProvider theme={theme}>
+        <Head>
+          <title>Forums &mdash; CineConnect</title>
+          <meta
+            name="description"
+            content="Millions of movies, TV shows and people to discover. Explore now."
+          />
+          <meta
+            name="keywords"
+            content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
+          />
 
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-      </Head>
+          <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        </Head>
 
-      <Navbar />
-     <BaseLayout> 
-    <PageContent>
-      <>
-        <CreatePostLink />
-        {loading ? (
-          <PostLoader />
-        ) : (
-          <Stack spacing={3}>
-            {postStateValue.posts.map((post) => (
-              <PostItem
-                key={post.id}
-                post={post}
-                onSelectPost={onSelectPost}
-                onDeletePost={onDeletePost}
-                onVote={onVote}
-                userVoteValue={
-                  postStateValue.postVotes.find((item) => item.postId === post.id)?.voteValue
-                }
-                userIsCreator={user?.uid === post.creatorId}
-                showCommunityImage={true}
-              />
-            ))}
-          </Stack>
-        )}
-      </>
-      <Stack spacing={2}>
-        <Recommendations />
-        <PersonalHome />
-      </Stack>
-    </PageContent>
-    </BaseLayout>
-    </ChakraProvider>
-  );
+        <Navbar />
+        <BaseLayout>
+          <PageContent>
+            <>
+              <Stack direction="column" borderRadius={10} spacing={3}>
+                {loading ? (
+                  <Stack mt={2} p={3}>
+                    {Array(5)
+                      .fill(0)
+                      .map((_, index) => (
+                        <ForumLoader key={index} />
+                      ))}
+                  </Stack>
+                ) : (
+                  <>
+                    {forums &&
+                      forums.forums?.map((forum, index) => {
+                        // const isJoined = !!communityStateValue.mySnippets.find(
+                        //   (snippet) => snippet.communityId === community.id
+                        // );
+                        return (
+                          <ForumItem
+                            key={index}
+                            Forum={forum}
+                            // isJoined={isJoined}
+                            // onJoinOrLeaveCommunity={onJoinOrLeaveCommunity}
+                          />
+                        )
+                      })}
+                  </>
+                )}
+                <Flex
+                  p="10px 20px"
+                  alignContent="center"
+                  justifyContent="center"
+                >
+                  <Button
+                    height="34px"
+                    width="200px"
+                    onClick={() => {
+                      getForums(5)
+                    }}
+                    shadow="md"
+                    isLoading={loading}
+                  >
+                    View More
+                  </Button>
+                </Flex>
+              </Stack>
+            </>
+            <Stack spacing={2}>
+              <PersonalHome />
+            </Stack>
+            <></>
+          </PageContent>
+        </BaseLayout>
+      </ChakraProvider>
+    </>
+  )
 }
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps(context) {
+  const cookie = context.req.headers.cookie
 
-  let response
-  const limit = 9
-  const offset = (query.page - 1) * limit || 0
-
-  if (query.with_genres) {
-    response = await fetch(
-      `http://localhost:4000/v1/genre/${query.with_genres}/movies?limit=${limit}&offset=${offset}`
-    ).then((res) => res.json())
-  } else {
-    response = await fetch(
-      `http://localhost:4000/v1/movies?limit=${limit}&offset=${offset}`
-    ).then((res) => res.json())
-  }
-
-  if (response.status === 404) {
-    return {
-      notFound: true,
+  // Helper function to fetch data
+  async function fetchData(url, params) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+        ...params,
+      })
+      return await response.json()
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return { notFound: true }
+      }
+      return { error: error.message }
     }
   }
 
-  if (response.success === false) {
+  try {
+    const limit = 9
+    const offset = (context.query.page - 1) * limit || 0
+
+    // const response = await fetchData(`http://localhost:4000/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`)
+    // const members = await fetchData(`http://localhost:4000/v1/forum/${forumId}/totalMembers`)
+    // const user = await fetchData(`http://localhost:4000/v1/forum/user`)
+    // const ForumAbout = await fetchData(`http://localhost:4000/v1/forum/${forumId}`)
+
+    const user = await fetchData(`http://localhost:4000/v1/auth/isLoggedIn`)
+
+    // if (response.status === 404) {
+    //   return {
+    //     notFound: true,
+    //   }
+    // }
+
+    // if (response.success === false) {
+    //   return {
+    //     props: {
+    //       error: {
+    //         statusCode: response.status,
+    //         statusMessage: response.errors[0] || response.status_message,
+    //       },
+    //     },
+    //   }
+    // }
+
     return {
       props: {
-        error: {
-          statusCode: response.status,
-          statusMessage: response.errors[0] || response.status_message,
-        },
+        user: user.user,
+        cookie: cookie,
+        //   query,
       },
     }
-  }
-
-  // const { data: genresData } = await tmdb.get('/genre/movie/list')
-  const genres = await fetch(`http://localhost:4000/v1/genres`).then((res) =>
-    res.json()
-  )
-
-  const totalMovies = await fetch(`http://localhost:4000/v1/movies/count`).then(
-    (res) => res.json()
-  )
-
-  return {
-    props: {
-      data: response,
-      genres: genres,
-      query,
-      totalMovies: totalMovies.count,
-    },
+  } catch (error) {
+    console.log('Error: getServerSideProps', error)
+    return { props: {} }
   }
 }
+
+export default Forums
