@@ -301,7 +301,7 @@ const marketplaceController = {
                     .status(500)
                     .json({ message: 'Internal server error' });
             }
-            res.status(201).json({ success: true });
+            res.status(201).json({ success: true, productId });
         } catch (error) {
             console.error(error.message);
             res.status(500).json({ message: 'Internal server error' });
@@ -430,7 +430,7 @@ const marketplaceController = {
 
             const { quantity } = req.body;
 
-            if (quantity===null || quantity===undefined || quantity<0) {
+            if (quantity === null || quantity === undefined || quantity < 0) {
                 return res.status(400).json({ message: 'Bad request' });
             }
 
