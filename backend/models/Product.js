@@ -27,15 +27,21 @@ async function fetchProductsByTagsAndMovies(
   const movieTitles = movies.length > 0 ? movies : null;
   const sortTypeUsed = sortType || "name_asc";
 
-  // Call the stored procedure
-  const { data, error } = await supabase.rpc(
-    "fetch_products_by_tags_movies_and_sort_v2",
-    {
-      tag_names: tagNames,
-      movie_titles: movieTitles,
-      limit_val: limit,
-      offset_val: offset,
-      sort_type: sortTypeUsed,
+    // Call the stored procedure
+    const { data, error } = await supabase.rpc(
+        'fetch_products_by_tags_movies_and_sort_v2',
+        {
+            tag_names: tagNames,
+            movie_titles: movieTitles,
+            limit_val: limit,
+            offset_val: offset,
+            sort_type: sortTypeUsed,
+        }
+    );
+
+    if (error) {
+        console.error('Error fetching products:', error.message);
+        throw error;
     }
   );
 
@@ -118,6 +124,25 @@ async function fetchProductTags(productId, limit, offset) {
   // const tags = data.map((tag) => tag.tag_name);
   // console.log('Returning from fetchProductTags:', data);
   return data;
+}
+
+async function fetchProductTagsByMovieId(movieId, limit, offset) {
+    const { data, error } = await supabase.rpc(
+        'fetch_distinct_tags_for_movie',
+        {
+            mid: movieId,
+            limit_val: limit,
+            offset_val: offset,
+        }
+    );
+
+    if (error) {
+        console.error('Error fetching product tags by movie id:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchProductTagsByMovieId:', data);
+    return data;
 }
 
 async function isAddedToWishlist(productId, userId) {
@@ -383,25 +408,26 @@ async function updateRating(productId, userId, rating) {
 }
 
 module.exports = {
-  fetchAllTags,
-  fetchProductsByTagsAndMovies,
-  getProductRatingInfo,
-  fetchProductDetails,
-  fetchProductFeatures,
-  fetchProductTags,
-  isAddedToWishlist,
-  addProductToWishlist,
-  removeProductFromWishlist,
-  fetchProductImages,
-  createNewProduct,
-  updateProductQuantity,
-  fetchProductOwner,
-  fetchTotalProductCountByMovieId,
-  fetchTotalProductCountByUsername,
-  fetchProductsByMovieId,
-  fetchProductsByUsername,
-  rateProduct,
-  updateRating,
-  updateProduct,
-  deleteProduct,
+    fetchAllTags,
+    fetchProductsByTagsAndMovies,
+    getProductRatingInfo,
+    fetchProductDetails,
+    fetchProductFeatures,
+    fetchProductTags,
+    isAddedToWishlist,
+    addProductToWishlist,
+    removeProductFromWishlist,
+    fetchProductImages,
+    createNewProduct,
+    updateProductQuantity,
+    fetchProductOwner,
+    fetchTotalProductCountByMovieId,
+    fetchTotalProductCountByUsername,
+    fetchProductsByMovieId,
+    fetchProductsByUsername,
+    rateProduct,
+    updateRating,
+    updateProduct,
+    deleteProduct,
+    fetchProductTagsByMovieId,
 };

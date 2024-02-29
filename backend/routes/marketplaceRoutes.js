@@ -162,6 +162,18 @@ router.get(
     See the response format in the snippet from marketplaceController.getProductsByMovie
 */
 
+// Route to get all tags of the products under a movie
+router.get(
+    '/movie/:movieId/products/tags',
+    marketplaceController.getTagsByMovie
+); // **//
+
+/*
+    Returns an array of strings (tags) as response
+    ['tag1', 'tag2', 'tag3']
+
+*/
+
 // Route for getting total product count by username
 router.get(
     '/user/:username/products/count',
