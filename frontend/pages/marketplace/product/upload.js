@@ -6,7 +6,7 @@ import BaseLayout from '@components/BaseLayout'
 import Head from 'next/head'
 import Search from '@components/marketplace/movieSearch'
 
-import supabase from '../../../utils/supabase'
+import supabase from '../../../utils/supabaseClient'
 
 function ProductUpload() {
   const [product, setProduct] = useState({
@@ -89,8 +89,8 @@ function ProductUpload() {
 
     // Check if at least one tag is added
     if (tags.length === 0) {
-      alert("Please add at least one tag.");
-      return; 
+      alert('Please add at least one tag.')
+      return
     }
 
     const formData = new FormData()
@@ -134,7 +134,37 @@ function ProductUpload() {
       product.thumbnailUrl = publicURL.publicUrl
     }
 
+    const newImages = []
+
+    // Upload new images
+    if (product.images.length > 0) {
+      for (let file of product.images) {
+        const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+        const filePath = `public/${product.movieId}/${uniquePrefix}-${file.name}`
+        const { data: uploadData, error } = await supabase.storage
+          .from('marketplace')
+          .upload(filePath, file)
+
+        if (error) {
+          console.error('Error uploading file:', file.name, error)
+          throw error
+        }
+
+        const { data: publicURL } = supabase.storage
+          .from('marketplace')
+          .getPublicUrl(filePath)
+
+        newImages.push({
+          imageUrl: publicURL.publicUrl,
+          caption: '',
+        })
+      }
+      product.images = newImages
+    }
+
     try {
+      // console.log('product', product)
+
       const response = await fetch(
         'http://localhost:4000/v1/marketplace/product',
         {
@@ -146,8 +176,6 @@ function ProductUpload() {
           body: JSON.stringify(product),
         }
       )
-
-      console.log('product', product)
 
       if (response.ok) {
         const { productId } = await response.json()
@@ -327,11 +355,10 @@ function ProductUpload() {
             <label>
               Thumbnail
               <input
-                type="text"
-                name="thumbnailUrl"
+                type="file"
+                accept="image/jpeg, image/png"
                 required
-                value={product.thumbnailUrl}
-                onChange={handleChange}
+                onChange={handleThumbnailFileChange}
                 className="input my-5"
               />
             </label>
@@ -365,6 +392,7 @@ function ProductUpload() {
               <input
                 type="file"
                 name="images"
+                accept="image/jpeg, image/png"
                 multiple
                 onChange={handleChange}
                 className="input my-5"

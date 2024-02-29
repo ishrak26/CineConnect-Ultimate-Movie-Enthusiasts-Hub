@@ -480,7 +480,12 @@ function ProductEdit({
             </div>
             <div>
               <h3 className="my-5">Upload New Images</h3>
-              <input type="file" onChange={handleFileChange} />
+              <input
+                type="file"
+                accept="image/jpeg, image/png"
+                multiple
+                onChange={handleFileChange}
+              />
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
@@ -566,7 +571,7 @@ export async function getServerSideProps(context) {
     `http://localhost:4000/v1/marketplace/product/${productId}/tags`
   )
 
-  console.log('dataItem', dataItem)
+  // console.log('dataItem', dataItem)
 
   return {
     props: {

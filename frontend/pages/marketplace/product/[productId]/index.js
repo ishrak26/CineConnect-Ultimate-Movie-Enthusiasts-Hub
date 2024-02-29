@@ -442,7 +442,7 @@ export default function Product({
 
                   {dataItem?.sizes && (
                     <div className="sizes text-base text-gray-400">
-                      <p className="mb-2">Select size</p>
+                      <p className="mb-2">Sizes</p>
                       <div className="flex">
                         {dataItem.sizes?.map((size, idx) => (
                           <button
