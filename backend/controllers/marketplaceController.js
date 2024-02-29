@@ -498,6 +498,7 @@ const marketplaceController = {
                     name: product.name, // string
                     price: product.price, // numeric
                     thumbnailUrl: product.thumbnail_url, // string
+                    avgRating: product.average_rating, // numeric
                 });
             }
             res.status(200).json(data);
