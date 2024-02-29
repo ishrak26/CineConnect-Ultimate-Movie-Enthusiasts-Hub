@@ -23,6 +23,28 @@ const marketplaceController = {
         }
     },
 
+    getTagsByMovie: async (req, res) => {
+        try {
+            const movieId = req.params.movieId;
+            const limit = parseInt(req.query.limit) || 10;
+            const offset = parseInt(req.query.offset) || 0;
+            const tags = await dbProduct.fetchProductTagsByMovieId(
+                movieId,
+                limit,
+                offset
+            );
+            const data = [];
+            for (let tag_name of tags) {
+                data.push(tag_name.tag_name);
+            }
+
+            res.status(200).json(data);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     getAllProducts: async (req, res) => {
         try {
             const limit = parseInt(req.query.limit) || 10;

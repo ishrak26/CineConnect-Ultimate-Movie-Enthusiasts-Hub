@@ -120,6 +120,25 @@ async function fetchProductTags(productId, limit, offset) {
     return data;
 }
 
+async function fetchProductTagsByMovieId(movieId, limit, offset) {
+    const { data, error } = await supabase.rpc(
+        'fetch_distinct_tags_for_movie',
+        {
+            mid: movieId,
+            limit_val: limit,
+            offset_val: offset,
+        }
+    );
+
+    if (error) {
+        console.error('Error fetching product tags by movie id:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchProductTagsByMovieId:', data);
+    return data;
+}
+
 async function isAddedToWishlist(productId, userId) {
     const { data, error } = await supabase
         .from('user_wishes_product')
@@ -410,4 +429,5 @@ module.exports = {
     updateRating,
     updateProduct,
     deleteProduct,
+    fetchProductTagsByMovieId,
 };
