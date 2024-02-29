@@ -7,6 +7,8 @@ import ProductCard from '@/components/marketplace/productcard'
 import Head from 'next/head'
 import useCustomToast from '@/hooks/useCustomToast'
 import Pagination from '@components/pagination'
+import { set } from 'react-nprogress'
+import { da } from 'date-fns/locale'
 
 function Category({
   movieId,
@@ -22,9 +24,10 @@ function Category({
   const [tag, setTag] = useState('')
 
   const [movie, setMovie] = useState('')
-  const [poster, setPoster] = useState([])
+  const [filteredDataItems, setFilteredDataItems] = useState(dataItems)
 
   useEffect(() => {
+    console.log('Tag ', tag)
     const fetchMovie = async () => {
       try {
         const response = await fetch(
@@ -44,17 +47,44 @@ function Category({
         }
 
         const data = await response.json()
-        console.log('movie ', data)
         setMovie(data)
       } catch (error) {
         showToast('Failed to fetch movie', 'error')
       }
     }
 
-    fetchMovie()
-  }, [movieId])
+    const fetchProductsByTag = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/v1/marketplace/products?tag=${tag}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(cookie ? { Cookie: cookie } : {}),
+            },
+            credentials: 'include',
+          }
+        )
 
-  const data_items = dataItems
+        if (!response.ok) {
+          throw new Error('Failed to fetch products by tag')
+        }
+
+        const data = await response.json()
+        console.log('Data ', data)
+        setFilteredDataItems(data)
+      } catch (error) {
+        showToast('Failed to fetch products by tag', 'error')
+      }
+    }
+
+    fetchMovie()
+
+    if (tag) fetchProductsByTag()
+  }, [tag, movieId])
+
+  const data_items = filteredDataItems
     // .filter((item) => {
     //   if (recent_category.length > 0) {
     //     return item.type.name == recent_category
@@ -114,7 +144,7 @@ function Category({
 }
 
 export async function getServerSideProps(context) {
-  const cookie = context.req.headers.cookie
+  // const cookie = context.req.headers.cookie
 
   // Helper function to fetch data
   async function fetchData(url, params) {
@@ -123,7 +153,7 @@ export async function getServerSideProps(context) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
+          // ...(cookie ? { Cookie: cookie } : {}),
         },
         credentials: 'include',
         ...params,
@@ -169,7 +199,7 @@ export async function getServerSideProps(context) {
       dataItems,
       dataTypes,
       totalPages,
-      cookie,
+      // cookie,
       currentPage,
     },
   }

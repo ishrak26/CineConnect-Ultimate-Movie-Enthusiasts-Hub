@@ -184,6 +184,31 @@ export default function Product({
       // console.log('loggedIn', loggedIn)
       // console.log('userInfo', userInfo)
     }
+
+    const getOwner = async (ownerId) => {
+      const response = await fetch(
+        `http://localhost:4000/v1/profile/${ownerId}/profile`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+
+      if (response.ok) {
+        const data = await response.json()
+        // console.log('data.profileInfo', data.profileInfo)
+        setOwner(data.profileInfo.username)
+        return data.profileInfo
+      }
+
+      return null
+    }
+
+    getOwner(dataItem?.owner.id)
     getUserRating()
     // console.log('userRated', userRated, 'userRating', userRating)
   }, [userRating, avgRating, reviewCount, isAdded])
@@ -229,29 +254,6 @@ export default function Product({
     } catch (err) {
       console.log(err)
     }
-  }
-
-  const getOwner = async (ownerId) => {
-    const response = await fetch(
-      `http://localhost:4000/v1/profile/${ownerId}/profile`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
-        },
-        credentials: 'include',
-      }
-    )
-
-    if (response.ok) {
-      const data = await response.json()
-      // console.log('data.profileInfo', data.profileInfo)
-      setOwner(data.profileInfo.username)
-      return data.profileInfo
-    }
-
-    return null
   }
 
   return (
@@ -336,7 +338,7 @@ export default function Product({
                     {dataItem?.productName}
                   </h1>
 
-                  {dataItem?.owner.id !== user?.id && (
+                  {user && dataItem?.owner.id !== user?.id && (
                     <SetRating
                       onRating={handleRating}
                       defaultRating={userRating}
@@ -353,7 +355,7 @@ export default function Product({
 
                   <p className="py-2 text-base text-gray-400">Designed By </p>
                   <p className="font-semibold text-lg text-cusblack pb-4">
-                    {getOwner(dataItem?.owner.id) ? owner : 'Unknown'}
+                    {owner}
                   </p>
 
                   <p className="py-2 text-base text-gray-400">Price:</p>
@@ -369,7 +371,7 @@ export default function Product({
                       {stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}
                     </div>
                     <div className="px-10">
-                      {dataItem?.owner.id === user?.id && (
+                      {user && dataItem?.owner.id === user?.id && (
                         <div className="flex items-center ml-4">
                           <button
                             onClick={decrementStock}
@@ -459,7 +461,7 @@ export default function Product({
                     </div>
                   )}
                   <div className="buttoncart flex mt-5 w-full">
-                    {dataItem?.owner.id !== user?.id && (
+                    {user && dataItem?.owner.id !== user?.id && (
                       <button
                         onClick={handleClick}
                         className="w-4/5 md:w-3/5 bg-primary-600 overflow-hidden py-4 text-black-100 rounded-lg text-sm active:bg-primary-900 duration-100 hover:bg-primary-700"
@@ -484,7 +486,7 @@ export default function Product({
                       </button>
                     )}
 
-                    {dataItem?.owner.id === user?.id && (
+                    {user && dataItem?.owner.id === user?.id && (
                       <button
                         onClick={handleEditClick}
                         className="mr-2 w-4/5 md:w-3/5 bg-primary-600 overflow-hidden py-4 text-black-100 rounded-lg text-sm active:bg-primary-900 duration-100 hover:bg-primary-700"
@@ -515,7 +517,7 @@ export default function Product({
                       </button>
                     )}
 
-                    {dataItem?.owner.id === user?.id && (
+                    {user && dataItem?.owner.id === user?.id && (
                       <button
                         onClick={handleDeleteClick}
                         className="mr-2 w-4/5 md:w-3/5 bg-red-600 overflow-hidden py-4 text-black-100 rounded-lg text-sm active:bg-red-900 duration-100 hover:bg-red-700"
@@ -569,7 +571,7 @@ export default function Product({
 }
 
 export async function getServerSideProps(context) {
-  const cookie = context.req.headers.cookie
+  // const cookie = context.req.headers.cookie
 
   // Helper function to fetch data
   async function fetchData(url, params) {
@@ -578,7 +580,7 @@ export async function getServerSideProps(context) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
+          // ...(cookie ? { Cookie: cookie } : {}),
         },
         credentials: 'include',
         ...params,
@@ -600,6 +602,8 @@ export async function getServerSideProps(context) {
 
   const productId = context.params.productId
 
+  const cookie = ''
+
   const dataItem = await fetchData(
     `http://localhost:4000/v1/marketplace/product/${productId}`
   )
@@ -613,8 +617,6 @@ export async function getServerSideProps(context) {
   const dataTags = await fetchData(
     `http://localhost:4000/v1/marketplace/product/${productId}/tags`
   )
-
-  console.log('dataItem', dataItem)
 
   return {
     props: {

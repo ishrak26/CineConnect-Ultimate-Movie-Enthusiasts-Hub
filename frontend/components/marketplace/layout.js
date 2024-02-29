@@ -45,7 +45,9 @@ function Layout({
       <BaseLayout>
         <div className="max-w-7xl mx-auto pt-24 md:px-0">
           {/* <TopCategory categories={categories} /> */}
-          <Search />
+          <div className="search-bar flex-grow mr-80">
+            <Search />
+          </div>
 
           <div className="grid grid-cols-4 gap-x-6">
             {!isHome && (

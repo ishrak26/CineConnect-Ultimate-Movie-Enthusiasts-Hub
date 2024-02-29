@@ -26,6 +26,8 @@ function ProductUpload() {
 
   const [colorInput, setColorInput] = useState('')
   const [tagInput, setTagInput] = useState('')
+  const [tags, setTags] = useState([])
+
   const [sizeInput, setSizeInput] = useState('')
 
   const [movieId, setMovieId] = useState('')
@@ -59,10 +61,11 @@ function ProductUpload() {
   }
 
   const handleTagSubmit = (e) => {
-    e.preventDefault() // Prevent form submission
+    e.preventDefault()
     if (tagInput && !product.tags.includes(tagInput)) {
       setProduct({ ...product, tags: [...product.tags, tagInput] })
-      setTagInput('') // Reset input
+      setTags([...tags, tagInput])
+      setTagInput('')
     }
   }
 
@@ -83,6 +86,13 @@ function ProductUpload() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    // Check if at least one tag is added
+    if (tags.length === 0) {
+      alert("Please add at least one tag.");
+      return; 
+    }
+
     const formData = new FormData()
     Object.keys(product).forEach((key) => {
       if (['sizes', 'colors', 'tags', 'features'].includes(key)) {
@@ -242,7 +252,6 @@ function ProductUpload() {
               <div className="relative">
                 <input
                   type="text"
-                  required
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   placeholder="Add a tag"
