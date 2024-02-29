@@ -144,7 +144,8 @@ export default function Search({ forwardedRef }) {
     itemCount: filteredData.length,
     isDropdownVisible: dropdownVisible,
     onEnter: (index) => {
-      handleSelection(filteredData[index].name)
+      // console.log('Enter key pressed', filteredData[index])
+      handleSelection(filteredData[index])
     },
     onEscape: () => {
       setDropdownVisible(false)
