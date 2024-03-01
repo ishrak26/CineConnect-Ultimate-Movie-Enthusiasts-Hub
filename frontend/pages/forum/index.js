@@ -24,6 +24,8 @@ const Forums = ({ user, cookie }) => {
   const router = useRouter()
   const showToast = useCustomToast()
 
+
+
   // Gets the top 5 communities with the most members.
   const getForums = async (numberOfExtraPosts) => {
     setLoading(true)
@@ -127,9 +129,7 @@ const Forums = ({ user, cookie }) => {
                 </Flex>
               </Stack>
             </>
-            <Stack spacing={2}>
-              <PersonalHome />
-            </Stack>
+            <Stack spacing={2}>{/* <PersonalHome /> */}</Stack>
             <></>
           </PageContent>
         </BaseLayout>

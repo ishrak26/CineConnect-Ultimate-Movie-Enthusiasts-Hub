@@ -21,11 +21,6 @@ const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
   } = usePosts()
   const showToast = useCustomToast()
 
-  // setPostStateValue((prev) => ({
-  //   ...prev,
-  //   posts: ForumData,
-  // }));
-
   const postStateValue = {
     posts: ForumData,
   }

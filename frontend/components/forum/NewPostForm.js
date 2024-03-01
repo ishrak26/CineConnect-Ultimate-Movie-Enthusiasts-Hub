@@ -117,6 +117,8 @@ const NewPostForm = ({ user, currentForum, cookie }) => {
     } finally {
       setLoading(false)
     }
+
+    router.push(ForumLink)
   }
 
   const onTextChange = (event) => {
