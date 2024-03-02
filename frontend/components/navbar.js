@@ -33,6 +33,41 @@ export default function Navbar() {
   }, [searchOpen])
 
   useEffect(() => {
+    const fetchNotifications = async () => {
+      const url = new URL('http://localhost:4000/v1/notifications'); // Adjust the domain as necessary
+      
+      // If you need to add query parameters, you can do so like this:
+      const params = {
+        beforeTime: new Date().toISOString(), // or any specific datetime
+        limit: 10, // Default is 10, adjust if needed
+        offset: 0, // Default is 0, adjust if needed
+      };
+      Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer YOUR_AUTH_TOKEN', // Replace YOUR_AUTH_TOKEN with the actual token
+          },
+          credentials: 'include', // Necessary if your API requires cookies to be sent
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+  
+        const notifications = await response.json();
+        console.log('Notifications:', notifications);
+        // Set state or perform actions with the fetched notifications here
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error.message);
+      }
+    };
+  }, [showNotifications])
+
+  useEffect(() => {
     const checkLoggedIn = async () => {
       const response = await fetch(`http://localhost:4000/v1/auth/isLoggedIn`, {
         method: 'GET',
@@ -50,6 +85,7 @@ export default function Navbar() {
         setUserInfo(response.user)
       }
     }
+    
     checkLoggedIn()
   }, [])
 
@@ -98,15 +134,20 @@ export default function Navbar() {
             // </Link>
           )}
 
-          {loggedIn && (
-            <button className="icon-button">
-              <img
-                src="/notification.png"
-                alt="Notifications"
-                className="icon"
-              />
+          <div className="notifications-container">
+            <button className="icon-button" onClick={() => setShowNotifications(!showNotifications)}>
+              <img src="/notification.png" alt="Notifications" className="icon" size={25} />
             </button>
-          )}
+
+            {loggedIn && showNotifications && (
+              <div className="notifications-list">
+                {mockNotifications.map(notification => (
+                  <NotificationCard key={notification.id} notification={notification} />
+                ))}
+              </div>
+            )}
+          </div>
+
           {loggedIn && (
             <a href={`/profile/${userInfo.username}`}>
               <button className="profile-button">
@@ -114,18 +155,7 @@ export default function Navbar() {
               </button>
             </a>
           )}
-          {loggedIn && (
-            <button className="icon-button" onClick={() => setShowNotifications(!showNotifications)}>
-              <img src="/notification.png" alt="Notifications" className="icon" />
-            </button>
-          )}
-          {loggedIn && showNotifications && (
-            <div className="notification-list">
-              {mockNotifications.map(notification => (
-                <NotificationCard key={notification.id} notification={notification} />
-              ))}
-            </div>
-          )}
+          
 
 
           {/* <Link

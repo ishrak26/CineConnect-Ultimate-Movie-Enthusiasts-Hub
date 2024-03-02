@@ -1,10 +1,10 @@
 .card {
   display: flex;
   align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  /*border: 1px solid #ccc;
+  border-radius: 8px;*/
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0; /* Set margin to 0 to remove space between cards */
 }
 
 .userImage {
@@ -15,7 +15,8 @@
 }
 
 .content {
-  flex-grow: 1;
+  flex-grow: 1; /* Makes the content grow to use available space */
+  padding: 10px; /* Adjust padding as needed */
 }
 
 .message {
@@ -29,3 +30,12 @@
   margin-top: 5px;
 }
 
+
+.card:not(:last-child) {
+  border-bottom: 1px solid #ccc; /* Separator line */
+  padding-bottom: 10px; /* Adjust padding as needed */
+}
+
+.card:hover {
+  background-color: rgb(17, 12, 32); /* Change background color on hover */
+}
