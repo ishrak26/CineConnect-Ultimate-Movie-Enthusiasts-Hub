@@ -13,6 +13,7 @@ const authRouter = require('./routes/authRoutes.js');
 const userRouter = require('./routes/userRoutes.js');
 const postRouter = require('./routes/postRoutes.js');
 const marketplaceRouter = require('./routes/marketplaceRoutes.js');
+const notificationRouter = require('./routes/notificationRoutes.js');
 
 // const adminRouter = require('.routes/adminIndexRoute');
 
@@ -50,6 +51,7 @@ app.use('/v1/auth/', authRouter);
 app.use('/v1/', userRouter);
 app.use('/v1/forum/', postRouter);
 app.use('/v1/marketplace/', marketplaceRouter);
+app.use('/v1/notifications/', notificationRouter);
 app.use('/', movieRouter);
 
 // error handling middleware
