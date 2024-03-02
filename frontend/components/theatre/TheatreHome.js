@@ -26,18 +26,24 @@ export default function Map({ mapTiler }) {
   const mapRef = useRef()
 
   return (
-    <MapContainer center={center} zoom={ZOOM_LEVEL} style={{ height: '100vh' }}>
-      <TileLayer attribution={mapTiler.attribution} url={mapTiler.url} />
-      {geoData.lat && geoData.lng && (
-        <Marker position={[geoData.lat, geoData.lng]} icon={markerIcon}>
-          <Popup>
-            <b>
-              {'Dhaka'}, {'Bangladesh'}
-            </b>
-          </Popup>
-        </Marker>
-      )}
-      <ChangeView coords={center} />
-    </MapContainer>
+    <div className=" col-span-3">
+      <MapContainer
+        center={center}
+        zoom={ZOOM_LEVEL}
+        style={{ height: '80vh' }}
+      >
+        <TileLayer attribution={mapTiler.attribution} url={mapTiler.url} />
+        {geoData.lat && geoData.lng && (
+          <Marker position={[geoData.lat, geoData.lng]} icon={markerIcon}>
+            <Popup>
+              <b>
+                {'Dhaka'}, {'Bangladesh'}
+              </b>
+            </Popup>
+          </Marker>
+        )}
+        <ChangeView coords={center} />
+      </MapContainer>
+    </div>
   )
 }
