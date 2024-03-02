@@ -1,44 +1,77 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import styles from '@styles/Form.module.css'
 import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
 import Head from 'next/head'
 import Search from '@components/marketplace/movieSearch'
+import { set } from 'react-nprogress'
 
-import supabase from '../../../utils/supabaseClient'
+import supabase from '../../../../utils/supabaseClient'
 
-function ProductUpload() {
+function ProductEdit({
+  productId,
+  dataItem,
+  dataImages,
+  dataFeatures,
+  dataTags,
+  cookie,
+}) {
   const [product, setProduct] = useState({
-    name: '',
-    price: '',
-    category: '',
-    sizes: [],
-    colors: [],
-    availableQty: '',
-    thumbnailUrl: '',
-    movieId: '',
-    tags: [],
-    features: [],
-    images: [],
+    name: dataItem.productName || '',
+    price: dataItem.price || '',
+    category: dataItem.category || '',
+    sizes: dataItem.sizes || [],
+    colors: dataItem.colors || [],
+    availableQty: dataItem.availableQuantity || '',
+    thumbnailUrl: dataItem.thumbnailUrl || '',
+    movieId: dataItem.movie.id || '',
+    tags: dataTags || [],
+    features: dataFeatures || [],
+    images: dataImages || [],
   })
+
   const router = useRouter()
 
   const [colorInput, setColorInput] = useState('')
   const [tagInput, setTagInput] = useState('')
-  const [tags, setTags] = useState([])
-
   const [sizeInput, setSizeInput] = useState('')
 
   const [movieId, setMovieId] = useState('')
 
+  //   const [newImages, setNewImages] = useState([])
+  const [existingImages, setExistingImages] = useState(dataImages)
+  const [files, setFiles] = useState([])
   const [thumbnailFile, setThumbnailFile] = useState(null)
+
+  useEffect(() => {
+    setExistingImages(dataImages)
+  }, [productId])
+
+  // Handle file selection
+  const handleFileChange = (event) => {
+    // Create an array from the FileList
+    const newFiles = Array.from(event.target.files)
+    // Append new files to the existing list
+    setFiles((prevFiles) => [...prevFiles, ...newFiles])
+    // Clear the input after each selection
+    event.target.value = null
+  }
+
+  const removeFile = (index) => {
+    setFiles(files.filter((_, i) => i !== index))
+  }
+
+  // Handle existing image deletion
+  const handleDeleteExistingImage = (image) => {
+    setExistingImages(existingImages.filter((img) => img !== image))
+  }
 
   const handleMovieSelect = (movieId) => {
     setMovieId(movieId)
     setProduct({ ...product, movieId })
 
-    console.log('movieId', movieId)
+    // console.log('movieId', movieId)
   }
 
   const handleChange = (e) => {
@@ -61,11 +94,10 @@ function ProductUpload() {
   }
 
   const handleTagSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault() // Prevent form submission
     if (tagInput && !product.tags.includes(tagInput)) {
       setProduct({ ...product, tags: [...product.tags, tagInput] })
-      setTags([...tags, tagInput])
-      setTagInput('')
+      setTagInput('') // Reset input
     }
   }
 
@@ -84,27 +116,18 @@ function ProductUpload() {
     }
   }
 
+  const [shouldCallAPI, setShouldCallAPI] = useState(false)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // Check if at least one tag is added
-    if (tags.length === 0) {
-      alert('Please add at least one tag.')
-      return
-    }
+    // Prepare new images array
+    const newImages = existingImages.map((image) => ({
+      imageUrl: image.imageUrl,
+      caption: image.caption,
+    }))
 
-    const formData = new FormData()
-    Object.keys(product).forEach((key) => {
-      if (['sizes', 'colors', 'tags', 'features'].includes(key)) {
-        product[key].forEach((item) => formData.append(key + '[]', item))
-      } else if (key === 'images') {
-        product.images.forEach((image, index) =>
-          formData.append(`images[${index}]`, image)
-        )
-      } else {
-        formData.append(key, product[key])
-      }
-    })
+    // console.log('newImages', newImages)
 
     // Upload thumbnail image
     if (thumbnailFile) {
@@ -134,11 +157,11 @@ function ProductUpload() {
       product.thumbnailUrl = publicURL.publicUrl
     }
 
-    const newImages = []
+    // console.log('files.length', files.length)
 
     // Upload new images
-    if (product.images.length > 0) {
-      for (let file of product.images) {
+    if (files.length > 0) {
+      for (let file of files) {
         const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
         const filePath = `public/${product.movieId}/${uniquePrefix}-${file.name}`
         const { data: uploadData, error } = await supabase.storage
@@ -159,34 +182,64 @@ function ProductUpload() {
           caption: '',
         })
       }
-      product.images = newImages
     }
 
-    try {
-      // console.log('product', product)
+    // Update product state with new images
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      images: newImages,
+    }))
 
-      const response = await fetch(
-        'http://localhost:4000/v1/marketplace/product',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(product),
-        }
-      )
-
-      if (response.ok) {
-        const { productId } = await response.json()
-        router.push(`/marketplace/product/${productId}`)
-      } else {
-        console.error('Failed to upload product')
-      }
-    } catch (error) {
-      console.error('Error uploading product:', error)
-    }
+    // Indicate that we're ready to make the API call
+    setShouldCallAPI(true)
   }
+
+  useEffect(() => {
+    if (!shouldCallAPI) return
+
+    const makeAPICall = async () => {
+      const formData = new FormData()
+
+      Object.keys(product).forEach((key) => {
+        if (['sizes', 'colors', 'tags', 'features'].includes(key)) {
+          product[key].forEach((item) => formData.append(`${key}[]`, item))
+        } else if (key !== 'images') {
+          formData.append(key, product[key])
+        }
+      })
+
+      product.images.forEach((image, index) => {
+        formData.append(`images[${index}][imageUrl]`, image.imageUrl)
+        formData.append(`images[${index}][caption]`, image.caption)
+      })
+
+      try {
+        const response = await fetch(
+          `http://localhost:4000/v1/marketplace/product/${productId}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(product),
+          }
+        )
+
+        if (response.ok) {
+          router.push(`/marketplace/product/${productId}`)
+        } else {
+          console.error('Failed to upload product')
+        }
+      } catch (error) {
+        console.error('Error uploading product:', error)
+      }
+
+      setShouldCallAPI(false)
+    }
+
+    makeAPICall()
+  }, [shouldCallAPI, product, productId])
 
   return (
     <div>
@@ -357,7 +410,7 @@ function ProductUpload() {
               <input
                 type="file"
                 accept="image/jpeg, image/png"
-                required
+                required={!product.thumbnailUrl}
                 onChange={handleThumbnailFileChange}
                 className="input my-5"
               />
@@ -381,25 +434,89 @@ function ProductUpload() {
               <input
                 type="text"
                 name="features"
-                required
                 placeholder="Separate features with commas"
                 onChange={handleChange}
                 className="input my-5"
               />
             </label>
-            <label>
+            {/* <label>
               Images
               <input
                 type="file"
                 name="images"
-                accept="image/jpeg, image/png"
                 multiple
                 onChange={handleChange}
                 className="input my-5"
               />
-            </label>
+            </label> */}
+            <div>
+              <h2 className="my-5">Existing Images</h2>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {existingImages.map((image, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <img
+                      src={image.imageUrl}
+                      className="pb-2"
+                      alt={`Existing product`}
+                      style={{ width: '110px', height: '150px' }}
+                    />
+                    <button
+                      className="text-black-100 bg-primary-600 border border-cusblack py-2 text-xs w-24 rounded-lg"
+                      onClick={() => handleDeleteExistingImage(image)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="my-5">Upload New Images</h3>
+              <input
+                type="file"
+                accept="image/jpeg, image/png"
+                multiple
+                onChange={handleFileChange}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {files.map((file, index) => (
+                <div key={index} style={{ textAlign: 'center' }}>
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="Preview"
+                    onLoad={() => URL.revokeObjectURL(file)} // Revoke URL to free memory
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      objectFit: 'cover',
+                    }}
+                  />
+                  <div>{file.name}</div>
+                  <button
+                    className="text-black-100 bg-primary-600 border border-cusblack py-2 text-xs w-24 rounded-lg"
+                    onClick={() => {
+                      URL.revokeObjectURL(file) // Revoke URL to free memory when file is removed
+                      removeFile(index)
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+
             <button className={`${styles.btn}`} type="submit">
-              Upload Product
+              Save Product
             </button>
           </form>
         </div>
@@ -408,4 +525,64 @@ function ProductUpload() {
   )
 }
 
-export default ProductUpload
+export async function getServerSideProps(context) {
+  const cookie = context.req.headers.cookie
+
+  // Helper function to fetch data
+  async function fetchData(url, params) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+        ...params,
+      })
+
+      // console.log("response ", response);
+
+      if (response.ok) {
+        return await response.json()
+      }
+      return { error: response.statusText }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return { notFound: true }
+      }
+      return { error: error.message }
+    }
+  }
+
+  const productId = context.params.productId
+
+  const dataItem = await fetchData(
+    `http://localhost:4000/v1/marketplace/product/${productId}`
+  )
+
+  const dataImages = await fetchData(
+    `http://localhost:4000/v1/marketplace/product/${productId}/images`
+  )
+  const dataFeatures = await fetchData(
+    `http://localhost:4000/v1/marketplace/product/${productId}/features`
+  )
+  const dataTags = await fetchData(
+    `http://localhost:4000/v1/marketplace/product/${productId}/tags`
+  )
+
+  // console.log('dataItem', dataItem)
+
+  return {
+    props: {
+      productId,
+      dataItem,
+      dataImages,
+      dataFeatures,
+      dataTags,
+      cookie,
+    },
+  }
+}
+
+export default ProductEdit

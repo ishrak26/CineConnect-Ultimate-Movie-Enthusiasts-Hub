@@ -117,6 +117,16 @@ router.post('/product', marketplaceController.createProduct); // **//
     See the request body format in the snippet from marketplaceController.createProduct
 */
 
+// Route for editing an existing product
+router.put('/product/:id', marketplaceController.editProduct); // **//
+
+/*
+    See the request body format in the snippet from marketplaceController.editProduct
+*/
+
+// Route for deleting a product
+router.delete('/product/:id', marketplaceController.deleteProduct); // **//
+
 // Route for updating product quantity
 router.put(
     '/product/:id/quantity',
@@ -150,6 +160,18 @@ router.get(
 ); // **//
 /*
     See the response format in the snippet from marketplaceController.getProductsByMovie
+*/
+
+// Route to get all tags of the products under a movie
+router.get(
+    '/movie/:movieId/products/tags',
+    marketplaceController.getTagsByMovie
+); // **//
+
+/*
+    Returns an array of strings (tags) as response
+    ['tag1', 'tag2', 'tag3']
+
 */
 
 // Route for getting total product count by username

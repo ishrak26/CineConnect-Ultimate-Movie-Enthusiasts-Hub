@@ -127,8 +127,8 @@ function Backdrops({ backdrops }) {
         setIsOpen={setIsOpen}
         images={backdrops.map((backdrop) => ({
           src: `${backdrop}`,
-          w: 720,
-          h: 280,
+          w: 728,
+          h: 409,
         }))}
       />
     </>
@@ -144,7 +144,7 @@ function Posters({ posters }) {
       <ScrollContent className="py-4 w-full gap-8">
         {posters.map((poster, index) => (
           <div
-            key={poster.file_path}
+            key={index}
             onClick={() => {
               setIndex(index)
               setIsOpen(true)
@@ -152,7 +152,7 @@ function Posters({ posters }) {
           >
             <Poster
               className="h-96 cursor-zoom-in"
-              path={poster.file_path}
+              path={`${poster}`}
               alt="poster"
             />
           </div>
@@ -165,9 +165,9 @@ function Posters({ posters }) {
         }}
         setIsOpen={setIsOpen}
         images={posters.map((poster) => ({
-          src: `https://image.tmdb.org/t/p/original${poster.file_path}`,
-          w: poster.width,
-          h: poster.height,
+          src: `${poster}`,
+          w: 422,
+          h: 633,
         }))}
       />
     </>

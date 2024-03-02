@@ -202,6 +202,3 @@ text-lg font-semibold and text-sm text-gray-500: These classes are for the title
     </div>
   )
 }
-
-
-

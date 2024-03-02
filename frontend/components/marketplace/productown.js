@@ -1,14 +1,12 @@
 import Link from 'next/link'
 import React from 'react'
 import NumberFormat from 'react-number-format'
-// import { useDispatch } from "react-redux";
-// import { removeFromWishlist } from "../slices/wishlistSlice";
 import { motion } from 'framer-motion'
 
-function WishProduct({ item, idx, onRemove }) {
-  const removeFromWishlist = async (id) => {
+function Product({ item, idx, onRemove }) {
+  const removeFromProductlist = async (id) => {
     const response = await fetch(
-      `http://localhost:4000/v1/marketplace/product/${id}/wishlist`,
+      `http://localhost:4000/v1/marketplace/product/${id}`,
       {
         method: 'DELETE',
         headers: {
@@ -33,24 +31,13 @@ function WishProduct({ item, idx, onRemove }) {
       >
         <img
           className="h-48 rounded-lg object-cover w-full"
-          src={item.thumbnail_url}
+          src={item.thumbnailUrl}
           alt=""
         />
       </motion.div>
       <div className="px-2 py-1 text-cusblack">
         <p className="text-sm line-clamp-1">{item.name}</p>
-        {/* <NumberFormat
-          value={item.price}
-          className="text-xs my-1.5"
-          displayType={"text"}
-          thousandSeparator={true}
-          prefix={"Rp"}
-          renderText={(value, props) => (
-            <p className="text-xs my-1.5" {...props}>
-              {value}
-            </p>
-          )}
-        /> */}
+
         <p className="text-xs my-1.5">Tk {item.price}</p>
 
         <Link href={'/marketplace/product/' + item.id}>
@@ -59,7 +46,7 @@ function WishProduct({ item, idx, onRemove }) {
           </button>
         </Link>
         <button
-          onClick={() => removeFromWishlist(item.id)}
+          onClick={() => removeFromProductlist(item.id)}
           className="text-cusblack mt-1.5 bg-white border border-cusblack py-1 text-xs w-full rounded-lg"
         >
           Remove
@@ -69,4 +56,4 @@ function WishProduct({ item, idx, onRemove }) {
   )
 }
 
-export default WishProduct
+export default Product

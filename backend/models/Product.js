@@ -29,7 +29,7 @@ async function fetchProductsByTagsAndMovies(
 
     // Call the stored procedure
     const { data, error } = await supabase.rpc(
-        'fetch_products_by_tags_movies_and_sort',
+        'fetch_products_by_tags_movies_and_sort_v2',
         {
             tag_names: tagNames,
             movie_titles: movieTitles,
@@ -117,6 +117,25 @@ async function fetchProductTags(productId, limit, offset) {
 
     // const tags = data.map((tag) => tag.tag_name);
     // console.log('Returning from fetchProductTags:', data);
+    return data;
+}
+
+async function fetchProductTagsByMovieId(movieId, limit, offset) {
+    const { data, error } = await supabase.rpc(
+        'fetch_distinct_tags_for_movie',
+        {
+            mid: movieId,
+            limit_val: limit,
+            offset_val: offset,
+        }
+    );
+
+    if (error) {
+        console.error('Error fetching product tags by movie id:', error);
+        throw error;
+    }
+
+    // console.log('Returning from fetchProductTagsByMovieId:', data);
     return data;
 }
 
@@ -209,6 +228,48 @@ async function createNewProduct(product) {
 
     // console.log('Returning from createNewProduct:', data);
     return data; // This will be the UUID of the newly inserted product
+}
+
+async function updateProduct(product) {
+    const { data, error } = await supabase.rpc('update_product', {
+        _product_id: product.id,
+        _name: product.name,
+        _price: product.price,
+        _owner_id: product.ownerId,
+        _sizes: product.sizes,
+        _colors: product.colors,
+        _available_qty: product.availableQty,
+        _thumbnail_url: product.thumbnailUrl,
+        _movie_id: product.movieId,
+        _features: product.features,
+        _tags: product.tags,
+        _images: product.images,
+        _category: product.category,
+    });
+
+    if (error) {
+        console.error('Error updating product:', error);
+        throw error;
+    }
+
+    // console.log('Returning from updateProduct:', data);
+    return data; // This will be the UUID of the newly inserted product
+}
+
+async function deleteProduct(productId) {
+    const { data, error } = await supabase
+        .from('product')
+        .delete()
+        .eq('id', productId)
+        .select('id');
+
+    if (error) {
+        console.error('Error deleting product:', error);
+        throw error;
+    }
+
+    // console.log('Returning from deleteProduct:', data);
+    return data;
 }
 
 async function updateProductQuantity(productId, newQuantity) {
@@ -366,4 +427,7 @@ module.exports = {
     fetchProductsByUsername,
     rateProduct,
     updateRating,
+    updateProduct,
+    deleteProduct,
+    fetchProductTagsByMovieId,
 };
