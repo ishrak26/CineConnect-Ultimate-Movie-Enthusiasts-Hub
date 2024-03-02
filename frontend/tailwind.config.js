@@ -42,17 +42,16 @@ module.exports = {
       },
       colors: {
         primary: {
-          50: '#FFFDE7',   // very light yellow
-          100: '#FFF9C4',  // lighter yellow
-          200: '#FFF59D',  // light yellow
-          300: '#FFF176',  // soft yellow
-          400: '#FFEE58',  // medium light yellow
-          500: '#FFEB3B',  // standard yellow
-          600: '#FDD835',  // medium dark yellow
-          700: '#FBC02D',  // dark yellow
-          800: '#F9A825',  // darker yellow
-          900: '#F57F17',  // very dark yellow
-
+          50: '#FFFDE7', // very light yellow
+          100: '#FFF9C4', // lighter yellow
+          200: '#FFF59D', // light yellow
+          300: '#FFF176', // soft yellow
+          400: '#FFEE58', // medium light yellow
+          500: '#FFEB3B', // standard yellow
+          600: '#FDD835', // medium dark yellow
+          700: '#FBC02D', // dark yellow
+          800: '#F9A825', // darker yellow
+          900: '#F57F17', // very dark yellow
         },
         secondary: {
           50: '#E4F4FF',
@@ -100,7 +99,7 @@ module.exports = {
         },
       },
       boxShadow: {
-        lg: "0 10px 30px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+        lg: '0 10px 30px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       },
     },
   },
@@ -108,7 +107,8 @@ module.exports = {
     extend: {},
   },
   plugins: [
-    require("tailwind-scrollbar"),
-    require("tailwind-scrollbar-hide"),
+    require('tailwind-scrollbar'),
+    require('tailwind-scrollbar-hide'),
+    // require("daisyui"),
   ],
 }

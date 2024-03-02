@@ -74,13 +74,15 @@ const chatController = {
       }
 
       // Retrieve the list of users with whom the current user has chatted
-      const { data: userIds, error } = await dbChat.getChatUsers(req.user.id);
+      const { userIds } = await dbChat.getChatUsers(req.user.id);
 
       // Check for any errors from the chat service
       if (error) {
         console.error("Error fetching chat users:", error);
         return res.status(500).json({ error: "Failed to fetch chat users" });
       }
+
+      console.log("userIds ", userIds);
 
       // Fetch details for all users in parallel
       const userPromises = userIds.map((userId) =>
