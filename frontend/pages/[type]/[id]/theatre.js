@@ -1,23 +1,17 @@
-import About from '@/components/forum/About'
-import CreatePostLink from '@/components/forum/CreatePostLink'
-import PageContent from '@/components/forum/PageContent'
-import Posts from '@/components/forum/Posts'
 import React, { useEffect, useState, useRef } from 'react'
 import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '@theme/theme'
 import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
-import L, { map } from 'leaflet'
 
-import 'leaflet/dist/leaflet.css'
+import dynamic from 'next/dynamic'
+
+const MapWithNoSSR = dynamic(() => import('@components/theatre/TheatreHome'), {
+  ssr: false,
+})
 
 const TheatrePage = ({ mapTiler }) => {
-  const [center, setCenter] = useState({ lat: 13.084622, lng: 80.248357 })
-  const ZOOM_LEVEL = 9
-  const mapRef = useRef()
-
   return (
     <>
       <ChakraProvider theme={theme}>
@@ -37,22 +31,9 @@ const TheatrePage = ({ mapTiler }) => {
 
         <Navbar />
         <BaseLayout>
-          <PageContent>
-            <div className="row">
-              <div className="col text-center">
-                <h2>React-leaflet - Basic Openstreet Maps</h2>
-                <p>Loading basic map using layer from maptiler</p>
-                <div className="col">
-                  <Map center={center} zoom={ZOOM_LEVEL} ref={mapRef}>
-                    <TileLayer
-                      url={mapTiler.url}
-                      attribution={mapTiler.attribution}
-                    />
-                  </Map>
-                </div>
-              </div>
-            </div>
-          </PageContent>
+          <div>
+            <MapWithNoSSR mapTiler={mapTiler} />
+          </div>
         </BaseLayout>
       </ChakraProvider>
     </>
