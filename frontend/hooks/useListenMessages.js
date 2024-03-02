@@ -2,8 +2,31 @@ import { useEffect, useState } from 'react'
 import useConversation from '../zustand/useConversation'
 
 const useListenMessages = () => {
-  const [lastFetch, setLastFetch] = useState(Date.now())
+  const [lastFetch, setLastFetch] = useState(new Date().toISOString())
   const { messages, setMessages, selectedConversation } = useConversation()
+
+  const getMessages = async () => {
+    // setLoading(true)
+    try {
+      const res = await fetch(
+        `http://localhost:4000/v1/chat/${selectedConversation.userId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      )
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      setMessages(data)
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      // setLoading(false)
+    }
+  }
 
   const fetchMessages = async () => {
     try {
@@ -29,8 +52,9 @@ const useListenMessages = () => {
       if (newMessages.length > 0) {
         const sound = new Audio('/notification.mp3')
         sound.play() // Play notification sound for new messages
-        setMessages((currentMessages) => [...currentMessages, ...newMessages])
-        setLastFetch(Date.now()) // Update the last fetch timestamp to the current time
+        getMessages()
+        const currentDate = new Date()
+        setLastFetch(currentDate.toISOString())
       }
     } catch (error) {
       console.error('Error fetching messages:', error)
@@ -38,7 +62,7 @@ const useListenMessages = () => {
   }
 
   useEffect(() => {
-    const intervalId = setInterval(fetchMessages, 5000) // Poll every 5 seconds
+    const intervalId = setInterval(fetchMessages, 500) // Poll every 5 seconds
 
     return () => clearInterval(intervalId) // Clean up interval on component unmount
   }, [selectedConversation, lastFetch, setMessages])

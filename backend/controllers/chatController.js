@@ -13,7 +13,7 @@ const chatController = {
 
             // Extract the userId of the chat partner from the request parameters
             const userId = req.params.userId;
-            const limit = parseInt(req.query.limit) || 10;
+            const limit = parseInt(req.query.limit) || 100;
             const offset = parseInt(req.query.offset) || 0;
 
             if (!req.query.beforeTime) {
