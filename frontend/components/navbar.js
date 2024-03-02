@@ -7,6 +7,8 @@ import Search from './search'
 import SearchIcon from './icons/search.svg'
 import clsx from 'clsx'
 import { FaUserFriends } from 'react-icons/fa';
+import NotificationCard from './NotificationCard'; // Adjust the path as necessary
+
 
 export default function Navbar() {
   const ref = useRef(null)
@@ -14,6 +16,13 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const mockNotifications = [
+    { id: 1, imageUrl: '/user1.png', message: 'User1 liked your post.', createdAt: '2023-03-01T09:24:00' },
+    { id: 2, imageUrl: '/user2.png', message: 'User2 commented: "Amazing!"', createdAt: '2023-03-02T11:45:00' },
+    // Add more notifications as needed
+  ];
 
   useEffect(() => {
     if (searchOpen) {
@@ -40,8 +49,6 @@ export default function Navbar() {
         setLoggedIn(true)
         setUserInfo(response.user)
       }
-      // console.log('loggedIn', loggedIn)
-      // console.log('userInfo', userInfo)
     }
     checkLoggedIn()
   }, [])
@@ -108,10 +115,18 @@ export default function Navbar() {
             </a>
           )}
           {loggedIn && (
-            <button className="icon-button">
-              <img src="/settings.png" alt="Settings" className="icon" />
+            <button className="icon-button" onClick={() => setShowNotifications(!showNotifications)}>
+              <img src="/notification.png" alt="Notifications" className="icon" />
             </button>
           )}
+          {loggedIn && showNotifications && (
+            <div className="notification-list">
+              {mockNotifications.map(notification => (
+                <NotificationCard key={notification.id} notification={notification} />
+              ))}
+            </div>
+          )}
+
 
           {/* <Link
             href="/movie"

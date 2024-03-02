@@ -57,4 +57,18 @@
   /* margin: 0 1rem; Adds space around the search bar */
 }
 
+.notification-list {
+  position: absolute;
+  top: 100%; /* Adjust based on your navbar's height */
+  right: 0;
+  width: 300px; /* Adjust based on your design */
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: black;
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+
 
