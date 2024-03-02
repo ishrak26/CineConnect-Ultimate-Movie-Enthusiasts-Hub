@@ -1,13 +1,15 @@
 import { useEffect, useRef } from 'react'
 import useGetMessages from '../../hooks/useGetMessages'
-// import MessageSkeleton from "../skeletons/MessageSkeleton";
+import MessageSkeleton from './MessageSkeleton'
 import Message from './Message'
 import useListenMessages from '../../hooks/useListenMessages'
 
-const Messages = () => {
+const Messages = ({ user }) => {
   const { messages, loading } = useGetMessages()
   useListenMessages()
   const lastMessageRef = useRef()
+
+  // console.log(messages)
 
   useEffect(() => {
     setTimeout(() => {
@@ -16,12 +18,13 @@ const Messages = () => {
   }, [messages])
 
   return (
-    <div className="px-4 flex-1 overflow-auto">
+    <div className="px-10 flex-1 overflow-auto">
+      {console.log(messages)}
       {!loading &&
         messages.length > 0 &&
         messages.map((message) => (
           <div key={message._id} ref={lastMessageRef}>
-            <Message message={message} />
+            <Message message={message} user={user} />
           </div>
         ))}
 

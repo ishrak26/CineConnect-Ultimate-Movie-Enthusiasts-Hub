@@ -12,4 +12,7 @@ router.get("/:userId", chatController.getChats);
 // Send a message to a user
 router.post("/send/:userId", chatController.sendMessage);
 
+// Get new chats with a specific user
+router.get("/new/:userId", chatController.getNewChats);
+
 module.exports = router;

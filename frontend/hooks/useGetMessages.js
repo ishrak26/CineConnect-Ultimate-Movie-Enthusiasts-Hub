@@ -10,7 +10,16 @@ const useGetMessages = () => {
     const getMessages = async () => {
       setLoading(true)
       try {
-        const res = await fetch(`/api/messages/${selectedConversation._id}`)
+        const res = await fetch(
+          `http://localhost:4000/v1/chat/${selectedConversation.userId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          }
+        )
         const data = await res.json()
         if (data.error) throw new Error(data.error)
         setMessages(data)
@@ -21,8 +30,8 @@ const useGetMessages = () => {
       }
     }
 
-    if (selectedConversation?._id) getMessages()
-  }, [selectedConversation?._id, setMessages])
+    if (selectedConversation?.userId) getMessages()
+  }, [selectedConversation?.userId, setMessages])
 
   return { messages, loading }
 }
