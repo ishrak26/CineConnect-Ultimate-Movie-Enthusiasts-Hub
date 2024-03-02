@@ -82,4 +82,13 @@ router.get('/v1/movie/:movieId/images', movieController.getMovieImages);
 // Router to get search results for movies, moviePersons, users
 router.get('/v1/search', movieController.searchAllTypes);
 
+// Router to get all theatres showing this movie
+router.get('/v1/movie/:movieId/theatre', movieController.fetchMovieTheatres);
+
+// Router to get count of theatres nearby showing this movie
+router.get(
+    '/v1/movie/:movieId/theatre/count',
+    movieController.fetchNearbyTheatreCount
+);
+
 module.exports = router;

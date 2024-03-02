@@ -571,6 +571,45 @@ const moviesController = {
         }
     },
 
+    fetchMovieTheatres: async (req, res) => {
+        const movieId = req.params.movieId;
+        
+        const lat = parseFloat(req.query.lat);
+        const lng = parseFloat(req.query.lng);
+        const minPrice = parseInt(req.query.minPrice);
+        const maxPrice = parseInt(req.query.maxPrice);
+        const sortType = req.query.sortType || 'by_distance';
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = parseInt(req.query.offset) || 0;
+
+        try {
+            const theatres = await db_movie.fetchTheatres(lat, lng, movieId, minPrice, maxPrice, sortType, limit, offset);
+            res.status(200).json(theatres);
+        } catch (error) {
+            console.error('Error in fetchMovieTheatres:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    fetchNearbyTheatreCount: async (req, res) => {
+        const movieId = req.params.movieId;
+        try {
+            if (!req.query.lat || !req.query.lng) {
+                const count = await db_movie.fetchTotalTheatreCount(movieId);
+                return res.status(200).json({ count });
+            }
+        
+            const threshold = 10000; // 10 km
+            const lat = parseFloat(req.query.lat);
+            const lng = parseFloat(req.query.lng);
+            const count = await db_movie.fetchNearbyTheatreCount(lat, lng, movieId, threshold);
+            res.status(200).json({ count });
+        } catch (error) {
+            console.error('Error in fetchNearbyTheatreCount:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     // Add more methods as per your API documentation...
 };
 

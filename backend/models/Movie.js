@@ -638,6 +638,65 @@ async function getMovieRatingInfo(movieId, userId = null) {
     return data[0];
 }
 
+async function fetchTheatres(
+    lat,
+    lng,
+    minPrice,
+    maxPrice,
+    movieId,
+    sortType,
+    offset,
+    limit
+) {
+    const { data, error } = await supabase.rpc('fetch_theatre_halls', {
+        user_lat: lat,
+        user_lng: lng,
+        min_price: minPrice,
+        max_price: maxPrice,
+        given_movie_id: movieId,
+        given_sortType: sortType,
+        given_limit: limit,
+        given_offset: offset,
+    });
+
+    if (error) {
+        console.error('Error fetching theatres:', error);
+        throw error;
+    }
+
+    console.log('Returning from fetchTheatres:', data);
+    return data;
+}
+
+async function fetchNearbyTheatreCount(lat, lng, movieId, threshold) {
+    const { data, error } = await supabase.rpc('fetch_nearby_theatre_count', {
+        user_lat: lat,
+        user_lng: lng,
+        given_movie_id: movieId,
+        distance_threshold_meters: threshold,
+    });
+
+    if (error) {
+        console.error('Error fetching nearby theatre count:', error);
+        throw error;
+    }
+
+    console.log('Returning from fetchNearbyTheatreCount:', data);
+    return data;
+}
+
+async function fetchTotalTheatreCount(movieId) {
+    const { count, error } = await supabase.from('theatre').select('*', { count: 'exact' }).eq('movie_id', movieId);
+
+    if (error) {
+        console.error('Error fetching total theatre count:', error);
+        throw error;
+    }
+
+    console.log('Returning from fetchTotalTheatreCount:', count);
+    return count;
+}
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -660,4 +719,7 @@ module.exports = {
     fetchMovieImages,
     getMovieRatingInfo,
     fetchMovieWatchDetails,
+    fetchTheatres,
+    fetchNearbyTheatreCount,
+    fetchTotalTheatreCount,
 };
