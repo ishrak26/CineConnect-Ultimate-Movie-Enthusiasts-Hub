@@ -51,7 +51,7 @@ const useListenMessages = () => {
       // Update the state only if there are new messages to prevent unnecessary re-renders
       if (newMessages.length > 0) {
         const sound = new Audio('/notification.mp3')
-        sound.play() // Play notification sound for new messages
+        // sound.play() // Play notification sound for new messages
         getMessages()
         const currentDate = new Date()
         setLastFetch(currentDate.toISOString())

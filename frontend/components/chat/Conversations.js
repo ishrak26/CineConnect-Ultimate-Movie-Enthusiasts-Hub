@@ -40,7 +40,7 @@ const Conversations = ({ user }) => {
       )}
 
       {conversations.map((conversation, idx) =>
-        conversation.userId !== user.userId ? (
+        conversation.userId !== user?.userId ? (
           <Conversation
             key={conversation.userId}
             conversation={conversation}
