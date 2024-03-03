@@ -3,7 +3,7 @@ import { getRandomEmoji } from '../../utils/emojis'
 import Conversation from './Conversation'
 import { use, useEffect, useState } from 'react'
 
-const Conversations = ({user}) => {
+const Conversations = ({ user }) => {
   //   const { loading, conversations } = useGetConversations()
 
   const [conversations, setConversations] = useState([])
@@ -29,7 +29,6 @@ const Conversations = ({user}) => {
   return (
     <div className="py-2 flex flex-col overflow-auto">
       {user && (
-        
         <Conversation
           key={user.id}
           conversation={user}
@@ -37,14 +36,16 @@ const Conversations = ({user}) => {
         />
       )}
 
-      {conversations.map((conversation, idx) => (
-        <Conversation
-          key={conversation.userId}
-          conversation={conversation}
-          emoji={getRandomEmoji()}
-          lastIdx={idx === conversations.length - 1}
-        />
-      ))}
+      {conversations.map((conversation, idx) =>
+        conversation.userId !== user.userId ? (
+          <Conversation
+            key={conversation.userId}
+            conversation={conversation}
+            emoji={getRandomEmoji()}
+            lastIdx={idx === conversations.length - 1}
+          />
+        ) : null
+      )}
 
       {/* {loading ? (
         <span className="loading loading-spinner mx-auto"></span>
