@@ -50,7 +50,7 @@ export default function Home({ data, type, casts }) {
   useEffect(() => {
     const getRating = async () => {
       const ratingResponse = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/rating`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${data.id}/rating`,
         {
           method: 'GET',
           headers: {
@@ -87,7 +87,7 @@ export default function Home({ data, type, casts }) {
 
     const getWatchData = async () => {
       const watchResponse = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/watchInfo`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${data.id}/watchInfo`,
         {
           method: 'GET',
           headers: {
@@ -128,7 +128,7 @@ export default function Home({ data, type, casts }) {
 
     const getJoinedData = async () => {
       const joinedResponse = await fetch(
-        `http://localhost:4000/v1/forum/${data.id}/joined`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${data.id}/joined`,
         {
           method: 'GET',
           headers: {
@@ -180,7 +180,7 @@ export default function Home({ data, type, casts }) {
 
     const getMovieImages = async () => {
       const imageResponse = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/images`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${data.id}/images`,
         {
           method: 'GET',
           headers: {
@@ -212,7 +212,7 @@ export default function Home({ data, type, casts }) {
   const handleClickWatchlist = async () => {
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/watch`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${data.id}/watch`,
         {
           method: isWatchlisted ? 'DELETE' : 'POST',
           headers: {
@@ -244,7 +244,7 @@ export default function Home({ data, type, casts }) {
   const handleClickWatched = async () => {
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/watched`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${data.id}/watched`,
         {
           method: isWatched ? 'DELETE' : 'POST',
           headers: {
@@ -276,7 +276,7 @@ export default function Home({ data, type, casts }) {
   const handleClickRating = async (rate) => {
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/rate`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${data.id}/rate`,
         {
           method: userRating ? 'PUT' : 'POST',
           headers: {
@@ -317,7 +317,7 @@ export default function Home({ data, type, casts }) {
   const handleClickRemoveRating = async () => {
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/rate`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${data.id}/rate`,
         {
           method: 'DELETE',
           headers: {
@@ -356,7 +356,7 @@ export default function Home({ data, type, casts }) {
   const handleClickJoinForum = async () => {
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${data.id}/join`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${data.id}/join`,
         {
           method: 'POST',
           headers: {
@@ -994,26 +994,32 @@ export async function getServerSideProps(context) {
   let casts = ''
 
   if (params.type === 'movie') {
-    response = await fetch(`http://localhost:4000/v1/movie/${params.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(cookie ? { Cookie: cookie } : {}),
-      },
-      credentials: 'include',
-    }).then((res) => res.json())
+    response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${params.id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+      }
+    ).then((res) => res.json())
 
-    casts = await fetch(`http://localhost:4000/v1/movie/${params.id}/casts`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(cookie ? { Cookie: cookie } : {}),
-      },
-      credentials: 'include',
-    }).then((res) => res.json())
+    casts = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${params.id}/casts`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+      }
+    ).then((res) => res.json())
   } else if (params.type === 'moviePerson') {
     response = await fetch(
-      `http://localhost:4000/v1/moviePerson/${params.id}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/moviePerson/${params.id}`,
       {
         method: 'GET',
         headers: {

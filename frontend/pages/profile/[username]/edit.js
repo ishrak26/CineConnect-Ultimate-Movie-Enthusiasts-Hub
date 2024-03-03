@@ -65,9 +65,9 @@ const createSchema = (currentUsername) => {
               return true
             }
             const response = await fetch(
-              `http://localhost:4000/v1/username/check?newUsername=${encodeURIComponent(
-                username
-              )}`,
+              `${
+                process.env.NEXT_PUBLIC_SERVER_URL
+              }/v1/username/check?newUsername=${encodeURIComponent(username)}`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -143,7 +143,7 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
 
       // Step 1: Call your backend endpoint to validate old_password
       const response1 = await fetch(
-        `http://localhost:4000/v1/auth/${username}/matchPassword/`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/${username}/matchPassword/`,
         {
           method: 'POST',
           headers: {
@@ -186,7 +186,7 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
         }
 
         const response = await fetch(
-          `http://localhost:4000/v1/profile/${username}/update-profile`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${username}/update-profile`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -399,7 +399,9 @@ export async function getServerSideProps(context) {
 
   try {
     const [oldProfileData] = await Promise.all([
-      fetchData(`http://localhost:4000/v1/profile/${username}/edit-profile`),
+      fetchData(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${username}/edit-profile`
+      ),
     ])
     // console.log('oldProfileData', oldProfileData);
 

@@ -26,7 +26,7 @@
 //   console.log(`UserId and FellowID: ${userId}, ${fellowId}`)
 
 //   try {
-//     const response = fetch(`http://localhost:4000/v1/profile/${data.id}/rate`, {
+//     const response = fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${data.id}/rate`, {
 //       method: 'POST',
 //       headers: {
 //         'Content-Type': 'application/json',
@@ -41,7 +41,7 @@
 //     console.log(err)
 //   }
 // }
- 
+
 // // import Awards from '@components/Awards'; // Assuming you have this component
 // // import Activities from '@components/Activities'; // Assuming you have this component
 
@@ -68,7 +68,6 @@
 //       content: 'The Dark Knight is a masterpiece. Heath Ledger\'s performance as the Joker is iconic. The movie is a must-watch for any movie lover.Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?'
 //     },
 //   ]; // Assuming we have the user's reviews as static content
-
 
 //   // Function to create section headers with the same style as in Container component
 //   const SectionHeader = ({ title }) => (
@@ -98,7 +97,6 @@
 //   // Spacing classes for margin
 //   const sectionMargin = "mb-20 mt-16"; // Margin at the bottom of each section
 
-
 //   return (
 //     <div>
 //       <Navbar />
@@ -110,7 +108,7 @@
 //                 src={profileInfo.image_url}
 //                 alt={`${profileInfo.username}'s profile`}
 //                 className="rounded-full h-64 w-64 mr-8 object-cover" // Adjust h-32 and w-32 to the size you desire
-//               /> 
+//               />
 //               <div className="flex-grow">
 //                 <h1 className="text-4xl font-bold mb-1">{profileInfo.full_name}</h1>
 //                 {cinefellowCount < 2 && <p>{cinefellowCount} Cinefellow</p>}
@@ -136,7 +134,7 @@
 //                 // }} />
 //               ) : userType === 3 ? (  // If the user has been sent a request by the profile owner
 //                 // Wrap the buttons in a div with a flex container
-//                 <div style={{ display: 'flex', gap: '10px' }}> 
+//                 <div style={{ display: 'flex', gap: '10px' }}>
 //                   <AcceptCinefellowRequestButton />
 //                   <DeclineCinefellowRequestButton />
 //                 </div>
@@ -154,7 +152,6 @@
 //             <div className={`${sectionMargin}`}>
 //               <Row movies={watchedMovies} isMain={true} />
 //             </div>
-            
 
 //             {/* Watchlist Section */}
 //             <SectionHeader title="Watchlist" />
@@ -179,7 +176,7 @@
 //             <div className={`rounded-full h-64 w-64 mr-8 object-cover ${sectionMargin}`}>
 //               <CinefellowsRow cinefellows={cineFellows} />
 //             </div>
-            
+
 //           </main>
 //           <aside className="w-1/4">
 //             {/* Place for Recommendations, Awards, Activities */}
@@ -191,9 +188,7 @@
 //   );
 // };
 
-
 // // You will need to fetch the userData and other props for the component, potentially using getServerSideProps or getStaticProps
-
 
 // export async function getServerSideProps(context) {
 //   const { params } = context; // Destructure params from context
@@ -225,15 +220,15 @@
 //   // Use Promise.all to fetch data for different categories concurrently
 //   try {
 //     const [watchedMovies, cineFellows, watchlist, reviews, forums, userType, profileInfo, cinefellowCount, userId ] = await Promise.all([
-//       fetchData(`http://localhost:4000/v1/profile/${username}/watched/`), 
-//       fetchData(`http://localhost:4000/v1/profile/anonto50/cinefellows/`),
-//       fetchData(`http://localhost:4000/v1/profile/anonto50/watchlist/`),
-//       fetchData(`http://localhost:4000/v1/movies/`),  // dummy, will need to change to fetch top few reviews
-//       fetchData(`http://localhost:4000/v1/movies/`),  // dummy, will need to change to fetch top forums
-//       fetchData(`http://localhost:4000/v1/profile/anonto50/identify-profile`),
-//       fetchData(`http://localhost:4000/v1/profile/anonto50/`),
-//       fetchData(`http://localhost:4000/v1/profile/anonto50/cinefellows/count/`), 
-//       fetchData(`http://localhost:4000/v1/auth/isLoggedIn`)
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${username}/watched/`),
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/anonto50/cinefellows/`),
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/anonto50/watchlist/`),
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies/`),  // dummy, will need to change to fetch top few reviews
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies/`),  // dummy, will need to change to fetch top forums
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/anonto50/identify-profile`),
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/anonto50/`),
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/anonto50/cinefellows/count/`),
+//       fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/isLoggedIn`)
 //     ]);
 //     console.log('cinefellow count:', cinefellowCount);
 //     // console.log('watched', watchedMovies)

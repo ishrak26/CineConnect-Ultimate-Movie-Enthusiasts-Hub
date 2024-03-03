@@ -118,7 +118,9 @@ export default function Search({ forwardedRef }) {
 
     console.log(queryParams.toString())
     const response = await fetch(
-      `http://localhost:4000/v1/marketplace/products?${queryParams.toString()}`
+      `${
+        process.env.NEXT_PUBLIC_SERVER_URL
+      }/v1/marketplace/products?${queryParams.toString()}`
     )
     if (response.ok) {
       const data = await response.json()

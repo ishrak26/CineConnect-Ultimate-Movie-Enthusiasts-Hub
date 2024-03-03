@@ -13,7 +13,7 @@ function ProductList({ username, cookie, offset, totalProducts, currentPage }) {
 
   const fetchProductlist = async () => {
     const response = await fetch(
-      `http://localhost:4000/v1/marketplace/user/${username}/products?limit=${limit}&offset=${offset}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/user/${username}/products?limit=${limit}&offset=${offset}`,
       {
         method: 'GET',
         headers: {
@@ -125,7 +125,9 @@ export async function getServerSideProps(context) {
 
   // const productId = context.params.productId
 
-  const user = await fetchData('http://localhost:4000/v1/auth/isLoggedIn')
+  const user = await fetchData(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/isLoggedIn`
+  )
 
   // console.log('user', user)
 
@@ -134,7 +136,7 @@ export async function getServerSideProps(context) {
   const offset = (context.query.page - 1) * 9 || 0
 
   const totalProducts = await fetchData(
-    `http://localhost:4000/v1/marketplace/user/${username}/products/count`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/user/${username}/products/count`
   )
 
   const currentPage = context.query.page || 1

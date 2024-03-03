@@ -28,7 +28,7 @@ function Category({
     const fetchProductsByTag = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4000/v1/marketplace/products?tags=${tag}`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/products?tags=${tag}`,
           {
             method: 'GET',
             headers: {
@@ -167,13 +167,15 @@ export async function getServerSideProps({ query }) {
   movies = movies.slice(0, -1)
 
   const dataItems = await fetchData(
-    `http://localhost:4000/v1/marketplace/products?limit=${limit}&offset=${offset}&${tags}`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/products?limit=${limit}&offset=${offset}&${tags}`
   )
 
   const totalItems = dataItems.length
   console.log('Total Items ', totalItems)
 
-  const data = await fetchData('http://localhost:4000/v1/marketplace/tags')
+  const data = await fetchData(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/tags`
+  )
   const dataTypes = data
 
   const currentPage = query.page || 1

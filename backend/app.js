@@ -12,6 +12,7 @@ const movieRouter = require('./routes/movieRoutes.js');
 const authRouter = require('./routes/authRoutes.js');
 const userRouter = require('./routes/userRoutes.js');
 const postRouter = require('./routes/postRoutes.js');
+const chatRouter = require('./routes/chatRoutes.js');
 const marketplaceRouter = require('./routes/marketplaceRoutes.js');
 
 // const adminRouter = require('.routes/adminIndexRoute');
@@ -24,7 +25,7 @@ app.use(
     cors({
         // Configure with your specific CORS settings
         // origin: 'http://cineconnect.com', // PLACEHOLDER: Replace with your frontend domain
-        origin: 'http://localhost:3000', // PLACEHOLDER: Replace with your frontend domain
+        origin: process.env.CORS_ORIGIN, // PLACEHOLDER: Replace with your frontend domain
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     })
@@ -49,6 +50,9 @@ app.use(auth);
 app.use('/v1/auth/', authRouter);
 app.use('/v1/', userRouter);
 app.use('/v1/forum/', postRouter);
+
+app.use('/v1/chat/', chatRouter);
+
 app.use('/v1/marketplace/', marketplaceRouter);
 app.use('/', movieRouter);
 

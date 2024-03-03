@@ -33,7 +33,7 @@ const Comments = ({
   const fetchComments = async () => {
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${ForumId}/post/${selectedPost.postId}/comments`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumId}/post/${selectedPost.postId}/comments`,
         {
           method: 'GET',
           headers: {
@@ -76,7 +76,7 @@ const Comments = ({
       setComments((prev) => [newComment, ...prev]) // display new comment along with old comments after it
 
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${ForumId}/post/${selectedPost.postId}/comment/submit`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumId}/post/${selectedPost.postId}/comment/submit`,
         {
           method: 'POST',
           headers: {
@@ -88,7 +88,9 @@ const Comments = ({
         }
       )
 
-      updateCommentCount();
+      window.location.href = `/forum/${ForumId}/post/${selectedPost.postId}/comments`
+
+      updateCommentCount()
 
       // const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);
       // if (selectedFile) {

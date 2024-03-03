@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 function Product({ item, idx, onRemove }) {
   const removeFromProductlist = async (id) => {
     const response = await fetch(
-      `http://localhost:4000/v1/marketplace/product/${id}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${id}`,
       {
         method: 'DELETE',
         headers: {

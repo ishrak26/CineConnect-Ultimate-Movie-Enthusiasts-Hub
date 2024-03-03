@@ -853,6 +853,29 @@ const getHashedPasswordByUsername = async (username) => {
     }
 };
 
+const getJoinedForumsByUserId = async (userId) => {
+    try {
+        const { data, error } = await supabase
+            .from('watched_list')
+            .select(`
+                movie_id,
+                movie:movie_id (id, title, release_date, poster_url) 
+            `)
+            .eq('user_id', userId)
+            .eq('joined_forum', true);
+
+        if (error) throw error;
+
+        // Extract movie details from the joined data
+        const movies = data.map(entry => entry.movie);
+
+        return { success: true, movies };
+    } catch (error) {
+        console.error('Error fetching joined forums movies:', error);
+        return { success: false, error: 'Error fetching joined forums movies' };
+    }
+};
+
 module.exports = {
     createUser,
     findOne,
@@ -889,4 +912,5 @@ module.exports = {
     checkIfUsernameIsTaken,
     updateByUsername,
     getHashedPasswordByUsername,
+    getJoinedForumsByUserId,
 };
