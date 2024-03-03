@@ -57,4 +57,27 @@
   /* margin: 0 1rem; Adds space around the search bar */
 }
 
+.notifications-container {
+  position: relative; /* Ensures that the child .notifications-list can be positioned absolutely relative to this container */
+  
+}
+
+.notifications-list {
+  position: absolute;
+  top: 150%; /* Positions the top of the list right below the button */
+  right: 0; /* Adjust this value to align the list as per your design requirements */
+  z-index: 1000; /* Ensures the list appears above other content */
+  background-color: black; /* Or any color matching your design */
+  border: 1px solid #ccc; /* Optional, for styling */
+  border-radius: 8px; /* Optional, for styling */
+  width: 300px; /* Adjust based on the desired width of your notifications list */
+  max-height: 300px; /* Adjust based on the desired maximum height of your list */
+  overflow-y: auto; /* Makes the list scrollable */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Optional, adds a shadow for better visibility */
+  padding: 0; /* Remove padding if it's adding unwanted space */
+}
+
+
+
+
 
