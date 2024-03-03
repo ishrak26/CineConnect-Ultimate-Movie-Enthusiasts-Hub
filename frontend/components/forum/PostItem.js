@@ -11,6 +11,7 @@ import {
   useClipboard,
   useToast,
 } from '@chakra-ui/react'
+import { set } from 'date-fns'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from 'react'
@@ -24,6 +25,7 @@ import {
   IoPeopleCircleOutline,
 } from 'react-icons/io5'
 import { MdOutlineDelete } from 'react-icons/md'
+import { number } from 'sharp/lib/is'
 // import PostItemError from "../atoms/ErrorMessage";
 
 const PostItem = ({
@@ -35,24 +37,48 @@ const PostItem = ({
   onDeletePost,
   onSelectPost,
   showForumImage,
+  numberOfComments,
   // cookie,
 }) => {
   const [loadingImage, setLoadingImage] = useState(true)
   const [error, setError] = useState(false)
   const [loadingDelete, setLoadingDelete] = useState(false)
-  const [commentCount, setCommentCount] = useState(0)
+  const [commentCount, setCommentCount] = useState(numberOfComments)
   const router = useRouter()
   const showToast = useCustomToast()
   const { onCopy, value, setValue, hasCopied } = useClipboard('')
 
   const singlePostPage = !onSelectPost
 
-  useEffect(() => {
-    const getCommentCount = async (forumId, postId) => {
-      const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
+  // useEffect(() => {
+  //   const getCommentCount = async (forumId, postId) => {
+  //     const response = await fetch(
+  //       `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
+  //       {
+  //         method: 'GET',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           // ...(cookie ? { Cookie: cookie } : {}),
+  //         },
+  //         credentials: 'include',
+  //       }
+  //     )
+  //     const data = await response.json() // Convert the response to JSON
+
+  //     setCommentCount(data.total_comments)
+  //   }
+
+  //   getCommentCount(forumId, post.postId)
+  // }, [forumId, post.postId])
+
+  const handleDelete = async (event) => {
+    event.stopPropagation()
+    setLoadingDelete(true)
+    try {
+      const success = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${post.postId}`,
         {
-          method: 'GET',
+          method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
             // ...(cookie ? { Cookie: cookie } : {}),
@@ -60,21 +86,8 @@ const PostItem = ({
           credentials: 'include',
         }
       )
-      const data = await response.json() // Convert the response to JSON
 
-      setCommentCount(data.total_comments)
-    }
-
-    getCommentCount(forumId, post.postId)
-  }, [forumId, post.postId])
-
-  const handleDelete = async (event) => {
-    event.stopPropagation()
-    setLoadingDelete(true)
-    try {
-      const success = await onDeletePost(post, forumId)
-
-      if (!success) {
+      if (!success.ok) {
         throw new Error('Post could not be deleted')
       }
 
@@ -181,8 +194,10 @@ const PostItem = ({
 export default PostItem
 
 const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
-  let [voteCount, setVoteCount] = useState('')
-  let [downvoteCount, setDownvoteCount] = useState('')
+  let [voteCount, setVoteCount] = useState(0)
+  let [downvoteCount, setDownvoteCount] = useState(0)
+  const [isVoted, setIsVoted] = useState(false)
+  const [voteType, setVoteType] = useState('')
 
   useEffect(() => {
     const getVoteCount = async (forumId, postId) => {
@@ -204,46 +219,81 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
     }
 
     getVoteCount(forumId, post.postId)
-  }, [voteCount, downvoteCount, forumId, post.postId])
+  }, [isVoted, forumId, post.postId])
 
-  const handleClick = (event, value) => {
-    event.stopPropagation()
+  useEffect(() => {
+    const checkIfVoted = async (forumId, postId) => {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/voted`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      const data = await response.json() // Convert the response to JSON
 
-    if (value === 1) {
-      voteCount += 1
-      console.log('voteCount', voteCount)
-    } else {
-      downvoteCount += 1
-      console.log('downvoteCount', downvoteCount)
+      // console.log('data', data)
+      setIsVoted(data.voted)
+      setVoteType(data.type)
     }
 
-    onVote(event, post.postId, value, forumId)
+    checkIfVoted(forumId, post.postId)
+  }, [isVoted, forumId, post.postId])
+
+  const handleClick = async (event, value, isVoted) => {
+    event.stopPropagation()
+
+    onVote(event, post.postId, value, forumId, isVoted)
+
+    if (value === 1 && !isVoted) {
+      setVoteCount(voteCount + 1)
+      setIsVoted(true)
+      // console.log('voteCount', voteCount)
+    } else if (value === -1 && !isVoted) {
+      setDownvoteCount(downvoteCount + 1)
+      setIsVoted(true)
+      // console.log('downvoteCount', downvoteCount)
+    } else if (value === 1 && isVoted && voteCount > 0) {
+      setVoteCount(voteCount - 1)
+      setIsVoted(false)
+      // console.log('voteCount', voteCount)
+    } else if (value === -1 && isVoted && downvoteCount > 0) {
+      setDownvoteCount(downvoteCount - 1)
+      setIsVoted(false)
+      // console.log('downvoteCount', downvoteCount)
+    }
   }
 
   return (
     <>
       <Icon
-        as={userVoteValue === 1 ? IoArrowUpCircleSharp : IoArrowUpCircleOutline}
-        color={userVoteValue === 1 ? 'black' : 'gray.500'}
+        as={
+          voteType === 'upvote' ? IoArrowUpCircleSharp : IoArrowUpCircleOutline
+        }
+        color={voteType === 'upvote' ? '#FDD835' : 'gray.500'}
         fontSize={26}
         cursor="pointer"
         _hover={{ color: '#FBC02D' }}
-        onClick={(event) => handleClick(event, 1)}
+        onClick={(event) => handleClick(event, 1, isVoted)}
       />
       <Text fontSize="12pt" color="white">
         {voteCount}
       </Text>
       <Icon
         as={
-          userVoteValue === -1
+          voteType === 'downvote'
             ? IoArrowDownCircleSharp
             : IoArrowDownCircleOutline
         }
-        color={userVoteValue === -1 ? 'black' : 'gray.500'}
+        color={voteType === 'downvote' ? '#FDD835' : 'gray.500'}
         _hover={{ color: '#FBC02D' }}
         fontSize={26}
         cursor="pointer"
-        onClick={(event) => handleClick(event, -1)}
+        onClick={(event) => handleClick(event, -1, isVoted)}
       />
       <Text fontSize="12pt" color="white">
         {downvoteCount}

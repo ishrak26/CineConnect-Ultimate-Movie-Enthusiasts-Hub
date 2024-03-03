@@ -1,5 +1,5 @@
-import { Button, Flex, Image, Stack } from "@chakra-ui/react";
-import React, { useRef } from "react";
+import { Button, Flex, Image, Stack } from '@chakra-ui/react'
+import React, { useRef } from 'react'
 
 const ImageUpload = ({
   selectedFile,
@@ -8,7 +8,7 @@ const ImageUpload = ({
   setSelectedFile,
 }) => {
   // Button -> selectedFileRef -> input
-  const selectedFileRef = useRef(null);
+  const selectedFileRef = useRef(null)
 
   return (
     <Flex justify="center" direction="column" align="center" width="100%">
@@ -24,12 +24,12 @@ const ImageUpload = ({
             shadow="md"
           />
           <Stack direction="row" mt={4}>
-            <Button onClick={() => setSelectedTab("Post")} w="100%" shadow="md">
+            <Button onClick={() => setSelectedTab('Post')} w="100%" shadow="md">
               Back to Post
             </Button>
             <Button
               variant="outline"
-              onClick={() => setSelectedFile("")} // clearing image state removes uploaded image
+              onClick={() => setSelectedFile('')} // clearing image state removes uploaded image
               w="100%"
               shadow="md"
             >
@@ -52,7 +52,7 @@ const ImageUpload = ({
           <Button
             shadow="md"
             onClick={() => {
-              selectedFileRef.current?.click();
+              selectedFileRef.current?.click()
             }}
           >
             Upload Content
@@ -60,7 +60,7 @@ const ImageUpload = ({
           {/* Hidden input */}
           <input
             type="file"
-            accept="image/png, image/gif, image/jpeg"
+            accept="image/png, image/jpeg"
             ref={selectedFileRef}
             hidden
             onChange={onSelectImage}
@@ -68,7 +68,7 @@ const ImageUpload = ({
         </Flex>
       )}
     </Flex>
-  );
-};
+  )
+}
 
-export default ImageUpload;
+export default ImageUpload

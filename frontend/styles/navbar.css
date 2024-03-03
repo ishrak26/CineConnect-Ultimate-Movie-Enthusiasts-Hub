@@ -6,6 +6,26 @@
   @apply link inline-flex items-center px-4 py-3;
 }
 
+.profile-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  border-radius: 50%;
+  margin-right: 15px; /* Space between buttons */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  margin-left: auto; /* Pushes the icons to the right */
+}
+.profile-button:hover {
+  background-color: rgb(50, 50, 50); /* Change background color on hover */
+}
+.profile {
+  width: 45px; /* Set your desired size */
+  height: 45px; /* Set your desired size */
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .icon-button {
   display: flex;
   align-items: center;
@@ -36,3 +56,5 @@
   /* max-width: 600px; Optional: set a max-width for the search bar */
   /* margin: 0 1rem; Adds space around the search bar */
 }
+
+

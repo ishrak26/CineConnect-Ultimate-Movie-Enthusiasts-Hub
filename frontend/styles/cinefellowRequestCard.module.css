@@ -3,10 +3,10 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid #000000;
     border-radius: 8px;
     margin-bottom: 10px;
-    background-color: #f9f9f9;
+    background-color: #0f0f10;
   }
   
   .requestorInfo {
@@ -15,10 +15,12 @@
   }
   
   .profilePhoto {
-    width: 60px;
-    height: 60px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
+    border: 2px solid #FFFFFF;
     margin-right: 15px;
+    object-fit: cover; /* This will cover the area of the container without stretching the image */
   }
   
   .userInfo {
@@ -27,14 +29,34 @@
   }
   
   .username {
-    font-size: 1.1rem;
+    font-size: 1.32rem;
     font-weight: bold;
   }
+
+  .requestedAt {
+    font-size: 0.9rem;
+    font-weight: lighter;
+    font-style: italic;
+    color: #666;
+    margin-top: 10px;
+  }
+
+  .acceptedMessage {
+  font-size: 1.1rem; /* Slightly larger font */
+  color: rgb(99, 187, 99); /* Color for accepted message */
+  margin-right: 2rem;
+}
+
+  .rejectedMessage {
+  font-size: 1.1rem; /* Slightly larger font */
+  color: rgb(211, 86, 86); /* Color for rejected message */
+  margin-right: 2rem;
+}
   
   .commonForums {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 5px;
+    font-size: 1rem;
+    color: #adabab;
+    margin-top: 1px;
   }
   
   .actions {

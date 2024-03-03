@@ -1,11 +1,15 @@
 // Rating.js
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaStar } from 'react-icons/fa'
 
-const Rating = ({ onRating, defaultRating }) => {
-  console.log('defaultRating', defaultRating)
+const Rating = ({ onRating, defaultRating, userRated }) => {
+  // console.log('defaultRating', defaultRating)
   const [rating, setRating] = useState(defaultRating)
   // setRating(defaultRating)
+
+  useEffect(() => {
+    setRating(defaultRating)
+  }, [defaultRating])
 
   const handleRating = (rate) => {
     setRating(rate)
@@ -16,7 +20,9 @@ const Rating = ({ onRating, defaultRating }) => {
 
   return (
     <div className="flex">
-      <div className="text-xl text-primary-700 mr-8">Rate this movie : </div>
+      <div className="text-xl text-primary-700 mr-8">
+        {userRated ? 'Your rating' : 'Rate this movie'} :{' '}
+      </div>
       {[...Array(10)].map((_, i) => {
         const ratingValue = i + 1
 
@@ -38,7 +44,7 @@ const Rating = ({ onRating, defaultRating }) => {
           </label>
         )
       })}
-      {console.log('rating', rating)}
+      {/* {console.log('rating', rating)} */}
     </div>
   )
 }
