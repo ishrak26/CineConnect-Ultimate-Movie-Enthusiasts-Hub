@@ -63,14 +63,14 @@ export default function Home({
               <Row
                 // movies={trending.results}
                 movies={topRated}
-                title="Top Rated"
+                title="Trending Now"
                 isMain={true}
               />
             </div>
             <div className="pb-4 my-5">
               <Row
                 movies={netflixOriginals}
-                title="Netflix Originals"
+                title="Most Popular"
                 isMain={true}
               />
             </div>
@@ -78,7 +78,7 @@ export default function Home({
             <div className="pb-4 my-5">
               <Row
                 movies={actionMovies}
-                title="Action Thrillers"
+                title="Top Hits"
                 isMain={true}
               />
             </div>
@@ -163,15 +163,18 @@ export async function getServerSideProps(context) {
   // Use Promise.all to fetch data for different categories concurrently
   try {
     const limit = 10
+    const offset = 45
+    const offset2 = 15
+    const offset3 = 30
     const [topRated, netflixOriginals, actionMovies] = await Promise.all([
       fetchData(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}&offset=${offset3}`
       ),
       fetchData(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}&offset=${offset}`
       ),
       fetchData(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}&offset=${offset2}`
       ),
     ])
 
