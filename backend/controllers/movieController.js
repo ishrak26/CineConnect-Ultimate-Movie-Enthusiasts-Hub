@@ -603,6 +603,7 @@ const moviesController = {
             const lat = parseFloat(req.query.lat);
             const lng = parseFloat(req.query.lng);
             const count = await db_movie.fetchNearbyTheatreCount(lat, lng, movieId, threshold);
+            console.log('count:', count);
             res.status(200).json({ count });
         } catch (error) {
             console.error('Error in fetchNearbyTheatreCount:', error);

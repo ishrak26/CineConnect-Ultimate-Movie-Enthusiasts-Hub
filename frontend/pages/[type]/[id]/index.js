@@ -43,6 +43,8 @@ export default function Home({ data, type, casts }) {
 
   const [movieImages, setMovieImages] = useState(null)
 
+  const [theatreCount, setTheatreCount] = useState(0)
+
   const router = useRouter()
 
   useEffect(() => {
@@ -153,6 +155,29 @@ export default function Home({ data, type, casts }) {
       }
     }
 
+    const getTheatreCount = async () => {
+      const theatreCountResponse = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/theatre/count`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (theatreCountResponse.ok) {
+        const theatreCountData = await theatreCountResponse.json()
+        setTheatreCount(theatreCountData.count)
+      } else {
+        console.error(
+          'Error with request:',
+          theatreCountResponse.status,
+          theatreCountResponse.statusText
+        )
+      }
+    }
+
     const getMovieImages = async () => {
       const imageResponse = await fetch(
         `http://localhost:4000/v1/movie/${data.id}/images`,
@@ -180,6 +205,7 @@ export default function Home({ data, type, casts }) {
     getWatchData()
     getRating()
     getJoinedData()
+    getTheatreCount()
     getMovieImages()
   }, [])
 
@@ -622,6 +648,16 @@ export default function Home({ data, type, casts }) {
                         </button>
                       )}
                     </div>
+                    {theatreCount > 0 && <div><Link
+                href={`/movie/${data.id}/theatre`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mr-2 text-primary-600 hover:text-primary-700"
+                passHref
+              >
+                Showing in {theatreCount} theatres
+                {/* <FaExternalLinkAlt /> */}
+              </Link></div>}
                   </div>
                 )}
 

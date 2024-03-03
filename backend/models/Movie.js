@@ -686,7 +686,7 @@ async function fetchNearbyTheatreCount(lat, lng, movieId, threshold) {
 }
 
 async function fetchTotalTheatreCount(movieId) {
-    const { count, error } = await supabase.from('theatre').select('*', { count: 'exact' }).eq('movie_id', movieId);
+    const { count, error } = await supabase.from('theatre_has_showtime').select('*', { count: 'exact' }).eq('movie_id', movieId);
 
     if (error) {
         console.error('Error fetching total theatre count:', error);

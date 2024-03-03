@@ -75,7 +75,7 @@ export async function getServerSideProps(context) {
     url: process.env.MAPTILER_URL,
     attribution: process.env.MAPTILER_ATTRIBUTION,
   }
-  console.log('mapTiler', mapTiler)
+  // console.log('mapTiler', mapTiler)
   return { props: { mapTiler } }
 }
 
