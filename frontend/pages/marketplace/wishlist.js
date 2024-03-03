@@ -10,10 +10,9 @@ function WishList({ username, cookie, offset }) {
   const [items, setItems] = useState([])
 
   const fetchWishlist = async () => {
-
     const limit = 9
     const response = await fetch(
-      `http://localhost:4000/v1/${username}/product/wishlist?limit=${limit}&offset=${offset}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/${username}/product/wishlist?limit=${limit}&offset=${offset}`,
       {
         method: 'GET',
         headers: {
@@ -30,7 +29,7 @@ function WishList({ username, cookie, offset }) {
     const data = await response.json()
 
     setItems(data)
-  };
+  }
 
   useEffect(() => {
     fetchWishlist()
@@ -38,9 +37,9 @@ function WishList({ username, cookie, offset }) {
 
   const handleRemoveFromWishlist = (id) => {
     // removeFromWishlist(id).then(() => {
-      fetchWishlist(); 
+    fetchWishlist()
     // });
-  };
+  }
 
   return (
     <>
@@ -55,7 +54,12 @@ function WishList({ username, cookie, offset }) {
               {/* {console.log('items', items.length)} */}
               {items ? (
                 items?.map((item, idx) => (
-                  <WishProduct item={item} key={item.id} idx={idx} onRemove={handleRemoveFromWishlist} />
+                  <WishProduct
+                    item={item}
+                    key={item.id}
+                    idx={idx}
+                    onRemove={handleRemoveFromWishlist}
+                  />
                 ))
               ) : (
                 <div className="text-sm text-gray-400 col-span-2 md:col-span-3 lg:col-span-4 flex justify-center place-items-center">
@@ -115,7 +119,9 @@ export async function getServerSideProps(context) {
 
   // const productId = context.params.productId
 
-  const user = await fetchData('http://localhost:4000/v1/auth/isLoggedIn')
+  const user = await fetchData(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/isLoggedIn`
+  )
 
   // console.log('user', user)
 

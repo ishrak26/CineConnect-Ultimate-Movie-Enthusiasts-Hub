@@ -21,7 +21,7 @@ const ForumHeader = ({ ForumData }) => {
   useEffect(() => {
     const checkUserJoinedForum = async () => {
       const res = await fetch(
-        `http://localhost:4000/v1/forum/${ForumData.forumId}/joined`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumData.forumId}/joined`,
         {
           method: 'GET',
           headers: {
@@ -41,7 +41,7 @@ const ForumHeader = ({ ForumData }) => {
   const onJoinOrLeaveForum = async (ForumData, isJoined) => {
     if (isJoined) {
       const res = await fetch(
-        `http://localhost:4000/v1/forum/${ForumData.forumId}/leave`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumData.forumId}/leave`,
         {
           method: 'DELETE',
           headers: {
@@ -53,10 +53,10 @@ const ForumHeader = ({ ForumData }) => {
       )
       window.location.href = `/movie/${ForumData.forumId}`
       // setIsJoined(false)
-    } 
+    }
     // else {
     //   const res = await fetch(
-    //     `http://localhost:4000/v1/forum/${ForumData.forumId}/join`,
+    //     `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumData.forumId}/join`,
     //     {
     //       method: 'POST',
     //       headers: {
@@ -81,7 +81,7 @@ const ForumHeader = ({ ForumData }) => {
             <ForumName id={ForumData.title} />
             <Flex direction="row" flexGrow={1} align="end" justify="end">
               {/* <ForumSettings ForumData={ForumData} /> */}
-              
+
               <JoinOrLeaveButton
                 isJoined={isJoined}
                 onClick={() => onJoinOrLeaveForum(ForumData, isJoined)}

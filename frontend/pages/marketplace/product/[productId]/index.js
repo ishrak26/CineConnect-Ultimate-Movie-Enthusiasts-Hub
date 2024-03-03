@@ -70,7 +70,7 @@ export default function Product({
 
   const handleDeleteClick = async () => {
     const response = await fetch(
-      `http://localhost:4000/v1/marketplace/product/${productId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}`,
       {
         method: 'DELETE',
         headers: {
@@ -101,7 +101,7 @@ export default function Product({
   const saveStockChange = () => {
     const updateQuantity = async () => {
       const response = await fetch(
-        `http://localhost:4000/v1/marketplace/product/${productId}/quantity`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/quantity`,
         {
           method: 'PUT',
           headers: {
@@ -127,7 +127,7 @@ export default function Product({
   useEffect(() => {
     const getUserRating = async () => {
       const response = await fetch(
-        `http://localhost:4000/v1/marketplace/product/${productId}/rating`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/rating`,
         {
           method: 'GET',
           headers: {
@@ -154,7 +154,7 @@ export default function Product({
       }
 
       const responseWishlist = await fetch(
-        `http://localhost:4000/v1/marketplace/product/${productId}/wishlist`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/wishlist`,
         {
           method: 'GET',
           headers: {
@@ -169,14 +169,17 @@ export default function Product({
         setIsAdded(true)
       }
 
-      const loggedIn = await fetch(`http://localhost:4000/v1/auth/isLoggedIn`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
-        },
-        credentials: 'include',
-      }).then((res) => res.json())
+      const loggedIn = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/isLoggedIn`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      ).then((res) => res.json())
 
       if (loggedIn) {
         setUser(loggedIn.user)
@@ -187,7 +190,7 @@ export default function Product({
 
     const getOwner = async (ownerId) => {
       const response = await fetch(
-        `http://localhost:4000/v1/profile/${ownerId}/profile`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${ownerId}/profile`,
         {
           method: 'GET',
           headers: {
@@ -216,7 +219,7 @@ export default function Product({
   const handleClick = () => {
     try {
       const response = fetch(
-        `http://localhost:4000/v1/marketplace/product/${productId}/wishlist`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/wishlist`,
         {
           method: isAdded ? 'DELETE' : 'POST',
           headers: {
@@ -241,7 +244,7 @@ export default function Product({
 
     try {
       const response = fetch(
-        `http://localhost:4000/v1/marketplace/product/${productId}/rating`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/rating`,
         {
           method: userRated ? 'PUT' : 'POST',
           headers: {
@@ -640,17 +643,17 @@ export async function getServerSideProps(context) {
   const cookie = ''
 
   const dataItem = await fetchData(
-    `http://localhost:4000/v1/marketplace/product/${productId}`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}`
   )
 
   const dataImages = await fetchData(
-    `http://localhost:4000/v1/marketplace/product/${productId}/images`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/images`
   )
   const dataFeatures = await fetchData(
-    `http://localhost:4000/v1/marketplace/product/${productId}/features`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/features`
   )
   const dataTags = await fetchData(
-    `http://localhost:4000/v1/marketplace/product/${productId}/tags`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/tags`
   )
 
   return {

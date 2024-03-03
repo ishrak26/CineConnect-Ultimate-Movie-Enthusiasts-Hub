@@ -14,7 +14,7 @@ const ForumItem = ({ Forum }) => {
   useEffect(() => {
     const checkIfUserJoinedForum = async () => {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${Forum.movie_id}/joined`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${Forum.movie_id}/joined`,
         {
           method: 'GET',
           headers: {

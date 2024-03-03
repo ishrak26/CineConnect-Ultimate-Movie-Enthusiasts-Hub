@@ -8,15 +8,13 @@ import { useDispatch } from 'react-redux'
 import Link from 'next/link'
 // import { addToWishlist } from "../slices/wishlistSlice";
 
-
 function ProductCard({ item }) {
-
   const showToast = useCustomToast()
 
   const handleClick = () => {
     try {
       const response = fetch(
-        `http://localhost:4000/v1/marketplace/product/${item.id}/wishlist`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${item.id}/wishlist`,
         {
           method: 'POST',
           headers: {
@@ -26,7 +24,6 @@ function ProductCard({ item }) {
           credentials: 'include',
         }
       ).then((res) => res.json())
-
     } catch (err) {
       console.log(err)
 

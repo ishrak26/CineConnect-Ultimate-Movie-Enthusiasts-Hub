@@ -23,15 +23,18 @@ const Login = () => {
   const submit = async (e) => {
     e.preventDefault()
 
-    const response = await fetch('http://localhost:4000/v1/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    }).then((response) => response.json())
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/login`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      }
+    ).then((response) => response.json())
 
     console.log(response)
 

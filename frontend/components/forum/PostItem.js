@@ -54,7 +54,7 @@ const PostItem = ({
   useEffect(() => {
     const getCommentCount = async (forumId, postId) => {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${postId}/reactions`,
         {
           method: 'GET',
           headers: {
@@ -77,7 +77,7 @@ const PostItem = ({
     setLoadingDelete(true)
     try {
       const success = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${post.postId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${post.postId}`,
         {
           method: 'DELETE',
           headers: {
@@ -208,7 +208,7 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
   useEffect(() => {
     const getVoteCount = async (forumId, postId) => {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${postId}/reactions`,
         {
           method: 'GET',
           headers: {
@@ -226,7 +226,7 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
 
     const checkIfVoted = async (forumId, postId) => {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/voted`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${postId}/voted`,
         {
           method: 'GET',
           headers: {
@@ -279,7 +279,6 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
     // } else {
     //   setIsVoted(true)
     // }
-
   }
 
   return (
@@ -334,12 +333,12 @@ const PostDetails = ({ showForumImage, post }) => {
               alt="Forum logo"
             />
           ) : ( */}
-            <Icon
-              as={IoPeopleCircleOutline}
-              mr={1}
-              fontSize="18pt"
-              color="white"
-            />
+          <Icon
+            as={IoPeopleCircleOutline}
+            mr={1}
+            fontSize="18pt"
+            color="white"
+          />
           {/* )} */}
           <Link href={`/forum/${post.postId}`} isExternal>
             <Text
@@ -428,10 +427,8 @@ const PostActions = ({
           Edit
         </Button>
         )} */}
-    
 
         {userIsCreator && (
-
           <Button
             onClick={handleDelete}
             isLoading={loadingDelete}

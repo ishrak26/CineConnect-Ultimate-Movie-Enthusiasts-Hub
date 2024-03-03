@@ -122,11 +122,11 @@ export async function getServerSideProps({ query }) {
 
   if (query.with_genres) {
     response = await fetch(
-      `http://localhost:4000/v1/genre/${query.with_genres}/movies?limit=${limit}&offset=${offset}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/genre/${query.with_genres}/movies?limit=${limit}&offset=${offset}`
     ).then((res) => res.json())
   } else {
     response = await fetch(
-      `http://localhost:4000/v1/movies?limit=${limit}&offset=${offset}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}&offset=${offset}`
     ).then((res) => res.json())
   }
 
@@ -148,13 +148,13 @@ export async function getServerSideProps({ query }) {
   }
 
   // const { data: genresData } = await tmdb.get('/genre/movie/list')
-  const genres = await fetch(`http://localhost:4000/v1/genres`).then((res) =>
-    res.json()
-  )
+  const genres = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/genres`
+  ).then((res) => res.json())
 
-  const totalMovies = await fetch(`http://localhost:4000/v1/movies/count`).then(
-    (res) => res.json()
-  )
+  const totalMovies = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies/count`
+  ).then((res) => res.json())
 
   return {
     props: {

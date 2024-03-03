@@ -6,7 +6,7 @@ import Modal from './modal'
 import Search from './search'
 import SearchIcon from './icons/search.svg'
 import clsx from 'clsx'
-import { FaUserFriends } from 'react-icons/fa';
+import { FaUserFriends } from 'react-icons/fa'
 
 export default function Navbar() {
   const ref = useRef(null)
@@ -25,14 +25,17 @@ export default function Navbar() {
 
   useEffect(() => {
     const checkLoggedIn = async () => {
-      const response = await fetch(`http://localhost:4000/v1/auth/isLoggedIn`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          // ...(cookie ? { Cookie: cookie } : {}),
-        },
-        credentials: 'include',
-      }).then((res) => res.json())
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/isLoggedIn`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      ).then((res) => res.json())
       // console.log('response', response)
       if (!response.loggedIn) {
         setLoggedIn(false)
@@ -85,9 +88,13 @@ export default function Navbar() {
           {loggedIn && <p>{userInfo.username}</p>}
           {loggedIn && (
             // <Link href="/requests">
-              <a href='/requests' className="icon-button">
-                <FaUserFriends style={{ color: 'black' }} className="icon" size={25} />
-              </a>
+            <a href="/requests" className="icon-button">
+              <FaUserFriends
+                style={{ color: 'black' }}
+                className="icon"
+                size={25}
+              />
+            </a>
             // </Link>
           )}
 
@@ -103,7 +110,11 @@ export default function Navbar() {
           {loggedIn && (
             <a href={`/profile/${userInfo.username}`}>
               <button className="profile-button">
-                <img src={userInfo.image_url} alt="Profile" className="profile" />
+                <img
+                  src={userInfo.image_url}
+                  alt="Profile"
+                  className="profile"
+                />
               </button>
             </a>
           )}

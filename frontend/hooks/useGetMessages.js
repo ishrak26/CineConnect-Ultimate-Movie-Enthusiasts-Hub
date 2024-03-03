@@ -11,7 +11,7 @@ const useGetMessages = () => {
       setLoading(true)
       try {
         const res = await fetch(
-          `http://localhost:4000/v1/chat/${
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/chat/${
             selectedConversation.userId
               ? selectedConversation.userId
               : selectedConversation.id

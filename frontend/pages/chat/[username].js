@@ -63,20 +63,19 @@ export async function getServerSideProps(context) {
   }
 
   const userInfo = await fetchData(
-    `http://localhost:4000/v1/profile/${username}`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${username}`
   )
 
   const userDetails = userInfo.profileInfo
 
   const user = {
-    userId : userDetails.id,
+    userId: userDetails.id,
     username: userDetails.username,
     fullname: userDetails.full_name,
     imageUrl: userDetails.image_url,
   }
 
   console.log('user', user)
-  
 
   return {
     props: {

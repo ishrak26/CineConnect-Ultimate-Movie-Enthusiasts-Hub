@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 function WishProduct({ item, idx, onRemove }) {
   const removeFromWishlist = async (id) => {
     const response = await fetch(
-      `http://localhost:4000/v1/marketplace/product/${id}/wishlist`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${id}/wishlist`,
       {
         method: 'DELETE',
         headers: {

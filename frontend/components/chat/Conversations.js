@@ -10,13 +10,16 @@ const Conversations = ({ user }) => {
 
   useEffect(() => {
     const getConversions = async () => {
-      const response = await fetch(`http://localhost:4000/v1/chat/users`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/chat/users`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      )
 
       const data = await response.json()
       console.log(data)

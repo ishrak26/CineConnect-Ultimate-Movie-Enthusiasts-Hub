@@ -164,9 +164,15 @@ export async function getServerSideProps(context) {
   try {
     const limit = 10
     const [topRated, netflixOriginals, actionMovies] = await Promise.all([
-      fetchData(`http://localhost:4000/v1/movies?limit=${limit}`),
-      fetchData(`http://localhost:4000/v1/movies?limit=${limit}`),
-      fetchData(`http://localhost:4000/v1/movies?limit=${limit}`),
+      fetchData(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
+      ),
+      fetchData(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
+      ),
+      fetchData(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
+      ),
     ])
 
     // Check if any of the responses indicate 'not found'
