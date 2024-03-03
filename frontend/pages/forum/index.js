@@ -31,7 +31,7 @@ const Forums = ({ user, cookie }) => {
     setLoading(true)
     try {
       const forumsResponse = await fetch(
-        `http://localhost:4000/v1/profile/${user.username}/forums?limit=${
+        `http://localhost:4000/v1/profile/${user.username}/joined-forums?limit=${
           5 + numberOfExtraPosts
         }`,
         {
