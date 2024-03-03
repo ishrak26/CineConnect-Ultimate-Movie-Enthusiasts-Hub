@@ -1,4 +1,5 @@
 import React from 'react';
+import Head from 'next/head';
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
 import Sidebar from '@components/Sidebar';
@@ -6,6 +7,7 @@ import BaseLayout from '@components/BaseLayout';
 import Navbar from '@components/navbar';
 import Container from "@components/Container";
 import Row from '@components/Row';
+import ForumRow from '@components/ForumRow';
 import ReviewCard from '@components/ReviewCard';
 import CinefellowsRow from '@components/CinefellowsRow'; // Adjust the import path as necessary
 import { EditButton, AcceptCinefellowRequestButton, DeclineCinefellowRequestButton, SendCinefellowRequestButton, 
@@ -232,6 +234,19 @@ const handleWithdrawRequest = async (user, fellow) => {
 
   return (
     <div>
+      <Head>
+        <title>Profile &mdash; CineConnect</title>
+        <meta
+          name="description"
+          content="Millions of movies, TV shows and people to discover. Explore now."
+        />
+        <meta
+          name="keywords"
+          content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
+        />
+
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+      </Head>
       <Navbar />
       <BaseLayout>
         <div className="container">
@@ -290,7 +305,7 @@ const handleWithdrawRequest = async (user, fellow) => {
             {/* Discussion Forums Section */}
             <SectionHeader title="Discussion Forums"/>
             <div className={`${sectionMargin}`}>
-              <Row movies={forums.watchedMovies} isMain={true} />
+              <ForumRow movies={forums.movies} isMain={true} />
             </div>
 
             {/* cineFellows Section */}
@@ -351,7 +366,7 @@ export async function getServerSideProps(context) {
       fetchData(`http://localhost:4000/v1/profile/${username}/cinefellows/`),
       fetchData(`http://localhost:4000/v1/profile/${username}/watchlist/`),
       fetchData(`http://localhost:4000/v1/movies/`), // dummy, will need to change to fetch top few reviews
-      fetchData(`http://localhost:4000/v1/profile/${username}/watched/`), // dummy, will need to change to fetch top forums
+      fetchData(`http://localhost:4000/v1/profile/${username}/joined-forums/`), // dummy, will need to change to fetch top forums
       fetchData(`http://localhost:4000/v1/profile/${username}/identify-profile`),
       fetchData(`http://localhost:4000/v1/profile/${username}/`),
       fetchData(`http://localhost:4000/v1/profile/${username}/cinefellows/count/`), 

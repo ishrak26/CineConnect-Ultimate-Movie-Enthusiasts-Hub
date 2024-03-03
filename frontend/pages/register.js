@@ -88,7 +88,17 @@ export default function Register() {
     return (
         <Layout>
             <Head>
-                <title>Register</title>
+            <title>Register &mdash; CineConnect</title>
+                <meta
+                name="description"
+                content="Millions of movies, TV shows and people to discover. Explore now."
+                />
+                <meta
+                name="keywords"
+                content="where can i watch, movie, movies, tv, tv shows, cinema, movielister, movie list, list"
+                />
+
+                <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
             </Head>
             <div className="container mx-auto">
 

@@ -105,6 +105,10 @@ router.post(
     userController.updateUserProfile
 );
 
-module.exports = router;
+// Router to get the list of movies whose discussion forums have been joined by the user
+router.get(
+    "/profile/:username/joined-forums",
+    userController.getJoinedForumsByUser
+);
 
 // http://localhost:4000/v1/profile/
