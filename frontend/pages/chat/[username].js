@@ -33,7 +33,7 @@ const Home = ({ user }) => {
 export default Home
 
 export async function getServerSideProps(context) {
-  const userId = context.params.userId
+  const username = context.params.username
   const cookie = context.req.headers.cookie
 
   async function fetchData(url, params) {
@@ -63,11 +63,20 @@ export async function getServerSideProps(context) {
   }
 
   const userInfo = await fetchData(
-    `http://localhost:4000/v1/profile/${userId}/profile`
+    `http://localhost:4000/v1/profile/${username}`
   )
 
-  const user = await userInfo.profileInfo
+  const userDetails = userInfo.profileInfo
+
+  const user = {
+    userId : userDetails.id,
+    username: userDetails.username,
+    fullname: userDetails.full_name,
+    imageUrl: userDetails.image_url,
+  }
+
   console.log('user', user)
+  
 
   return {
     props: {
