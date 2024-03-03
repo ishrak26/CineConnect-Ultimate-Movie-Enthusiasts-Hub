@@ -794,6 +794,11 @@ const userController = {
             .status(409)
             .send({ message: "New username is already taken." });
         }
+      }
+    } catch (error) {
+      console.error("Error checking username availability:", error);
+      return res.status(500).send({ message: "Internal server error" });
+    }
     },
 
     // Controller function to get the list of movies whose discussion forums the user has joined

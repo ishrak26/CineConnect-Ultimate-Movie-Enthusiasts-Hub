@@ -14,8 +14,6 @@ const Message = ({ message, user }) => {
 
   const shakeClass = message.shouldShake ? 'shake' : ''
 
-  console.log(user)
-
   return (
     <div className={`flex items-end ${fromMe ? 'flex-row-reverse' : ''} gap-2`}>
       <div className="w-10 h-10 rounded-full overflow-hidden">
