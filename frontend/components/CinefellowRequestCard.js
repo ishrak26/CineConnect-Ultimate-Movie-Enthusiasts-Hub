@@ -13,7 +13,7 @@ const CinefellowRequestCard = ({ requestorPhoto, requestedAt, requestorUsername,
         <img src={requestorPhoto} alt={`${requestorUsername}'s profile`} className={styles.profilePhoto} />
         <div className={styles.userInfo}>
           <div className={styles.username}>{requestorUsername}</div>
-          <div className={styles.commonForums}>Common Forums: {commonForumsCount}</div>
+          {/* <div className={styles.commonForums}>Common Forums: {commonForumsCount}</div> */}
           <div className={styles.requestedAt}>{requestedAt}</div>
         </div>
       </div>
