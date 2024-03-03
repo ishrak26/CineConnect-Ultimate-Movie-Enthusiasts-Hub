@@ -6,7 +6,7 @@ import Modal from './modal'
 import Search from './search'
 import SearchIcon from './icons/search.svg'
 import clsx from 'clsx'
-import { FaUserFriends } from 'react-icons/fa'
+import { FaUserFriends, FaSignOutAlt } from 'react-icons/fa';
 
 export default function Navbar() {
   const ref = useRef(null)
@@ -14,6 +14,29 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
+
+  const handleLogout = async () => {
+    try {
+        const response = await fetch(`http://localhost:4000/v1/auth/logout`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            // Ensure you're passing necessary information if required by your backend API
+            // body: JSON.stringify({
+            // }),
+        });
+        if (!response.ok) {
+            throw new Error('Failed to logout');
+        }
+        const data = await response.json();
+        console.log('logout successful :', data);
+        window.location.href = '/';
+    } catch (err) {
+        console.error(err); // Handle errors
+    }
+  };
 
   useEffect(() => {
     if (searchOpen) {
@@ -118,9 +141,14 @@ export default function Navbar() {
               </button>
             </a>
           )}
-          {loggedIn && (
+          {/* {loggedIn && (
             <button className="icon-button">
               <img src="/settings.png" alt="Settings" className="icon" />
+            </button>
+          )} */}
+          {loggedIn && (
+            <button className="icon-button" onClick={() => handleLogout()}>
+              <FaSignOutAlt style={{ color: 'black' }} className="icon" size={25} />
             </button>
           )}
 

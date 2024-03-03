@@ -14,6 +14,16 @@ export const EditButton = ({ onClick }) => {
     );
   };
 
+// ChatButton component
+export const ChatButton = ({ onClick }) => {
+    return (
+      <button className={styles.chatButton} onClick={onClick}>
+        <BiMailSend className={styles.chatButtonIcon} /> {/* Example icon */}
+        Chat
+      </button>
+    );
+  };
+
 // SendCinefellowRequestButton component
 export const SendCinefellowRequestButton = ({ onClick }) => {
     return (

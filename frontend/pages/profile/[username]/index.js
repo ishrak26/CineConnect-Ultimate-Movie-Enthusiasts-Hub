@@ -108,6 +108,10 @@ export default function Profile({
     router.push(`/profile/${user.username}/edit`)
   }
 
+  const handleChat = (fellow) => {
+    router.push(`/chat/${fellow.username}`);
+  }
+
   const handleUnfollow = async (user, fellow) => {
     console.log('Inside handleUnfollow, user:', user, 'fellow:', fellow)
     try {
@@ -323,6 +327,9 @@ export default function Profile({
               ) : (
                 <></>
               )}
+              {profileOwnerState !== 1 && (
+                <ChatButton onClick={() => handleChat(profileInfo)} />
+              )}
             </div>
 
             {/* Watched Section */}
@@ -338,12 +345,12 @@ export default function Profile({
             </div>
 
             {/* Reviews Section */}
-            <SectionHeader title="Recent Reviews" />
+            {/* <SectionHeader title="Recent Reviews" />
             <div className={`space-y-4 ${sectionMargin}`}>
               {userReviews.map((review, index) => (
                 <ReviewCard key={index} review={review} />
               ))}
-            </div>
+            </div> */}
 
             {/* Discussion Forums Section */}
             <SectionHeader title="Discussion Forums" />
