@@ -34,22 +34,21 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      const url = new URL('http://localhost:4000/v1/notifications'); // Adjust the domain as necessary
+      // const url = new URL('http://localhost:4000/v1/notifications'); // Adjust the domain as necessary
+
+      const beforeTime = new Date().toISOString();
+      const limit = 10;
+      const offset = 0; 
       
-      // If you need to add query parameters, you can do so like this:
-      const params = {
-        beforeTime: new Date().toISOString(), // or any specific datetime
-        limit: 10, // Default is 10, adjust if needed
-        offset: 0, // Default is 0, adjust if needed
-      };
-      Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+      // Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
   
       try {
-        const response = await fetch(url, {
+        console.log('Inside navbars fetchNotifications, url:', url)
+        const response = await fetch(`http://localhost:4000/v1/notifications?beforeTime=${beforeTime}&limit=${limit}&offset=${offset}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer YOUR_AUTH_TOKEN', // Replace YOUR_AUTH_TOKEN with the actual token
+            // 'Authorization': 'Bearer YOUR_AUTH_TOKEN', // Replace YOUR_AUTH_TOKEN with the actual token
           },
           credentials: 'include', // Necessary if your API requires cookies to be sent
         });
@@ -57,14 +56,14 @@ export default function Navbar() {
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
-  
+        console.log('Inside navbars fetchNotifications, response:', response)
         const notifications = await response.json();
         console.log('Notifications:', notifications);
         // Set state or perform actions with the fetched notifications here
       } catch (error) {
         console.error('Failed to fetch notifications:', error.message);
       }
-    };
+    }; fetchNotifications();
   }, [showNotifications])
 
   useEffect(() => {
@@ -85,7 +84,6 @@ export default function Navbar() {
         setUserInfo(response.user)
       }
     }
-    
     checkLoggedIn()
   }, [])
 
