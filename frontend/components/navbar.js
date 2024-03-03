@@ -17,6 +17,7 @@ export default function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [showNotifications, setShowNotifications] = useState(false);
+  const [fetchedNotifications, setFetchedNotifications] = useState([]);
 
   const mockNotifications = [
     { id: 1, imageUrl: '/user1.png', message: 'User1 liked your post.', createdAt: '2023-03-01T09:24:00' },
@@ -32,40 +33,7 @@ export default function Navbar() {
     }
   }, [searchOpen])
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      // const url = new URL('http://localhost:4000/v1/notifications'); // Adjust the domain as necessary
-
-      const beforeTime = new Date().toISOString();
-      const limit = 10;
-      const offset = 0; 
-      
-      // Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
   
-      try {
-        console.log('Inside navbars fetchNotifications, url:', url)
-        const response = await fetch(`http://localhost:4000/v1/notifications?beforeTime=${beforeTime}&limit=${limit}&offset=${offset}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': 'Bearer YOUR_AUTH_TOKEN', // Replace YOUR_AUTH_TOKEN with the actual token
-          },
-          credentials: 'include', // Necessary if your API requires cookies to be sent
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-        console.log('Inside navbars fetchNotifications, response:', response)
-        const notifications = await response.json();
-        console.log('Notifications:', notifications);
-        // Set state or perform actions with the fetched notifications here
-      } catch (error) {
-        console.error('Failed to fetch notifications:', error.message);
-      }
-    }; fetchNotifications();
-  }, [showNotifications])
-
   useEffect(() => {
     const checkLoggedIn = async () => {
       const response = await fetch(`http://localhost:4000/v1/auth/isLoggedIn`, {
@@ -86,6 +54,43 @@ export default function Navbar() {
     }
     checkLoggedIn()
   }, [])
+
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      // const url = new URL('http://localhost:4000/v1/notifications'); // Adjust the domain as necessary
+
+      const beforeTime = new Date().toISOString();
+      const limit = 10;
+      const offset = 0; 
+      
+      // Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  
+      try {
+        // console.log('Inside navbars fetchNotifications, url:', url)
+        const response = await fetch(`http://localhost:4000/v1/notifications?beforeTime=${beforeTime}&limit=${limit}&offset=${offset}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': 'Bearer YOUR_AUTH_TOKEN', // Replace YOUR_AUTH_TOKEN with the actual token
+          },
+          credentials: 'include', // Necessary if your API requires cookies to be sent
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        console.log('Inside navbars fetchNotifications, response:', response)
+        setFetchedNotifications(await response.json());
+        console.log('Notifications:', fetchedNotifications);
+
+        // Set state or perform actions with the fetched notifications here
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error.message);
+      }
+    }; fetchNotifications();
+  }, [showNotifications])
+
 
   return (
     <header className="navbar">
@@ -139,7 +144,7 @@ export default function Navbar() {
 
             {loggedIn && showNotifications && (
               <div className="notifications-list">
-                {mockNotifications.map(notification => (
+                {fetchedNotifications.map(notification => (
                   <NotificationCard key={notification.id} notification={notification} />
                 ))}
               </div>

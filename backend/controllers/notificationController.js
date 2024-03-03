@@ -24,15 +24,16 @@ const notificationController = {
             for (let notification of notifications) {
                 data.push({
                     interactor: {
-                        id: notification.interactor_id,
-                        username: notification.username,
-                        fullname: notification.full_name,
-                        imageUrl: notification.image_url,
+                        id: notification._interactor_id,
+                        username: notification._username,
+                        fullname: notification._full_name,
+                        imageUrl: notification._image_url,
                     },
-                    type: notification.type,
-                    created_at: notification.created_at,
-                    isRead: notification.is_read,
-                    postId: notification.post_id,
+                    type: notification._type,
+                    created_at: notification._created_at,
+                    isRead: notification._is_read,
+                    postId: notification._post_id,
+                    movieId: notification._movie_id,
                 });
             }
             res.status(200).json(data);
