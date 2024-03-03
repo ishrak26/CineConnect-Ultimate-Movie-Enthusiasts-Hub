@@ -664,7 +664,7 @@ async function fetchTheatres(
         throw error;
     }
 
-    // console.log('Returning from fetchTheatres:', data);
+    console.log('Returning from fetchTheatres:', data);
     return data;
 }
 

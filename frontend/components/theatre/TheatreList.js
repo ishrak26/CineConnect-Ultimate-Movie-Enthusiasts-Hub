@@ -19,6 +19,7 @@ function TheatreList({ TheatreList }) {
 
   return (
     <div>
+      {console.log('TheatreList', TheatreList)}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -44,7 +45,7 @@ function TheatreList({ TheatreList }) {
           (item, index) =>
             index <= 7 && (
               <div key={index} onClick={() => setSelectedTheatre(item)}>
-                <TheatreItem Theatre={item} />
+                {item && <TheatreItem Theatre={item} />}
               </div>
             )
         )}

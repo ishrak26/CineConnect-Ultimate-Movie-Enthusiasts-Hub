@@ -10,11 +10,7 @@ export function ChangeView({ coords }) {
   return null
 }
 
-export default function Map({ mapTiler, movieId }) {
-  const [geoData, setGeoData] = useState({ lat: 23.750246, lng: 90.413466 })
-  const [theatres, setTheatres] = useState([])
-
-  const center = [geoData.lat, geoData.lng]
+export default function Map({ mapTiler, center, theatres, location }) {
 
   const markerIcon = new L.Icon({
     iconUrl: '/marker.png',
@@ -24,42 +20,6 @@ export default function Map({ mapTiler, movieId }) {
   })
 
   const ZOOM_LEVEL = 9
-  const mapRef = useRef()
-
-  useEffect(() => {
-    const getTheatres = async () => {
-      const theatreResponse = await fetch(
-        `http://localhost:4000/v1/movie/${movieId}/theatre?lat=${geoData.lat}&lng=${geoData.lng}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // ...(cookie ? { Cookie: cookie } : {}),
-          },
-          // credentials: 'include',
-        }
-      )
-
-      // Check the response status code before proceeding to parse the JSON
-      if (theatreResponse.ok) {
-        // If the response is successful (status in the range 200-299)
-        const theatreData = await theatreResponse.json() // Now it's safe to parse JSON
-          setTheatres(theatreData)
-      } else {
-        // If the response is not successful, log or handle the error
-        console.error(
-          'Error with request:',
-          theatreResponse.status,
-          theatreResponse.statusText
-        )
-        // Optionally, you can still read and log the response body
-        // const responseBody = await ratingResponse.text()
-        // console.log('Response Body:', responseBody)
-      }
-    }
-
-    getTheatres()
-  }, [])
 
   return (
     <div className=" col-span-3">
@@ -82,8 +42,25 @@ export default function Map({ mapTiler, movieId }) {
               </Popup>
             </Marker>
           ))}
+          <Marker
+              position={[location.coordinates.lat, location.coordinates.lng]}
+              icon={markerIcon}
+            >
+              <Popup>
+                <b>
+                  {'You are here'}
+                </b>
+              </Popup>
+            </Marker>
         <ChangeView coords={center} />
       </MapContainer>
+      {/* <div className="row my-4">
+        <div className="col d-flex justify-content-center">
+          <button className="btn btn-primary" onClick={showMyLocation}>
+            Locate Me
+          </button>
+        </div>
+      </div> */}
     </div>
   )
 }
