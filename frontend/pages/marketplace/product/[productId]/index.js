@@ -358,9 +358,11 @@ export default function Product({
                   </div>
 
                   <p className="py-2 text-base text-gray-400">Designed By </p>
-                  <p className="font-semibold text-lg text-cusblack pb-4">
-                    {owner}
-                  </p>
+                  <Link href={`/profile/${owner}`} passHref>
+                    <p className="font-semibold text-lg text-cusblack pb-4">
+                      {owner}
+                    </p>
+                  </Link>
 
                   <p className="py-2 text-base text-gray-400">Price:</p>
                   <div className="flex items-center pb-4">
