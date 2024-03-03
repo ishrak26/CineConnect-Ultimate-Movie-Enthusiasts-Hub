@@ -12,7 +12,7 @@ export function ChangeView({ coords }) {
 }
 
 export default function Map({ mapTiler, movieId }) {
-  const [center, setCenter] = useState({ lat: 23.750246, lng: 90.413466 })
+  const [center, setCenter] = useState({ lat: 22.750246, lng: 90.413466 })
   const [theatres, setTheatres] = useState([])
   const [location, setLocation] = useState({
     loaded: false,
@@ -51,7 +51,7 @@ export default function Map({ mapTiler, movieId }) {
       if (theatreResponse.ok) {
         // If the response is successful (status in the range 200-299)
         const theatreData = await theatreResponse.json() // Now it's safe to parse JSON
-        console.log('theatreData', theatreData)
+        // console.log('theatreData', theatreData)
         setTheatres(theatreData)
       } else {
         // If the response is not successful, log or handle the error
@@ -83,6 +83,10 @@ export default function Map({ mapTiler, movieId }) {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           },
+        })
+        setCenter({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
         })
       },
       (error) => {
