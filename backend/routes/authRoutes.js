@@ -15,4 +15,7 @@ router.get('/isLoggedIn/', authController.isLoggedIn); // /v1/auth/isLoggedIn
 // Route to match password and confirm password
 router.post('/:username/matchPassword/', authController.matchPassword); // /v1/auth/:username/matchPassword
 
+// Router to logout 
+router.post('/logout/', authController.logout); // /v1/auth/logout
+
 module.exports = router;
