@@ -10,8 +10,8 @@ function TheaterItem({Theater,showDir=false}) {
     const [distance,setDistance]=useState();
     useEffect(()=>{
       calculateDistance(
-        Theater.lat,
-        Theater.lng,
+        Theater.geometry.location.lat,
+        Theater.geometry.location.lng,
         userLocation.lat,
         userLocation.lng
       )
@@ -52,8 +52,9 @@ function TheaterItem({Theater,showDir=false}) {
     <div className='w-[195px] flex-shrink-0 p-2
      rounded-lg shadow-md mb-1
      bg-white hover:scale-110 transition-all mt-[20px] cursor-pointer'>
-        {console.log('Theater', Theater)}
-        {Theater.image_url && <Image src={Theater.image_url}
+        {/* {console.log('Theater', Theater)} */}
+        {<Image src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo_ref}&key=${GOOGLE_API_KEY}`}
+
             alt={Theater.name}
             width={180}
             height={80}

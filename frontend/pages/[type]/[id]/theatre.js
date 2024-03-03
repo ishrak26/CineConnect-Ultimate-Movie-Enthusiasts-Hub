@@ -113,27 +113,27 @@ const TheatrePage = ({ mapTiler, movieId }) => {
     grid-cols-1
     md:grid-cols-4 "
           >
-            <div className="p-3 pt-20">
+            {/* <div className="p-3 pt-20">
               <CategoryList onCategoryChange={(value) => setCategory(value)} />
               <RangeSelect onRadiusChange={(value) => setRadius(value)} />
               {/* <SelectRating onRatingChange={(value) => onRatingChange(value)} /> */}
-              <SetPrice />
+              {/* <SetPrice /> */}
 
-              <button
+              {/* <button
                 type="button"
                 // onClick={handleSizeSubmit}
                 className="px-4 py-2 my-5 text-black-100 bg-primary-600 rounded-r focus:outline-none hover:bg-primary-800 transition-all duration-300 ease-in-out w-full md:w-3/4 mx-auto"
-              >
-                Filter
-              </button>
-            </div>
-            <div className="col-span-3 pt-10">
-              <MapWithNoSSR mapTiler={mapTiler} center={center} theatres={theatres} location={location} />
+              > */}
+                {/* Filter */}
+              {/* </button> */}
+            {/* </div> */} */
+            <div className="col-span-4 pt-10">
+              <MapWithNoSSR mapTiler={mapTiler} movieId={movieId} />
               <div
                 className="md:absolute mx-2 w-[90%] md:w-[74%]
            bottom-36 relative md:bottom-3"
               >
-                 {theatres && <TheaterList TheatreList={theatres} />}
+                 {/* {theatres && <TheaterList TheatreList={theatres} />} */}
                 {/* {console.log('theatres', theatres)} */}
               </div>
             </div>

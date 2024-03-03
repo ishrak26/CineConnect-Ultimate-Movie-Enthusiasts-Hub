@@ -457,7 +457,7 @@ export default function Home({ data, type, casts }) {
             {/* {data.credits?.cast.length > 0 && <Cast cast={data.credits.cast} />} */}
 
             <strong className="heading block mb-2">Top Casts</strong>
-            <div className="mr-2 text-right">
+            {/* <div className="mr-2 text-right">
               <Link
                 href={`/movie/${data.id}/casts`}
                 target="_blank"
@@ -467,8 +467,8 @@ export default function Home({ data, type, casts }) {
               >
                 See all
                 {/* <FaExternalLinkAlt /> */}
-              </Link>
-            </div>
+              {/* </Link> */}
+            {/* </div> */} 
             {casts && <Cast casts={casts} />}
 
             <div className="flex flex-col-reverse my-5 gap-12 md:gap-20 lg:flex-row">
