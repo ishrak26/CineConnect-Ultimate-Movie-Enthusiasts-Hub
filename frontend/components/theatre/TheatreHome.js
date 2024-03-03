@@ -10,8 +10,9 @@ export function ChangeView({ coords }) {
   return null
 }
 
-export default function Map({ mapTiler }) {
+export default function Map({ mapTiler, movieId }) {
   const [geoData, setGeoData] = useState({ lat: 23.750246, lng: 90.413466 })
+  const [theatres, setTheatres] = useState([])
 
   const center = [geoData.lat, geoData.lng]
 
@@ -25,6 +26,41 @@ export default function Map({ mapTiler }) {
   const ZOOM_LEVEL = 9
   const mapRef = useRef()
 
+  useEffect(() => {
+    const getTheatres = async () => {
+      const theatreResponse = await fetch(
+        `http://localhost:4000/v1/movie/${movieId}/theatre?lat=${geoData.lat}&lng=${geoData.lng}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          // credentials: 'include',
+        }
+      )
+
+      // Check the response status code before proceeding to parse the JSON
+      if (theatreResponse.ok) {
+        // If the response is successful (status in the range 200-299)
+        const theatreData = await theatreResponse.json() // Now it's safe to parse JSON
+          setTheatres(theatreData)
+      } else {
+        // If the response is not successful, log or handle the error
+        console.error(
+          'Error with request:',
+          theatreResponse.status,
+          theatreResponse.statusText
+        )
+        // Optionally, you can still read and log the response body
+        // const responseBody = await ratingResponse.text()
+        // console.log('Response Body:', responseBody)
+      }
+    }
+
+    getTheatres()
+  }, [])
+
   return (
     <div className=" col-span-3">
       <MapContainer
@@ -33,15 +69,19 @@ export default function Map({ mapTiler }) {
         style={{ height: '80vh' }}
       >
         <TileLayer attribution={mapTiler.attribution} url={mapTiler.url} />
-        {geoData.lat && geoData.lng && (
-          <Marker position={[geoData.lat, geoData.lng]} icon={markerIcon}>
-            <Popup>
-              <b>
-                {'Dhaka'}, {'Bangladesh'}
-              </b>
-            </Popup>
-          </Marker>
-        )}
+          {theatres.map((theatre, idx) => (
+            <Marker
+              position={[theatre.lat, theatre.lng]}
+              icon={markerIcon}
+              key={idx}
+            >
+              <Popup>
+                <b>
+                  {theatre.name}
+                </b>
+              </Popup>
+            </Marker>
+          ))}
         <ChangeView coords={center} />
       </MapContainer>
     </div>

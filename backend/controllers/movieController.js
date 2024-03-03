@@ -573,11 +573,11 @@ const moviesController = {
 
     fetchMovieTheatres: async (req, res) => {
         const movieId = req.params.movieId;
-        
+
         const lat = parseFloat(req.query.lat);
         const lng = parseFloat(req.query.lng);
-        const minPrice = parseInt(req.query.minPrice);
-        const maxPrice = parseInt(req.query.maxPrice);
+        const minPrice = parseInt(req.query.minPrice) || 0;
+        const maxPrice = parseInt(req.query.maxPrice) || 10000;
         const sortType = req.query.sortType || 'by_distance';
         const limit = parseInt(req.query.limit) || 10;
         const offset = parseInt(req.query.offset) || 0;

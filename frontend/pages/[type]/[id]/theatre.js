@@ -15,7 +15,7 @@ const MapWithNoSSR = dynamic(() => import('@components/theatre/TheatreHome'), {
   ssr: false,
 })
 
-const TheatrePage = ({ mapTiler }) => {
+const TheatrePage = ({ mapTiler, movieId }) => {
   return (
     <>
       <ChakraProvider theme={theme}>
@@ -55,7 +55,7 @@ const TheatrePage = ({ mapTiler }) => {
               </button>
             </div>
             <div className="col-span-3 pt-10">
-              <MapWithNoSSR mapTiler={mapTiler} />
+              <MapWithNoSSR mapTiler={mapTiler} movieId={movieId} />
               <div
                 className="md:absolute mx-2 w-[90%] md:w-[74%]
            bottom-36 relative md:bottom-3"
@@ -71,12 +71,13 @@ const TheatrePage = ({ mapTiler }) => {
 }
 
 export async function getServerSideProps(context) {
+  // console.log('context', context)
   const mapTiler = {
     url: process.env.MAPTILER_URL,
     attribution: process.env.MAPTILER_ATTRIBUTION,
   }
   // console.log('mapTiler', mapTiler)
-  return { props: { mapTiler } }
+  return { props: { mapTiler, movieId: context.params.id } }
 }
 
 export default TheatrePage

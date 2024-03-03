@@ -641,12 +641,12 @@ async function getMovieRatingInfo(movieId, userId = null) {
 async function fetchTheatres(
     lat,
     lng,
+    movieId,
     minPrice,
     maxPrice,
-    movieId,
     sortType,
+    limit,
     offset,
-    limit
 ) {
     const { data, error } = await supabase.rpc('fetch_theatre_halls', {
         user_lat: lat,
@@ -654,7 +654,7 @@ async function fetchTheatres(
         min_price: minPrice,
         max_price: maxPrice,
         given_movie_id: movieId,
-        given_sortType: sortType,
+        given_sorttype: sortType,
         given_limit: limit,
         given_offset: offset,
     });
@@ -664,7 +664,7 @@ async function fetchTheatres(
         throw error;
     }
 
-    console.log('Returning from fetchTheatres:', data);
+    // console.log('Returning from fetchTheatres:', data);
     return data;
 }
 
@@ -686,7 +686,10 @@ async function fetchNearbyTheatreCount(lat, lng, movieId, threshold) {
 }
 
 async function fetchTotalTheatreCount(movieId) {
-    const { count, error } = await supabase.from('theatre_has_showtime').select('*', { count: 'exact' }).eq('movie_id', movieId);
+    const { count, error } = await supabase
+        .from('theatre_has_showtime')
+        .select('*', { count: 'exact' })
+        .eq('movie_id', movieId);
 
     if (error) {
         console.error('Error fetching total theatre count:', error);
