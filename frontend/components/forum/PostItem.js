@@ -325,7 +325,7 @@ const PostDetails = ({ showForumImage, post }) => {
     <Stack direction="row" spacing={0.5} align="center" fontSize="9pt">
       {showForumImage && (
         <>
-          {post.topImage ? (
+          {/* {post.topImage ? (
             <Image
               borderRadius="full"
               boxSize="30px"
@@ -333,14 +333,14 @@ const PostDetails = ({ showForumImage, post }) => {
               mr={2}
               alt="Forum logo"
             />
-          ) : (
+          ) : ( */}
             <Icon
               as={IoPeopleCircleOutline}
               mr={1}
               fontSize="18pt"
               color="white"
             />
-          )}
+          {/* )} */}
           <Link href={`/forum/${post.postId}`} isExternal>
             <Text
               fontWeight={700}
@@ -374,14 +374,14 @@ const PostBody = ({ post, loadingImage, setLoadingImage }) => {
       <Text fontSize="12pt" color="white">
         {post.content.split(' ').slice(0, 30).join(' ')}
       </Text>
-      {post.image_url && (
+      {post.topImage && (
         <Flex justify="center" align="center">
-          {loadingImage && (
+          {/* {loadingImage && (
             <Skeleton height="300px" width="100%" borderRadius={10} />
-          )}
+          )} */}
           <Image
             mt={4}
-            src={post.image_url}
+            src={post.topImage}
             alt="Image for post"
             maxHeight="450px"
             maxWidth="100%"
@@ -422,12 +422,12 @@ const PostActions = ({
           Share
         </Button> */}
 
-        {userIsCreator && (
+        {/* {userIsCreator && (
           <Button onClick={handleEdit} className="mx-2">
           <Icon as={BsBookmark} mr={2} />
           Edit
         </Button>
-        )}
+        )} */}
     
 
         {userIsCreator && (
