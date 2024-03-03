@@ -11,7 +11,7 @@ import ForumRow from '@components/ForumRow';
 import ReviewCard from '@components/ReviewCard';
 import CinefellowsRow from '@components/CinefellowsRow'; // Adjust the import path as necessary
 import { EditButton, AcceptCinefellowRequestButton, DeclineCinefellowRequestButton, SendCinefellowRequestButton, 
-  RemoveCinefellowButton, WithdrawCinefellowRequestButton } from '@components/cinefellowProfileButtons';
+  RemoveCinefellowButton, WithdrawCinefellowRequestButton, ChatButton } from '@components/cinefellowProfileButtons';
 import Footer from '@components/footer';
 import Recommendations from '@components/recommendations';
 import { Box, Typography } from "@mui/material"; // Import from MUI
@@ -87,6 +87,10 @@ export default function Profile({ watchedMovies, watchlist, reviews, forums, cin
 
   const handleEditProfile = () => {
     router.push(`/profile/${user.username}/edit`);
+  }
+
+  const handleChat = (fellow) => {
+    router.push(`/chat/${fellow.username}`);
   }
 
   const handleUnfollow = async (user, fellow) => {
@@ -279,6 +283,9 @@ const handleWithdrawRequest = async (user, fellow) => {
               ) : (
                 <></>
               )}
+              {profileOwnerState !== 1 && (
+                <ChatButton onClick={() => handleChat(profileInfo)} />
+              )}
             </div>
 
             {/* Watched Section */}
@@ -295,12 +302,12 @@ const handleWithdrawRequest = async (user, fellow) => {
             </div>
 
             {/* Reviews Section */}
-            <SectionHeader title="Recent Reviews" />
+            {/* <SectionHeader title="Recent Reviews" />
             <div className={`space-y-4 ${sectionMargin}`}>
               {userReviews.map((review, index) => (
                 <ReviewCard key={index} review={review} />
               ))}
-            </div>
+            </div> */}
 
             {/* Discussion Forums Section */}
             <SectionHeader title="Discussion Forums"/>
