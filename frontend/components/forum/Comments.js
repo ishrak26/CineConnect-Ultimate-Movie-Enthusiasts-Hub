@@ -88,6 +88,8 @@ const Comments = ({
         }
       )
 
+      window.location.href = `/forum/${ForumId}/post/${selectedPost.postId}/comments`
+
       updateCommentCount();
 
       // const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);

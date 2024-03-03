@@ -114,3 +114,5 @@ router.get(
 module.exports = router;
 
 // http://localhost:4000/v1/profile/
+
+module.exports = router;

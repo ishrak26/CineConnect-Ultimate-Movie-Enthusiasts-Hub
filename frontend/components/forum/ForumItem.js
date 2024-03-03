@@ -3,9 +3,40 @@ import { Button, Flex, Icon, Image, Stack, Text } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { BsFillPeopleFill } from 'react-icons/bs'
 import { IoPeopleCircleOutline } from 'react-icons/io5'
+import { useState, useEffect } from 'react'
+import { set } from 'react-nprogress'
 
-const ForumItem = ({ Forum, isJoined, onJoinOrLeaveForum }) => {
+const ForumItem = ({ Forum }) => {
   const router = useRouter()
+
+  const [isJoined, setIsJoined] = useState(false)
+
+  useEffect(() => {
+    const checkIfUserJoinedForum = async () => {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${Forum.movie_id}/joined`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+
+      if (response.ok) {
+        const data = await response.json()
+        setIsJoined(data.joined)
+      }
+    }
+
+    checkIfUserJoinedForum()
+  }, [Forum.movie_id, isJoined])
+
+  const onJoinOrLeaveForum = async (Forum, isJoined) => {
+    router.push(`/forum/${Forum.id ? Forum.id : Forum.movie_id}`)
+  }
 
   return (
     <Flex
@@ -64,7 +95,9 @@ const ForumItemNameIconSection = ({ Forum }) => {
             mr={4}
           />
         )}
-        <Text fontSize={16}>{Forum.title}</Text>
+        <Text color="black" fontSize={16}>
+          {Forum.title}
+        </Text>
       </Flex>
     </Flex>
   )
@@ -92,13 +125,10 @@ const ForumItemButtonMembersSection = ({
         width="130px"
         fontSize="10pt"
         variant={isJoined ? 'outline' : 'solid'}
-        onClick={(event) => {
-          event.preventDefault()
-          event.stopPropagation() // stop the event from bubbling up
-          onJoinOrLeaveForum(Forum, isJoined)
-        }}
+        onClick={() => onJoinOrLeaveForum(Forum, isJoined)}
       >
-        {isJoined ? 'Leave Forum' : 'Join Forum'}
+        {console.log(isJoined)}
+        {isJoined ? 'Go to Forum' : 'Join Forum'}
       </Button>
     </Stack>
   )

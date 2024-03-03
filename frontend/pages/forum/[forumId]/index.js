@@ -53,7 +53,7 @@ const ForumPage = ({ ForumData, user, members, ForumAbout, cookie }) => {
         <ForumHeader ForumData={ForumAbout} />
         <PageContent>
           <>
-            <CreatePostLink />
+            {/* <CreatePostLink /> */}
             <Posts ForumData={ForumData} user={user} ForumAbout={ForumAbout} cookie={cookie}/>
           </>
           <>

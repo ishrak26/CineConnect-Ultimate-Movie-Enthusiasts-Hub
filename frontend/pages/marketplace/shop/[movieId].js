@@ -186,7 +186,7 @@ export async function getServerSideProps(context) {
     `http://localhost:4000/v1/marketplace/movie/${movieId}/products/count`
   )
 
-  const data = await fetchData('http://localhost:4000/v1/marketplace/tags')
+  const data = await fetchData(`http://localhost:4000/v1/marketplace/tags`)
   const dataTypes = data
 
   const currentPage = context.query.page || 1

@@ -16,6 +16,7 @@ const ForumHeader = ({ ForumData }) => {
 
   // console.log('ForumData', ForumData)
   const [isJoined, setIsJoined] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const checkUserJoinedForum = async () => {
@@ -50,21 +51,23 @@ const ForumHeader = ({ ForumData }) => {
           credentials: 'include',
         }
       )
-      setIsJoined(false)
-    } else {
-      const res = await fetch(
-        `http://localhost:4000/v1/forum/${ForumData.forumId}/join`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // ...(cookie ? { Cookie: cookie } : {}),
-          },
-          credentials: 'include',
-        }
-      )
-      setIsJoined(true)
-    }
+      window.location.href = `/movie/${ForumData.forumId}`
+      // setIsJoined(false)
+    } 
+    // else {
+    //   const res = await fetch(
+    //     `http://localhost:4000/v1/forum/${ForumData.forumId}/join`,
+    //     {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //         // ...(cookie ? { Cookie: cookie } : {}),
+    //       },
+    //       credentials: 'include',
+    //     }
+    //   )
+    //   setIsJoined(true)
+    // }
   }
 
   return (

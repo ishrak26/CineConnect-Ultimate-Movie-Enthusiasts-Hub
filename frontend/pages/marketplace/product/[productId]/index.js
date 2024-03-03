@@ -232,6 +232,10 @@ export default function Product({
     }
   }
 
+  const handleContact = () => {
+    Router.push(`/chat/${owner}`)
+  }
+
   const handleRating = (rate) => {
     // console.log(`Rated with: ${rate}`)
 
@@ -354,9 +358,11 @@ export default function Product({
                   </div>
 
                   <p className="py-2 text-base text-gray-400">Designed By </p>
-                  <p className="font-semibold text-lg text-cusblack pb-4">
-                    {owner}
-                  </p>
+                  <Link href={`/profile/${owner}`} passHref>
+                    <p className="font-semibold text-lg text-cusblack pb-4">
+                      {owner}
+                    </p>
+                  </Link>
 
                   <p className="py-2 text-base text-gray-400">Price:</p>
                   <div className="flex items-center pb-4">
@@ -464,7 +470,7 @@ export default function Product({
                     {user && dataItem?.owner.id !== user?.id && (
                       <button
                         onClick={handleClick}
-                        className="w-4/5 md:w-3/5 bg-primary-600 overflow-hidden py-4 text-black-100 rounded-lg text-sm active:bg-primary-900 duration-100 hover:bg-primary-700"
+                        className="mr-2 w-4/5 md:w-3/5 bg-primary-600 overflow-hidden py-4 text-black-100 rounded-lg text-sm active:bg-primary-900 duration-100 hover:bg-primary-700"
                       >
                         <motion.span
                           initial={{ y: -100 }}
@@ -480,6 +486,35 @@ export default function Product({
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                            </svg>
+                          </span>
+                        </motion.span>
+                      </button>
+                    )}
+
+                    {user && dataItem?.owner.id !== user?.id && (
+                      <button
+                        onClick={handleContact}
+                        className="mr-2 w-4/5 md:w-3/5 bg-primary-600 overflow-hidden py-4 text-black-100 rounded-lg text-sm active:bg-primary-900 duration-100 hover:bg-primary-700"
+                      >
+                        <motion.span
+                          initial={{ y: -100 }}
+                          animate={{ y: 0 }}
+                          className="flex justify-center place-items-center overflow-hidden"
+                        >
+                          {'Contact '}
+                          <span>
+                            <svg
+                              className="ml-2 w-5 h-5"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M10 3a4 4 0 100 8 4 4 0 000-8zM2 16a2 2 0 012-2h12a2 2 0 012 2v1H2v-1z"
+                                clip-rule="evenodd"
+                              />
                             </svg>
                           </span>
                         </motion.span>
