@@ -52,8 +52,8 @@ function WishProduct({ item, idx, onRemove }) {
           )}
         /> */}
         <p className="text-xs my-1.5">Tk {item.price}</p>
-
-        <Link href={'/marketplace/product/' + item.id}>
+        {console.log('item', item)}
+        <Link href={`/marketplace/product/${item.id}`}>
           <button className="text-black-100 bg-primary-600 border border-cusblack py-1 text-xs w-full rounded-lg">
             View product
           </button>
