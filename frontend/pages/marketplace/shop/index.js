@@ -57,9 +57,7 @@ function Category({
             isHome={true}
           >
             {data_items ? (
-              data_items.map((item) => (
-                <MovieCard key={item.id} item={item} />
-              ))
+              data_items.map((item) => <MovieCard key={item.id} item={item} />)
             ) : (
               <p className="col-span-full mx-auto my-10 text-sm text-gray-400">
                 No item found
@@ -113,12 +111,16 @@ export async function getServerSideProps(context) {
   const offset = (context.query.page - 1) * limit || 0
 
   const dataItems = await fetchData(
-    `http://localhost:4000/v1/movies?limit=${limit}&offset=${offset}`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}&offset=${offset}`
   )
 
-  const totalItems = await fetchData(`http://localhost:4000/v1/movies/count`)
+  const totalItems = await fetchData(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies/count`
+  )
 
-  const data = await fetchData('http://localhost:4000/v1/marketplace/tags')
+  const data = await fetchData(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/tags`
+  )
   const dataTypes = data
 
   const currentPage = context.query.page || 1

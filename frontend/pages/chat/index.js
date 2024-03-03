@@ -1,4 +1,4 @@
-import MessageContainer from '../components/chat/MessageContainer'
+import MessageContainer from '@components/chat/MessageContainer'
 import Sidebar from '@components/chat/SideBar'
 import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'

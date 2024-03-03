@@ -23,13 +23,16 @@ function Header() {
 
   useEffect(() => {
     const checkIsLoggedIn = async () => {
-      const response = await fetch('http://localhost:4000/v1/auth/isLoggedIn', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      }).then((res) => res.json())
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/isLoggedIn`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      ).then((res) => res.json())
 
       if (!response.loggedIn) {
         setIsLoggedIn(false)

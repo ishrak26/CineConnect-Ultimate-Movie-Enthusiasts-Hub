@@ -105,12 +105,14 @@ export async function getServerSideProps(context) {
     const forumId = context.params.forumId
 
     const ForumAbout = await fetchData(
-      `http://localhost:4000/v1/forum/${forumId}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}`
     )
     const members = await fetchData(
-      `http://localhost:4000/v1/forum/${forumId}/totalMembers`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/totalMembers`
     )
-    const user = await fetchData(`http://localhost:4000/v1/forum/user`)
+    const user = await fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/user`
+    )
 
     // console.log('ForumAbout', ForumAbout)
 

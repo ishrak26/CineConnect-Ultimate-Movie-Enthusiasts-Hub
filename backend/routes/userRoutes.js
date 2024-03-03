@@ -107,10 +107,12 @@ router.post(
 
 // Router to get the list of movies whose discussion forums have been joined by the user
 router.get(
-    "/profile/:username/joined-forums",
+    '/profile/:username/joined-forums',
     userController.getJoinedForumsByUser
 );
 
 module.exports = router;
 
-// http://localhost:4000/v1/profile/
+// ${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/
+
+module.exports = router;

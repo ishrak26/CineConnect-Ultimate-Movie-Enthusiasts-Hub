@@ -25,7 +25,7 @@ export default function Search({ forwardedRef }) {
     if (!value) return setFilteredData([])
     const limit = 10
     const response = await fetch(
-      `http://localhost:4000/v1/search?query=${value}&limit=${limit}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/search?query=${value}&limit=${limit}`
     )
     if (response.ok) {
       const data = await response.json()

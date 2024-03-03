@@ -10,7 +10,7 @@ import useKeyboardNavigation from '../../hooks/useKeyboardNavigation'
 
 import debounce from 'lodash.debounce'
 
-export default function Search({ forwardedRef, ...props}) {
+export default function Search({ forwardedRef, ...props }) {
   const ref = useRef(null)
   const router = useRouter()
   const [value, setValue] = useState(router.query.query || '')
@@ -25,7 +25,7 @@ export default function Search({ forwardedRef, ...props}) {
     if (!value) return setFilteredData([])
     const limit = 5
     const data = await fetch(
-      `http://localhost:4000/v1/movies?title=${value}&limit=${limit}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?title=${value}&limit=${limit}`
     ).then((res) => res.json())
     setFilteredData(data)
   }

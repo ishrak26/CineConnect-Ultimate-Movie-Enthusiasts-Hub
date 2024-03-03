@@ -24,16 +24,14 @@ const Forums = ({ user, cookie }) => {
   const router = useRouter()
   const showToast = useCustomToast()
 
-
-
   // Gets the top 5 communities with the most members.
   const getForums = async (numberOfExtraPosts) => {
     setLoading(true)
     try {
       const forumsResponse = await fetch(
-        `http://localhost:4000/v1/profile/${user.username}/forums?limit=${
-          5 + numberOfExtraPosts
-        }`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${
+          user.username
+        }/joined-forums?limit=${5 + numberOfExtraPosts}`,
         {
           method: 'GET',
           headers: {
@@ -166,12 +164,14 @@ export async function getServerSideProps(context) {
     const limit = 9
     const offset = (context.query.page - 1) * limit || 0
 
-    // const response = await fetchData(`http://localhost:4000/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`)
-    // const members = await fetchData(`http://localhost:4000/v1/forum/${forumId}/totalMembers`)
-    // const user = await fetchData(`http://localhost:4000/v1/forum/user`)
-    // const ForumAbout = await fetchData(`http://localhost:4000/v1/forum/${forumId}`)
+    // const response = await fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`)
+    // const members = await fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/totalMembers`)
+    // const user = await fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/user`)
+    // const ForumAbout = await fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}`)
 
-    const user = await fetchData(`http://localhost:4000/v1/auth/isLoggedIn`)
+    const user = await fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/isLoggedIn`
+    )
 
     // if (response.status === 404) {
     //   return {

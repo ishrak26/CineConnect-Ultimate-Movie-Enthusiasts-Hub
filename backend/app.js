@@ -25,7 +25,7 @@ app.use(
     cors({
         // Configure with your specific CORS settings
         // origin: 'http://cineconnect.com', // PLACEHOLDER: Replace with your frontend domain
-        origin: 'http://localhost:3000', // PLACEHOLDER: Replace with your frontend domain
+        origin: process.env.CORS_ORIGIN, // PLACEHOLDER: Replace with your frontend domain
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     })

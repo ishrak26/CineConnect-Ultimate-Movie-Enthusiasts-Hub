@@ -18,14 +18,17 @@ const usePosts = (cookie) => {
   // function for getting user
 
   const getUser = async () => {
-    const userId = await fetch(`http://localhost:4000/v1/forum/user`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(cookie ? { Cookie: cookie } : {}),
-      },
-      credentials: 'include',
-    })
+    const userId = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/user`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
+        },
+        credentials: 'include',
+      }
+    )
     return userId
   }
 
@@ -36,7 +39,7 @@ const usePosts = (cookie) => {
 
     if (!isVoted) {
       response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${postId}/vote`,
         {
           method: 'POST',
           headers: {
@@ -49,7 +52,7 @@ const usePosts = (cookie) => {
       )
     } else {
       response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/vote`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${postId}/vote`,
         {
           method: 'DELETE',
           headers: {
@@ -73,7 +76,7 @@ const usePosts = (cookie) => {
     setLoading(true)
     try {
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/posts`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/posts`,
         {
           method: 'GET',
           headers: {
@@ -151,7 +154,7 @@ const usePosts = (cookie) => {
       }
 
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/post/${post.id}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${post.id}`,
         {
           method: 'DELETE',
           headers: {

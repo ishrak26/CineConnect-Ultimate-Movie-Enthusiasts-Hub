@@ -31,7 +31,7 @@ function Category({
     const fetchMovie = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4000/v1/movie/${movieId}`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movie/${movieId}`,
           {
             method: 'GET',
             headers: {
@@ -56,7 +56,7 @@ function Category({
     const fetchProductsByTag = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4000/v1/marketplace/products?tag=${tag}`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/products?tag=${tag}`,
           {
             method: 'GET',
             headers: {
@@ -179,14 +179,16 @@ export async function getServerSideProps(context) {
   const offset = (context.query.page - 1) * limit || 0
 
   const dataItems = await fetchData(
-    `http://localhost:4000/v1/marketplace/movie/${movieId}/products?limit=${limit}&offset=${offset}`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/movie/${movieId}/products?limit=${limit}&offset=${offset}`
   )
 
   const totalItems = await fetchData(
-    `http://localhost:4000/v1/marketplace/movie/${movieId}/products/count`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/movie/${movieId}/products/count`
   )
 
-  const data = await fetchData('http://localhost:4000/v1/marketplace/tags')
+  const data = await fetchData(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/tags`
+  )
   const dataTypes = data
 
   const currentPage = context.query.page || 1

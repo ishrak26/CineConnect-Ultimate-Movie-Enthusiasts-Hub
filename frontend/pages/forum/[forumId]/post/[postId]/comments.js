@@ -141,30 +141,32 @@ export async function getServerSideProps(context) {
     const postId = context.params.postId
 
     // const response = await fetchData(
-    //   `http://localhost:4000/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`
+    //   `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`
     // )
     // const members = await fetchData(
-    //   `http://localhost:4000/v1/forum/${forumId}/totalMembers`
+    //   `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/totalMembers`
     // )
-    const user = await fetchData(`http://localhost:4000/v1/forum/user`)
+    const user = await fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/user`
+    )
     // const ForumAbout = await fetchData(
-    //   `http://localhost:4000/v1/forum/${forumId}`
+    //   `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}`
     // )
 
     const postData = await fetchData(
-      `http://localhost:4000/v1/forum/${forumId}/post/${postId}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${postId}`
     )
     const postComments = await fetchData(
-      `http://localhost:4000/v1/forum/${forumId}/post/${postId}/comments/`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${postId}/comments/`
     )
     const votes = await fetchData(
-      `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions/`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/post/${postId}/reactions/`
     )
     const ForumAbout = await fetchData(
-      `http://localhost:4000/v1/forum/${forumId}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}`
     )
     const members = await fetchData(
-      `http://localhost:4000/v1/forum/${forumId}/totalMembers`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/totalMembers`
     )
 
     console.log('postData', postData)

@@ -9,7 +9,7 @@ const useListenMessages = () => {
     // setLoading(true)
     try {
       const res = await fetch(
-        `http://localhost:4000/v1/chat/${selectedConversation.userId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/chat/${selectedConversation.userId}`,
         {
           method: 'GET',
           headers: {
@@ -32,7 +32,7 @@ const useListenMessages = () => {
     try {
       // Assuming the API can filter messages newer than a certain timestamp
       const response = await fetch(
-        `http://localhost:4000/v1/chat/new/${selectedConversation.userId}?afterTime=${lastFetch}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/chat/new/${selectedConversation.userId}?afterTime=${lastFetch}`,
         {
           method: 'GET',
           headers: {
@@ -51,7 +51,7 @@ const useListenMessages = () => {
       // Update the state only if there are new messages to prevent unnecessary re-renders
       if (newMessages.length > 0) {
         const sound = new Audio('/notification.mp3')
-        sound.play() // Play notification sound for new messages
+        // sound.play() // Play notification sound for new messages
         getMessages()
         const currentDate = new Date()
         setLastFetch(currentDate.toISOString())

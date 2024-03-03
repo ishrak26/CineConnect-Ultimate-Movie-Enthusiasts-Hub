@@ -18,14 +18,14 @@ const ForumPage = ({ ForumData, user, members, ForumAbout, cookie }) => {
   //   const setForumStateValue = useSetRecoilState(ForumState);
   const setForumStateValue = []
 
-    // useEffect(() => {
-    //   if (ForumData) {
-    //     setForumStateValue((prev) => ({
-    //       ...prev,
-    //       currentForum: ForumData,
-    //     }));
-    //   }
-    // }, [ForumData, setForumStateValue]);
+  // useEffect(() => {
+  //   if (ForumData) {
+  //     setForumStateValue((prev) => ({
+  //       ...prev,
+  //       currentForum: ForumData,
+  //     }));
+  //   }
+  // }, [ForumData, setForumStateValue]);
 
   if (!ForumData || Object.keys(ForumData).length === 0) {
     // return <NotFound />;
@@ -47,19 +47,24 @@ const ForumPage = ({ ForumData, user, members, ForumAbout, cookie }) => {
 
           <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
         </Head>
-        
+
         <Navbar />
-        <BaseLayout >
-        <ForumHeader ForumData={ForumAbout} />
-        <PageContent>
-          <>
-            {/* <CreatePostLink /> */}
-            <Posts ForumData={ForumData} user={user} ForumAbout={ForumAbout} cookie={cookie}/>
-          </>
-          <>
-            <About ForumData={ForumAbout} members={members}/>
-          </>
-        </PageContent>
+        <BaseLayout>
+          <ForumHeader ForumData={ForumAbout} />
+          <PageContent>
+            <>
+              {/* <CreatePostLink /> */}
+              <Posts
+                ForumData={ForumData}
+                user={user}
+                ForumAbout={ForumAbout}
+                cookie={cookie}
+              />
+            </>
+            <>
+              <About ForumData={ForumAbout} members={members} />
+            </>
+          </PageContent>
         </BaseLayout>
       </ChakraProvider>
     </>
@@ -67,7 +72,6 @@ const ForumPage = ({ ForumData, user, members, ForumAbout, cookie }) => {
 }
 
 export async function getServerSideProps(context) {
-   
   const cookie = context.req.headers.cookie
 
   // Helper function to fetch data
@@ -92,17 +96,23 @@ export async function getServerSideProps(context) {
   }
 
   try {
-
     const limit = 9
     const offset = (context.query.page - 1) * limit || 0
 
     const forumId = context.params.forumId
 
-    const response = await fetchData(`http://localhost:4000/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`)
-    const members = await fetchData(`http://localhost:4000/v1/forum/${forumId}/totalMembers`)
-    const user = await fetchData(`http://localhost:4000/v1/forum/user`)
-    const ForumAbout = await fetchData(`http://localhost:4000/v1/forum/${forumId}`)
-
+    const response = await fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`
+    )
+    const members = await fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/totalMembers`
+    )
+    const user = await fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/user`
+    )
+    const ForumAbout = await fetchData(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}`
+    )
 
     if (response.status === 404) {
       return {
@@ -124,10 +134,10 @@ export async function getServerSideProps(context) {
     return {
       props: {
         ForumData: response,
-        user : user,
+        user: user,
         members: members,
         ForumAbout: ForumAbout,
-        cookie: cookie, 
+        cookie: cookie,
         //   query,
       },
     }

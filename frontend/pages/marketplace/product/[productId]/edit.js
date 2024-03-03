@@ -215,7 +215,7 @@ function ProductEdit({
 
       try {
         const response = await fetch(
-          `http://localhost:4000/v1/marketplace/product/${productId}`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}`,
           {
             method: 'PUT',
             headers: {
@@ -558,17 +558,17 @@ export async function getServerSideProps(context) {
   const productId = context.params.productId
 
   const dataItem = await fetchData(
-    `http://localhost:4000/v1/marketplace/product/${productId}`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}`
   )
 
   const dataImages = await fetchData(
-    `http://localhost:4000/v1/marketplace/product/${productId}/images`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/images`
   )
   const dataFeatures = await fetchData(
-    `http://localhost:4000/v1/marketplace/product/${productId}/features`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/features`
   )
   const dataTags = await fetchData(
-    `http://localhost:4000/v1/marketplace/product/${productId}/tags`
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/tags`
   )
 
   // console.log('dataItem', dataItem)

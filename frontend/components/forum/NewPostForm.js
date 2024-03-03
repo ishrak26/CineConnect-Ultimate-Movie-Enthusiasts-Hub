@@ -89,7 +89,7 @@ const NewPostForm = ({ user, currentForum, cookie }) => {
       }
       // console.log(cookie)
       const response = await fetch(
-        `http://localhost:4000/v1/forum/${forumId}/submit`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/submit`,
         {
           method: 'POST',
           headers: {
