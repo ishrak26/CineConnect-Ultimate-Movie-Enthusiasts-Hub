@@ -11,6 +11,8 @@ import {
   useClipboard,
   useToast,
 } from '@chakra-ui/react'
+import { set } from 'date-fns'
+import { de } from 'date-fns/locale'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from 'react'
@@ -24,6 +26,7 @@ import {
   IoPeopleCircleOutline,
 } from 'react-icons/io5'
 import { MdOutlineDelete } from 'react-icons/md'
+import { number } from 'sharp/lib/is'
 // import PostItemError from "../atoms/ErrorMessage";
 
 const PostItem = ({
@@ -35,17 +38,18 @@ const PostItem = ({
   onDeletePost,
   onSelectPost,
   showForumImage,
+  numberOfComments,
   // cookie,
 }) => {
   const [loadingImage, setLoadingImage] = useState(true)
   const [error, setError] = useState(false)
   const [loadingDelete, setLoadingDelete] = useState(false)
-  const [commentCount, setCommentCount] = useState(0)
+  const [commentCount, setCommentCount] = useState(numberOfComments)
   const router = useRouter()
   const showToast = useCustomToast()
   const { onCopy, value, setValue, hasCopied } = useClipboard('')
 
-  const singlePostPage = !onSelectPost
+  const singlePostPage = onSelectPost
 
   useEffect(() => {
     const getCommentCount = async (forumId, postId) => {
@@ -72,9 +76,19 @@ const PostItem = ({
     event.stopPropagation()
     setLoadingDelete(true)
     try {
-      const success = await onDeletePost(post, forumId)
+      const success = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${post.postId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
 
-      if (!success) {
+      if (!success.ok) {
         throw new Error('Post could not be deleted')
       }
 
@@ -84,9 +98,7 @@ const PostItem = ({
         status: 'success',
       })
 
-      if (singlePostPage) {
-        router.push(`/forum/${forumId}`)
-      }
+      router.push(`/forum/${forumId}`)
     } catch (error) {
       setError(error.message)
       showToast({
@@ -121,6 +133,12 @@ const PostItem = ({
       description: 'Currently, this functionality is not available',
       status: 'warning',
     })
+  }
+
+  const handleEdit = (event) => {
+    event.stopPropagation()
+
+    router.push(`/forum/${forumId}/post/${post.postId}/edit`)
   }
 
   return (
@@ -168,6 +186,7 @@ const PostItem = ({
         </Stack>
         <PostActions
           handleDelete={handleDelete}
+          handleEdit={handleEdit}
           loadingDelete={loadingDelete}
           userIsCreator={userIsCreator}
           handleShare={handleShare}
@@ -181,8 +200,10 @@ const PostItem = ({
 export default PostItem
 
 const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
-  let [voteCount, setVoteCount] = useState('')
-  let [downvoteCount, setDownvoteCount] = useState('')
+  let [voteCount, setVoteCount] = useState(0)
+  let [downvoteCount, setDownvoteCount] = useState(0)
+  const [isVoted, setIsVoted] = useState(false)
+  const [voteType, setVoteType] = useState('')
 
   useEffect(() => {
     const getVoteCount = async (forumId, postId) => {
@@ -203,47 +224,90 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
       setDownvoteCount(data.downvotes)
     }
 
-    getVoteCount(forumId, post.postId)
-  }, [voteCount, downvoteCount, forumId, post.postId])
+    const checkIfVoted = async (forumId, postId) => {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/voted`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      const data = await response.json() // Convert the response to JSON
 
-  const handleClick = (event, value) => {
-    event.stopPropagation()
-
-    if (value === 1) {
-      voteCount += 1
-      console.log('voteCount', voteCount)
-    } else {
-      downvoteCount += 1
-      console.log('downvoteCount', downvoteCount)
+      setIsVoted(data.voted)
+      setVoteType(data.type)
     }
 
-    onVote(event, post.postId, value, forumId)
+    getVoteCount(forumId, post.postId)
+    checkIfVoted(forumId, post.postId)
+  }, [isVoted, forumId, post.postId])
+
+  const handleClick = async (event, value, isVoted) => {
+    event.stopPropagation()
+
+    onVote(event, post.postId, value, forumId, isVoted)
+
+    setIsVoted(!isVoted)
+
+    // let decreased = false
+
+    // if (value === 1 && !isVoted) {
+    //   setVoteCount(voteCount + 1)
+    //   // setIsVoted(true)
+    //   // console.log('voteCount', voteCount)
+    // } else if (value === -1 && !isVoted) {
+    //   setDownvoteCount(downvoteCount + 1)
+    //   // setIsVoted(true)
+    //   // console.log('downvoteCount', downvoteCount)
+    // } else if (value === 1 && isVoted && voteCount > 0) {
+    //   setVoteCount(voteCount - 1)
+    //   decreased = true
+    //   // console.log('voteCount', voteCount)
+    // } else if (value === -1 && isVoted && downvoteCount > 0) {
+    //   setDownvoteCount(downvoteCount - 1)
+    //   // setIsVoted(false)
+    //   decreased = true
+    //   // console.log('downvoteCount', downvoteCount)
+    // }
+
+    // if (decreased) {
+    //   setIsVoted(false)
+    // } else {
+    //   setIsVoted(true)
+    // }
+
   }
 
   return (
     <>
       <Icon
-        as={userVoteValue === 1 ? IoArrowUpCircleSharp : IoArrowUpCircleOutline}
-        color={userVoteValue === 1 ? 'black' : 'gray.500'}
+        as={
+          voteType === 'upvote' ? IoArrowUpCircleSharp : IoArrowUpCircleOutline
+        }
+        color={voteType === 'upvote' ? '#FDD835' : 'gray.500'}
         fontSize={26}
         cursor="pointer"
         _hover={{ color: '#FBC02D' }}
-        onClick={(event) => handleClick(event, 1)}
+        onClick={(event) => handleClick(event, 1, isVoted)}
       />
       <Text fontSize="12pt" color="white">
         {voteCount}
       </Text>
       <Icon
         as={
-          userVoteValue === -1
+          voteType === 'downvote'
             ? IoArrowDownCircleSharp
             : IoArrowDownCircleOutline
         }
-        color={userVoteValue === -1 ? 'black' : 'gray.500'}
+        color={voteType === 'downvote' ? '#FDD835' : 'gray.500'}
         _hover={{ color: '#FBC02D' }}
         fontSize={26}
         cursor="pointer"
-        onClick={(event) => handleClick(event, -1)}
+        onClick={(event) => handleClick(event, -1, isVoted)}
       />
       <Text fontSize="12pt" color="white">
         {downvoteCount}
@@ -261,7 +325,7 @@ const PostDetails = ({ showForumImage, post }) => {
     <Stack direction="row" spacing={0.5} align="center" fontSize="9pt">
       {showForumImage && (
         <>
-          {post.topImage ? (
+          {/* {post.topImage ? (
             <Image
               borderRadius="full"
               boxSize="30px"
@@ -269,14 +333,14 @@ const PostDetails = ({ showForumImage, post }) => {
               mr={2}
               alt="Forum logo"
             />
-          ) : (
+          ) : ( */}
             <Icon
               as={IoPeopleCircleOutline}
               mr={1}
               fontSize="18pt"
               color="white"
             />
-          )}
+          {/* )} */}
           <Link href={`/forum/${post.postId}`} isExternal>
             <Text
               fontWeight={700}
@@ -310,14 +374,14 @@ const PostBody = ({ post, loadingImage, setLoadingImage }) => {
       <Text fontSize="12pt" color="white">
         {post.content.split(' ').slice(0, 30).join(' ')}
       </Text>
-      {post.image_url && (
+      {post.topImage && (
         <Flex justify="center" align="center">
-          {loadingImage && (
+          {/* {loadingImage && (
             <Skeleton height="300px" width="100%" borderRadius={10} />
-          )}
+          )} */}
           <Image
             mt={4}
-            src={post.image_url}
+            src={post.topImage}
             alt="Image for post"
             maxHeight="450px"
             maxWidth="100%"
@@ -336,6 +400,7 @@ const PostActions = ({
   handleDelete,
   loadingDelete,
   userIsCreator,
+  handleEdit,
   handleShare,
   handleSave,
   commentCount,
@@ -352,17 +417,21 @@ const PostActions = ({
       width="100%" // Ensure the Flex container takes full width
     >
       <Flex direction="row">
-        <Button onClick={handleShare} className="mr-2">
+        {/* <Button onClick={handleShare} className="mr-2">
           <Icon as={FiShare2} mr={2} />
           Share
-        </Button>
+        </Button> */}
 
-        <Button onClick={handleSave} className="mx-2">
+        {/* {userIsCreator && (
+          <Button onClick={handleEdit} className="mx-2">
           <Icon as={BsBookmark} mr={2} />
-          Save
+          Edit
         </Button>
+        )} */}
+    
 
         {userIsCreator && (
+
           <Button
             onClick={handleDelete}
             isLoading={loadingDelete}

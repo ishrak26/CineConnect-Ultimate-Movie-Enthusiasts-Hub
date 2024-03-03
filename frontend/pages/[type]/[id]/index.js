@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { tmdb } from '@lib/service'
 import { format, formatDuration, intervalToDuration } from 'date-fns'
 import ArrowIcon from '@components/icons/arrow.svg'
@@ -17,123 +17,341 @@ import Card from '@components/card'
 import Link from 'next/link'
 import clsx from 'clsx'
 import ScrollContent from '@components/scroll-content'
-import { FaPlus, FaCheck } from 'react-icons/fa'
+import {
+  FaPlus,
+  FaCheck,
+  FaLock,
+  FaArrowCircleRight,
+  FaExternalLinkAlt,
+} from 'react-icons/fa'
+import { RiDeleteBin6Line } from 'react-icons/ri'
 import SetRating from '@components/SetRating'
 import { useRouter } from 'next/router'
 
-export default function Home({ data, type, casts, cookie }) {
-  const [isAdded, setIsAdded] = useState(false)
+export default function Home({ data, type, casts }) {
+  const [movieRating, setMovieRating] = useState(0.0)
+  const [totalRatingCount, setTotalRatingCount] = useState(0)
   const [userRating, setUserRating] = useState(0)
-  const [userRated, setUserRated] = useState(false)
+
+  const [totalWatchCount, setTotalWatchCount] = useState(0)
+  const [isWatchlisted, setIsWatchlisted] = useState(false)
+
+  const [totalWatchedCount, setTotalWatchedCount] = useState(0)
   const [isWatched, setIsWatched] = useState(false)
 
+  const [isJoined, setIsJoined] = useState(false)
+
+  const [movieImages, setMovieImages] = useState(null)
+
+  const router = useRouter()
+
   useEffect(() => {
-    const getUserRating = async () => {
-      const response = await fetch(
-        `http://localhost:4000/v1/movie/${data.id}/userInfo`,
+    const getRating = async () => {
+      const ratingResponse = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/rating`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
-      // console.log('response', response)
-      if (!response.rating) {
-        setUserRated(false)
-        setUserRating(0)
-      } else {
-        setUserRated(true)
-        setUserRating(response.rating)
-      }
-      if (!response.in_watchlist) {
-        setIsAdded(false)
-      } else {
-        setIsAdded(true)
-      }
-      if (!response.in_watchedlist) {
-        setIsWatched(false)
-      } else {
-        setIsWatched(true)
-      }
-      // console.log('loggedIn', loggedIn)
-      // console.log('userInfo', userInfo)
-    }
-    getUserRating()
-    console.log('userRated', userRated, 'userRating', userRating)
-  }, [userRating, isAdded, isWatched])
+      )
 
-  const handleClick = () => {
-    // Additional logic to handle adding/removing from watchlist
-    try {
-      const response = fetch(
-        `http://localhost:4000/v1/movie/${data.id}/watch`,
+      // Check the response status code before proceeding to parse the JSON
+      if (ratingResponse.ok) {
+        // If the response is successful (status in the range 200-299)
+        const ratingData = await ratingResponse.json() // Now it's safe to parse JSON
+        if (!ratingData.user_rating) {
+          setUserRating(0)
+        } else {
+          setUserRating(ratingData.user_rating)
+        }
+        setMovieRating(ratingData.average_rating)
+        setTotalRatingCount(ratingData.total_ratings)
+      } else {
+        // If the response is not successful, log or handle the error
+        console.error(
+          'Error with request:',
+          ratingResponse.status,
+          ratingResponse.statusText
+        )
+        // Optionally, you can still read and log the response body
+        // const responseBody = await ratingResponse.text()
+        // console.log('Response Body:', responseBody)
+      }
+    }
+
+    const getWatchData = async () => {
+      const watchResponse = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/watchInfo`,
         {
-          method: isAdded ? 'DELETE' : 'POST',
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
-      setIsAdded(!isAdded)
+      )
+
+      if (watchResponse.ok) {
+        const watchData = await watchResponse.json()
+
+        setTotalWatchCount(watchData.watchlist_count)
+        setTotalWatchedCount(watchData.watched_count)
+
+        if (!watchData.user_in_watchlist) {
+          setIsWatchlisted(false)
+        } else {
+          setIsWatchlisted(true)
+        }
+
+        if (!watchData.user_has_watched) {
+          setIsWatched(false)
+        } else {
+          setIsWatched(true)
+        }
+      } else {
+        console.error(
+          'Error with request:',
+          watchResponse.status,
+          watchResponse.statusText
+        )
+        const responseBody = await watchResponse.text()
+        console.log('Response Body:', responseBody)
+      }
+    }
+
+    const getJoinedData = async () => {
+      const joinedResponse = await fetch(
+        `http://localhost:4000/v1/forum/${data.id}/joined`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+
+      if (joinedResponse.ok) {
+        const joinedData = await joinedResponse.json()
+        if (!joinedData.joined) {
+          setIsJoined(false)
+        } else {
+          setIsJoined(true)
+        }
+      } else {
+        console.error(
+          'Error with request:',
+          joinedResponse.status,
+          joinedResponse.statusText
+        )
+      }
+    }
+
+    const getMovieImages = async () => {
+      const imageResponse = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/images`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (imageResponse.ok) {
+        const imageData = await imageResponse.json()
+        // console.log('imageData', imageData)
+        setMovieImages(imageData.images)
+      } else {
+        console.error(
+          'Error with request:',
+          imageResponse.status,
+          imageResponse.statusText
+        )
+      }
+    }
+
+    getWatchData()
+    getRating()
+    getJoinedData()
+    getMovieImages()
+  }, [])
+
+  const handleClickWatchlist = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/watch`,
+        {
+          method: isWatchlisted ? 'DELETE' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      if (response.ok) {
+        if (!isWatchlisted) {
+          setTotalWatchCount(totalWatchCount + 1)
+        } else {
+          setTotalWatchCount(totalWatchCount - 1)
+        }
+        setIsWatchlisted(!isWatchlisted)
+      } else {
+        console.error(
+          'Error with request:',
+          response.status,
+          response.statusText
+        )
+      }
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
-  const handleClickForum = () => {
-    // Additional logic to handle adding/removing from watchlist
+  const handleClickWatched = async () => {
     try {
-      const router = useRouter()
-      router.push(`/forum/${data.id}`)
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  const handleClickWatched = () => {
-    // Additional logic to handle adding/removing from watchlist
-    try {
-      const response = fetch(
+      const response = await fetch(
         `http://localhost:4000/v1/movie/${data.id}/watched`,
         {
           method: isWatched ? 'DELETE' : 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(cookie ? { Cookie: cookie } : {}),
+            // ...(cookie ? { Cookie: cookie } : {}),
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
-      setIsWatched(!isWatched)
+      )
+      if (response.ok) {
+        if (!isWatched) {
+          setTotalWatchedCount(totalWatchedCount + 1)
+        } else {
+          setTotalWatchedCount(totalWatchedCount - 1)
+        }
+        setIsWatched(!isWatched)
+      } else {
+        console.error(
+          'Error with request:',
+          response.status,
+          response.statusText
+        )
+      }
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
-  const handleRating = (rate) => {
-    console.log(`Rated with: ${rate}`)
-    // Handle the rating logic (e.g., send to API)
-
+  const handleClickRating = async (rate) => {
     try {
-      const response = fetch(`http://localhost:4000/v1/movie/${data.id}/rate`, {
-        method: userRated ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(cookie ? { Cookie: cookie } : {}),
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          rating: parseInt(rate),
-        }),
-      }).then((res) => res.json())
-      setUserRating(rate)
+      const response = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/rate`,
+        {
+          method: userRating ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            rating: parseInt(rate),
+          }),
+        }
+      )
+
+      if (response.ok) {
+        if (userRating === 0) {
+          const newTotalRating = totalRatingCount + 1
+          setTotalRatingCount(newTotalRating)
+          setMovieRating((movieRating + rate) / newTotalRating)
+        } else {
+          setMovieRating(
+            (movieRating * totalRatingCount - userRating + rate) /
+              totalRatingCount
+          )
+        }
+        setUserRating(rate)
+      } else {
+        console.error(
+          'Error with request:',
+          response.status,
+          response.statusText
+        )
+      }
     } catch (err) {
-      console.log(err)
+      console.error(err)
+    }
+  }
+
+  const handleClickRemoveRating = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/movie/${data.id}/rate`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      if (response.ok) {
+        setMovieRating(
+          (movieRating * totalRatingCount - userRating) / (totalRatingCount - 1)
+        )
+        setTotalRatingCount(totalRatingCount - 1)
+        setUserRating(0)
+      } else {
+        console.error(
+          'Error with request for handleClickRemoveRating:',
+          response.status,
+          response.statusText
+        )
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleClickEnterForum = async () => {
+    try {
+      router.push(`/forum/${data.id}`)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleClickJoinForum = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${data.id}/join`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+
+      if (response.ok) {
+        setIsJoined(true)
+      } else {
+        console.error(
+          'Error with request for handleClickJoinForum:',
+          response.status,
+          response.statusText
+        )
+      }
+    } catch (err) {
+      console.error(err)
     }
   }
 
@@ -156,7 +374,7 @@ export default function Home({ data, type, casts, cookie }) {
       <Navbar />
 
       <div className="container pb-12 mt-10">
-        {type !== 'cast' && (
+        {type !== 'moviePerson' && (
           <div className="w-full relative">
             <img
               // src={backdropData.img.src}
@@ -179,7 +397,7 @@ export default function Home({ data, type, casts, cookie }) {
         <div
           className={clsx(
             'p-8 md:p-10 rounded-[40px] bg-grey-900 bg-opacity-80 backdrop-blur-md max-w-xl relative',
-            type !== 'cast' && '-top-16 lg:ml-20 -mb-16'
+            type !== 'moviePerson' && '-top-16 lg:ml-20 -mb-16'
           )}
         >
           <Breadcrumb
@@ -195,7 +413,7 @@ export default function Home({ data, type, casts, cookie }) {
                     ? 'Movies'
                     : type === 'tv'
                     ? 'TV Shows'
-                    : type === 'cast'
+                    : type === 'moviePerson'
                     ? 'Person'
                     : 'Collection',
               },
@@ -212,6 +430,19 @@ export default function Home({ data, type, casts, cookie }) {
           <div className="mt-8 md:m-12 md:mt-8 xl:m-20 xl:mt-8">
             {/* {data.credits?.cast.length > 0 && <Cast cast={data.credits.cast} />} */}
 
+            <strong className="heading block mb-2">Top Casts</strong>
+            <div className="mr-2 text-right">
+              <Link
+                href={`/movie/${data.id}/casts`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mr-2 text-primary-600 hover:text-primary-700"
+                passHref
+              >
+                See all
+                {/* <FaExternalLinkAlt /> */}
+              </Link>
+            </div>
             {casts && <Cast casts={casts} />}
 
             <div className="flex flex-col-reverse my-5 gap-12 md:gap-20 lg:flex-row">
@@ -244,10 +475,10 @@ export default function Home({ data, type, casts, cookie }) {
                   Watch
                 </Link> */}
                 <button
-                  onClick={handleClick}
+                  onClick={handleClickWatchlist}
                   className="flex items-center justify-center button button-primary"
                 >
-                  {isAdded ? (
+                  {isWatchlisted ? (
                     <>
                       <FaCheck className="mr-2" /> Added to Watchlist
                     </>
@@ -257,25 +488,54 @@ export default function Home({ data, type, casts, cookie }) {
                     </>
                   )}
                 </button>
+                <span className="ml-2">
+                  Added by {totalWatchCount} user{totalWatchCount > 1 && 's'}
+                </span>
                 <button
                   onClick={handleClickWatched}
                   className="flex items-center justify-center button button-primary"
                 >
                   {isWatched ? (
                     <>
-                      <FaCheck className="mr-2" /> Added to Watchedlist
+                      <FaCheck className="mr-2" /> Marked as Watched
                     </>
                   ) : (
                     <>
-                      <FaPlus className="mr-2" /> Add to Watchedlist
+                      <FaPlus className="mr-2" /> Mark as Watched
                     </>
                   )}
                 </button>
+                <span className="ml-2">
+                  Marked by {totalWatchedCount} user
+                  {totalWatchedCount > 1 && 's'}
+                </span>
 
-                <SetRating onRating={handleRating} defaultRating={userRating} />
+                <SetRating
+                  onRating={handleClickRating}
+                  defaultRating={userRating}
+                  userRated={userRating !== 0}
+                />
+
+                {userRating !== 0 && (
+                  <button
+                    onClick={handleClickRemoveRating}
+                    className="flex items-center justify-center button button-primary"
+                  >
+                    <>
+                      <RiDeleteBin6Line className="mr-2" /> Remove rating
+                    </>
+                  </button>
+                )}
 
                 {/* <Rating average={data.vote_average} /> */}
-                <Rating average={data.rating} />
+                <div className="text-xl text-primary-700 mr-8">
+                  CineConnect Rating:{' '}
+                  <Rating
+                    average={movieRating}
+                    count={totalRatingCount}
+                    inMoviePage={true}
+                  />
+                </div>
 
                 {type === 'movie' && (
                   <div className="space-y-6">
@@ -285,6 +545,27 @@ export default function Home({ data, type, casts, cookie }) {
                       <span className="text-sm text-white-30">Type</span>
                       <span className="block mt-2">Movie</span>
                     </p>
+
+                    {casts.directors && (
+                      <p>
+                        <span className="text-sm text-white-30">
+                          Directed by
+                        </span>
+                        <span className="block mt-2">
+                          {casts.directors.map((director, index) => (
+                            <span key={director.id}>
+                              {index > 0 ? ', ' : ''}
+                              <Link
+                                href={`/moviePerson/${director.id}`}
+                                className="text-primary-600 hover:text-primary-700"
+                              >
+                                {director.name}
+                              </Link>
+                            </span>
+                          ))}
+                        </span>
+                      </p>
+                    )}
                     {data.release_date && (
                       <p>
                         <span className="text-sm text-white-30">
@@ -318,12 +599,29 @@ export default function Home({ data, type, casts, cookie }) {
                         {data.genres.map((genre) => genre.name).join(', ')}
                       </span>
                     </p>
-                    <button
-                      className="flex items-center justify-center button button-primary"
-                      onClick={handleClickForum}
-                    >
-                      Enter Discussion Forum
-                    </button>
+                    <div>
+                      {isJoined && (
+                        <button
+                          className="flex items-center justify-center button button-primary"
+                          onClick={handleClickEnterForum}
+                        >
+                          <>
+                            <FaArrowCircleRight className="mr-2" /> Go to
+                            Discussion Forum
+                          </>
+                        </button>
+                      )}
+                      {!isJoined && (
+                        <button
+                          className="flex items-center justify-center button button-primary"
+                          onClick={handleClickJoinForum}
+                        >
+                          <>
+                            <FaLock className="mr-2" /> Join Discussion Forum
+                          </>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -426,11 +724,11 @@ export default function Home({ data, type, casts, cookie }) {
               </div>
             </div>
 
-            {(data.videos || data.images) && (
+            {(data.videos || movieImages) && (
               <Media
                 videos={data.videos?.results}
-                posters={data.images?.posters}
-                backdrops={data.images?.backdrops}
+                posters={movieImages?.posters}
+                backdrops={movieImages?.backdrops}
               />
             )}
 
@@ -498,12 +796,12 @@ export default function Home({ data, type, casts, cookie }) {
           </div>
         )} */}
 
-        {data && type === 'cast' && (
+        {data && type === 'moviePerson' && (
           <div>
             <div
               className={clsx(
                 'flex my-5 gap-12 md:gap-20 lg:flex-row',
-                type === 'cast' ? 'flex-col' : 'flex-col-reverse'
+                type === 'moviePerson' ? 'flex-col' : 'flex-col-reverse'
               )}
             >
               <div className="lg:w-1/2">
@@ -677,7 +975,7 @@ export async function getServerSideProps(context) {
       },
       credentials: 'include',
     }).then((res) => res.json())
-  } else if (params.type === 'cast') {
+  } else if (params.type === 'moviePerson') {
     response = await fetch(
       `http://localhost:4000/v1/moviePerson/${params.id}`,
       {
@@ -697,7 +995,6 @@ export async function getServerSideProps(context) {
       type: params.type,
       data: response,
       casts: casts,
-      cookie,
     },
   }
 }

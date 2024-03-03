@@ -1,4 +1,6 @@
+const e = require('express');
 const supabase = require('../config/supabaseConfig');
+const { randomUUID } = require('crypto');
 
 /*
     returns a specific post given the postId
@@ -30,6 +32,25 @@ async function fetchSinglePostById(postId, imgLimit) {
     }
 }
 
+async function fetchPostAuthorByPostId(postId) {
+    const { data, error } = await supabase
+        .from('post')
+        .select('author_id')
+        .eq('id', postId);
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    if (data.length > 1) {
+        console.error('Error: more than one author found');
+        return null;
+    }
+
+    return data[0].author_id;
+}
+
 async function fetchPostReactionCount(postId) {
     try {
         const { data, error } = await supabase.rpc('get_post_reaction_count', {
@@ -49,7 +70,7 @@ async function fetchPostReactionCount(postId) {
     }
 }
 
-async function createNewPost(userId, movieId, content, images) {
+async function createNewPost(userId, movieId, title, content, images) {
     // Convert images array to JSONB format expected by the PostgreSQL function
     // const imagesJsonb = JSON.stringify(images);
 
@@ -57,6 +78,7 @@ async function createNewPost(userId, movieId, content, images) {
         const { data, error } = await supabase.rpc('create_new_forum_post', {
             user_id: userId,
             movie_id: movieId,
+            title: title,
             content: content,
             images,
             // images: imagesJsonb,
@@ -72,6 +94,45 @@ async function createNewPost(userId, movieId, content, images) {
     } catch (err) {
         console.error('Exception creating new post:', err.message);
     }
+}
+
+async function updatePost(postId, title, content, images) {
+    try {
+        const { data, error } = await supabase.rpc(
+            'update_forum_post_version',
+            {
+                p_post_id: postId,
+                p_content: content,
+                p_title: title,
+                p_images: images,
+            }
+        );
+
+        if (error) {
+            console.error('Error updating post:', error.message);
+            return null;
+        }
+
+        console.log('Returning from updatePost: new post_version ID:', data);
+        return data;
+    } catch (err) {
+        console.error('Exception creating new post:', err.message);
+    }
+}
+
+async function removePost(postId) {
+    const { data, error } = await supabase
+        .from('post')
+        .delete()
+        .eq('id', postId)
+        .select();
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+
+    return data;
 }
 
 async function createNewComment(userId, parentId, content, images) {
@@ -136,10 +197,29 @@ async function isJoinedForumByPostId(postId, userId) {
 }
 
 async function joinForum(id) {
+    
+    console.log('id:', id);
+
     const { data, error } = await supabase
         .from('watched_list')
         .update({ joined_forum: true })
         .eq('id', id)
+        .select();
+
+    if (error) {
+        console.error('Error:', error.message);
+        return null;
+    }
+    
+    return data;
+}
+
+async function leaveForum(userId, forumId) {
+    const { data, error } = await supabase
+        .from('watched_list')
+        .update({ joined_forum: false })
+        .eq('user_id', userId)
+        .eq('movie_id', forumId)
         .select();
 
     if (error) {
@@ -271,7 +351,6 @@ async function fetchTotalMemberCountInForum(forumId) {
 }
 
 async function fetchForumById(forumId) {
-
     const { data, error } = await supabase
         .from('movie')
         .select('id, title, poster_url, release_date, plot_summary')
@@ -286,11 +365,29 @@ async function fetchForumById(forumId) {
     return data;
 }
 
+async function getSignedUrlForPostImage(folder, extension) {
+    const randomFileName = `${randomUUID()}.${extension}`;
+    const filePath = `forum/${folder}/${randomFileName}`;
+    console.log('filePath', filePath);
+    const { signedURL, error } = await supabase.storage
+        .from('forum')
+        .createSignedUrl(filePath, 60); // URL expires in 60 seconds
+
+    if (error) {
+        console.error('Error in getSignedUrForPostImage:', error.message);
+        throw error;
+    }
+
+    return signedURL;
+}
+
 module.exports = {
     createNewPost,
+    updatePost,
     isJoinedForumByForumId,
     fetchMovieIdByPostId,
     joinForum,
+    leaveForum,
     fetchPostsByMovieId,
     fetchSinglePostById,
     fetchPostVoteByUser,
@@ -302,4 +399,7 @@ module.exports = {
     fetchPostReactionCount,
     fetchCommentsByPostId,
     fetchForumById,
+    getSignedUrlForPostImage,
+    fetchPostAuthorByPostId,
+    removePost,
 };

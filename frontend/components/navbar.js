@@ -6,6 +6,7 @@ import Modal from './modal'
 import Search from './search'
 import SearchIcon from './icons/search.svg'
 import clsx from 'clsx'
+import { FaUserFriends } from 'react-icons/fa';
 
 export default function Navbar() {
   const ref = useRef(null)
@@ -83,6 +84,14 @@ export default function Navbar() {
           )}
           {loggedIn && <p>{userInfo.username}</p>}
           {loggedIn && (
+            // <Link href="/requests">
+              <a href='/requests' className="icon-button">
+                <FaUserFriends style={{ color: 'black' }} className="icon" size={25} />
+              </a>
+            // </Link>
+          )}
+
+          {loggedIn && (
             <button className="icon-button">
               <img
                 src="/notification.png"
@@ -92,9 +101,11 @@ export default function Navbar() {
             </button>
           )}
           {loggedIn && (
-            <button className="icon-button">
-              <img src={userInfo.image_url} alt="Profile" className="icon" />
-            </button>
+            <a href={`/profile/${userInfo.username}`}>
+              <button className="profile-button">
+                <img src={userInfo.image_url} alt="Profile" className="profile" />
+              </button>
+            </a>
           )}
           {loggedIn && (
             <button className="icon-button">

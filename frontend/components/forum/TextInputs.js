@@ -28,12 +28,12 @@ const TextInputs = ({ textInputs, onChange, handleCreatePost, loading }) => {
       {/* Body of the post */}
       <Textarea
         name="body"
-        placeholder="Text (Optional)"
+        placeholder="Write your post here..."
         value={textInputs.body}
         onChange={onChange}
         fontSize="10pt"
         height="120px"
-        color={"white"}
+        color={'white'}
         borderRadius={10}
         _placeholder={{ color: 'gray.500' }}
         _hover={{

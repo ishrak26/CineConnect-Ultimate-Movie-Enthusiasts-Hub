@@ -19,6 +19,9 @@ import { MdOutlineArrowBackIos } from 'react-icons/md'
 import ImageUpload from './ImageUpload'
 import TextInputs from './TextInputs'
 import TabItem from './TabItem'
+import getFileExtensionFromDataURL from '../../utils/getFileExtensionFromDataURL'
+
+import supabase from '../../utils/supabaseClient'
 
 const formTabs = [
   {
@@ -31,14 +34,17 @@ const formTabs = [
   },
 ]
 
-const NewPostForm = ({ user, currentForum }) => {
+const NewPostForm = ({ user, currentForum, cookie }) => {
   const router = useRouter()
   const [selectedTab, setSelectedTab] = useState(formTabs[0].title)
   const [textInputs, setTextInputs] = useState({
     title: '',
     body: '',
   })
-  const { selectedFile, onSelectFile } = useSelectFile(3000, 3000)
+  const { selectedFile, onSelectFile, originalImage } = useSelectFile(
+    3000,
+    3000
+  )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const showToast = useCustomToast()
@@ -61,7 +67,27 @@ const NewPostForm = ({ user, currentForum }) => {
     setLoading(true)
 
     try {
-      console.log(cookie)
+      // upload image to supabase storage
+      if (originalImage) {
+        const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+        const filePath = `public/${forumId}/${uniquePrefix}-${originalImage.name}`
+
+        const { data: uploadData, error } = await supabase.storage
+          .from('forum')
+          .upload(filePath, originalImage)
+
+        if (error) {
+          console.error('Error uploading file:', error)
+          throw error
+        }
+
+        const { data: publicURL } = supabase.storage
+          .from('forum')
+          .getPublicUrl(filePath)
+
+        newPost.images = [{ image_url: publicURL.publicUrl, caption: '' }]
+      }
+      // console.log(cookie)
       const response = await fetch(
         `http://localhost:4000/v1/forum/${forumId}/submit`,
         {
@@ -69,22 +95,18 @@ const NewPostForm = ({ user, currentForum }) => {
           headers: {
             'Content-Type': 'application/json',
             // ...(cookie ? { Cookie: cookie } : {}),
-            
           },
           credentials: 'include',
           body: JSON.stringify(newPost),
         }
       )
-      // const postDocRef = await addDoc(collection(firestore, 'posts'), newPost);
-      if (selectedFile) {
-        // const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
-        // await uploadString(imageRef, selectedFile, 'data_url');
-        // const downloadURL = await getDownloadURL(imageRef);
-        // await updateDoc(postDocRef, {
-        //   imageURL: downloadURL,
-        // });
+
+      if (response.ok) {
+        router.push(ForumLink)
+      } else {
+        const responseData = await response.json()
+        throw new Error(responseData.message)
       }
-      router.push(ForumLink)
     } catch (error) {
       console.error('Error creating post: ', error)
       showToast({
@@ -96,6 +118,8 @@ const NewPostForm = ({ user, currentForum }) => {
     } finally {
       setLoading(false)
     }
+
+    router.push(ForumLink)
   }
 
   const onTextChange = (event) => {

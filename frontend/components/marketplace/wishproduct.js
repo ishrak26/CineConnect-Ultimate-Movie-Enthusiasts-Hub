@@ -1,12 +1,30 @@
-import Link from "next/link";
-import React from "react";
-import NumberFormat from "react-number-format";
-import { useDispatch } from "react-redux";
+import Link from 'next/link'
+import React from 'react'
+import NumberFormat from 'react-number-format'
+// import { useDispatch } from "react-redux";
 // import { removeFromWishlist } from "../slices/wishlistSlice";
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion'
 
-function WishProduct({ item, idx }) {
-  const dispatch = useDispatch();
+function WishProduct({ item, idx, onRemove }) {
+  const removeFromWishlist = async (id) => {
+    const response = await fetch(
+      `http://localhost:4000/v1/marketplace/product/${id}/wishlist`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Something went wrong')
+    } else {
+      onRemove(id)
+    }
+  }
+
   return (
     <div className="mb-4 overflow-hidden">
       <motion.div
@@ -14,14 +32,14 @@ function WishProduct({ item, idx }) {
         animate={{ scale: 1, x: 0, y: 0, opacity: 1 }}
       >
         <img
-          className="h-28 rounded-lg object-cover w-full"
-          src={item.prop[0].image[0]}
+          className="h-48 rounded-lg object-cover w-full"
+          src={item.thumbnail_url}
           alt=""
         />
       </motion.div>
       <div className="px-2 py-1 text-cusblack">
         <p className="text-sm line-clamp-1">{item.name}</p>
-        <NumberFormat
+        {/* <NumberFormat
           value={item.price}
           className="text-xs my-1.5"
           displayType={"text"}
@@ -32,21 +50,23 @@ function WishProduct({ item, idx }) {
               {value}
             </p>
           )}
-        />
-        <Link href={"/product/" + item.slug}>
-          <button className="text-white bg-cusblack border border-cusblack py-1 text-xs w-full rounded-lg">
+        /> */}
+        <p className="text-xs my-1.5">Tk {item.price}</p>
+
+        <Link href={'/marketplace/product/' + item.id}>
+          <button className="text-black-100 bg-primary-600 border border-cusblack py-1 text-xs w-full rounded-lg">
             View product
           </button>
         </Link>
         <button
-        //   onClick={() => dispatch(removeFromWishlist(item))}
+          onClick={() => removeFromWishlist(item.id)}
           className="text-cusblack mt-1.5 bg-white border border-cusblack py-1 text-xs w-full rounded-lg"
         >
           Remove
         </button>
       </div>
     </div>
-  );
+  )
 }
 
-export default WishProduct;
+export default WishProduct

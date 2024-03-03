@@ -11,6 +11,7 @@ const nextConfig = {
       '64.media.tumblr.com',
       'www.redwolf.in',
       'posterdrops-images.s3.amazonaws.com',
+      'yvezrqitxosjfitjgzmz.supabase.co'
     ],
   },
   webpack(config) {

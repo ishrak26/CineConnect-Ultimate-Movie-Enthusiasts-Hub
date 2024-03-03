@@ -22,7 +22,8 @@ async function createUser(user) {
     }
 }
 
-async function findOne({ username }) {  // Fetch user{id, username, password, role} by username
+async function findOne({ username }) {
+    // Fetch user{id, username, password, role} by username
     const { data, error } = await supabase
         .from('user_info')
         .select('id, password, username, role')
@@ -37,7 +38,8 @@ async function findOne({ username }) {  // Fetch user{id, username, password, ro
     }
 }
 
-async function findOneById(id) {  // Fetch user{id, username, password, role} by username
+async function findOneById(id) {
+    // Fetch user{id, username, password, role} by username
     const { data, error } = await supabase
         .from('user_info')
         .select('id, password, username, role')
@@ -53,7 +55,8 @@ async function findOneById(id) {  // Fetch user{id, username, password, role} by
     }
 }
 
-async function findOneById(id) {  // Fetch user{id, username, password, role} by username
+async function findOneById(id) {
+    // Fetch user{id, username, password, role} by username
     const { data, error } = await supabase
         .from('user_info')
         .select('id, password, username, role')
@@ -101,7 +104,6 @@ async function checkIfEmailExists({ email }) {
     }
 }
 
-
 async function getProfileByUsername({ username }) {
     try {
         const { data, error } = await supabase
@@ -112,22 +114,23 @@ async function getProfileByUsername({ username }) {
         if (error) throw error;
 
         return data;
-
     } catch (error) {
         console.error('Error fetching profile:', error.message);
         return null;
     }
 }
 
-async function getCineFellows({ userId, limit, offset}) {
+async function getCineFellows({ userId, limit, offset }) {
     try {
         // Fetch fellow1 details
         const { data: fellowsAsFellow1, error: error1 } = await supabase
             .from('cinefellow')
-            .select(`
+            .select(
+                `
                 requestee_id,
                 user_info:requestee_id (id, username, full_name, image_url, email)
-            `)
+            `
+            )
             .eq('requestor_id', userId)
             .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
@@ -136,24 +139,25 @@ async function getCineFellows({ userId, limit, offset}) {
         // Fetch fellow2 details
         const { data: fellowsAsFellow2, error: error2 } = await supabase
             .from('cinefellow')
-            .select(`
+            .select(
+                `
                 requestor_id,
                 user_info:requestor_id (id, username, full_name, image_url, email)
-            `)
+            `
+            )
             .eq('requestee_id', userId);
 
         if (error2) throw error2;
 
         // Map and combine the results to a unified structure
         const combinedFellows = [
-            ...fellowsAsFellow1.map(item => item.user_info),
-            ...fellowsAsFellow2.map(item => item.user_info),
+            ...fellowsAsFellow1.map((item) => item.user_info),
+            ...fellowsAsFellow2.map((item) => item.user_info),
         ];
 
         // console.log(combinedFellows);
 
         return combinedFellows;
-
     } catch (error) {
         console.error('Error fetching CineFellows:', error.message);
         return null;
@@ -187,7 +191,7 @@ async function getCineFellowCount({ userId }) {
         // Combine the counts from both queries
         const totalCount = count1 + count2;
 
-        console.log(totalCount);
+        // console.log(totalCount);
 
         return totalCount;
     } catch (error) {
@@ -198,19 +202,17 @@ async function getCineFellowCount({ userId }) {
 
 async function getCinefellowCount2({ userId }) {
     const { data, error } = await supabase
-      .from('cinefellow')
-      .select('id', { count: 'exact' }) // We want to count the number of matches
-      .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`);
-  
-    if (error) {
-      console.error('Error fetching cinefellow count:', error);
-      return 0; // Return 0 if there's an error
-    }
-  
-    return data.length; // The number of cinefellow rows for the user
-  }
-  
+        .from('cinefellow')
+        .select('id', { count: 'exact' }) // We want to count the number of matches
+        .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`);
 
+    if (error) {
+        console.error('Error fetching cinefellow count:', error);
+        return 0; // Return 0 if there's an error
+    }
+
+    return data.length; // The number of cinefellow rows for the user
+}
 
 async function followCinefellow({ userId, fellowId }) {
     try {
@@ -236,37 +238,37 @@ async function followCinefellow({ userId, fellowId }) {
             .insert([{ from_id: userId, to_id: fellowId, status: 'pending' }]);
 
         if (insertError) {
-            throw insertError;            
+            throw insertError;
         }
 
         return true; // Successfully created a new follow request
-
     } catch (error) {
         console.error('Error following cinefellow:', error.message);
         throw error;
     }
 }
 
-
 async function unfollowCinefellow({ userId, fellowId }) {
     try {
-
         // Delete the cinefellow relationship
         const { data, error: deleteError } = await supabase
             .from('cinefellow')
             .delete()
             .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)
-            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`).select();
+            .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`)
+            .select();
 
         if (deleteError) throw deleteError;
 
-        if(data.length === 0) {
+        if (data.length === 0) {
+            console.log('No cinefellow relationship found.');
+        }
+        if (data.length === 0) {
             console.log('No cinefellow relationship found.');
             return false;
         }
 
         return true;
-
     } catch (error) {
         console.error('Error unfollowing cinefellow:', error.message);
         throw error;
@@ -279,7 +281,11 @@ async function withdrawCineFellowRequest({ requestorId, requesteeId }) {
         const { data: requests, error: fetchError } = await supabase
             .from('cinefellow_request')
             .select('*')
-            .match({ from_id: requestorId, to_id: requesteeId, status: 'pending' })
+            .match({
+                from_id: requestorId,
+                to_id: requesteeId,
+                status: 'pending',
+            })
             .order('created_at', { ascending: false })
             .limit(1);
 
@@ -290,7 +296,7 @@ async function withdrawCineFellowRequest({ requestorId, requesteeId }) {
         // If no pending request is found
         if (requests.length === 0) {
             console.log('No pending request found to withdraw.');
-            return { success: false, message: "No pending request found." };
+            return { success: false, message: 'No pending request found.' };
         }
 
         // Withdraw the most recent request
@@ -305,13 +311,12 @@ async function withdrawCineFellowRequest({ requestorId, requesteeId }) {
         }
 
         console.log('CineFellow request withdrawn successfully.');
-        return { success: true, message: "Request withdrawn successfully." };
+        return { success: true, message: 'Request withdrawn successfully.' };
     } catch (error) {
         console.error('Error withdrawing cinefellow request:', error);
-        return { success: false, message: "Failed to withdraw request." };
+        return { success: false, message: 'Failed to withdraw request.' };
     }
 }
-
 
 async function isFollowing({ userId, fellowId }) {
     try {
@@ -320,23 +325,39 @@ async function isFollowing({ userId, fellowId }) {
         const { data, error } = await supabase
             .from('cinefellow')
             .select('id')
-            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`)  // Check if user is requestor
+            .or(`requestor_id.eq.${userId},requestee_id.eq.${userId}`) // Check if user is requestor
             .or(`requestor_id.eq.${fellowId},requestee_id.eq.${fellowId}`); // Check if user is requestee
 
         // console.log('in isfollowing function', data, error);
-            if (error || data.length > 1) throw error;
+        if (error || data.length > 1) throw error;
 
         if (data.length === 0) {
             return null;
         }
-        
-            return data[0];
 
+        return data[0];
     } catch (error) {
         console.error('Error checking if following:', error.message);
         throw error;
     }
 }
+
+const getPendingRequestCount = async ({ userId }) => {
+    try {
+        const { data, error } = await supabase
+            .from('cinefellow_request')
+            .select('id')
+            .eq('to_id', userId)
+            .eq('status', 'pending');
+
+        if (error) throw error;
+
+        return data.length;
+    } catch (error) {
+        console.error('Error fetching pending request count:', error.message);
+        throw error;
+    }
+};
 
 const getPendingRequests = async ({ userId, limit, offset }) => {
     try {
@@ -355,7 +376,39 @@ const getPendingRequests = async ({ userId, limit, offset }) => {
         console.error('Error fetching pending requests:', error.message);
         throw error;
     }
-}
+};
+
+const getPendingRequestsWithRequesters = async ({ userId, limit, offset }) => {
+    try {
+        // Fetch incoming requests
+        const { data: incomingRequests, error: incomingError } = await supabase
+            .from('cinefellow_request')
+            .select('*')
+            .eq('to_id', userId)
+            .eq('status', 'pending')
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
+        if (incomingError) throw incomingError;
+
+        // Fetch requester details for each incoming request
+        const requestsWithRequesterDetails = await Promise.all(
+            incomingRequests.map(async (request) => {
+                const requesterDetails = await fetchUserPhotoById({
+                    id: request.from_id,
+                });
+                return {
+                    ...request,
+                    requesterDetails, // Add the requesterDetails to the request object
+                };
+            })
+        );
+
+        return { incomingRequests: requestsWithRequesterDetails };
+    } catch (error) {
+        console.error('Error fetching pending requests:', error.message);
+        throw error;
+    }
+};
 
 const acceptCineFellowRequest = async ({ userId, requestorId }) => {
     try {
@@ -385,23 +438,28 @@ const acceptCineFellowRequest = async ({ userId, requestorId }) => {
         const { error: cinefellowError } = await supabase
             .from('cinefellow')
             .insert([
-                { requestor_id: requestData[0].from_id, requestee_id: requestData[0].to_id },
+                {
+                    requestor_id: requestData[0].from_id,
+                    requestee_id: requestData[0].to_id,
+                },
             ]);
 
         if (cinefellowError) throw cinefellowError;
 
         return true;
-
     } catch (error) {
         console.error('Error accepting cinefellow request:', error.message);
         throw error;
     }
 };
 
-
 const rejectCineFellowRequest = async ({ userId, requestorId }) => {
     try {
-        console.log('DHUKLAM Inside rejectCineFellowRequest model function : ', userId, requestorId);
+        // console.log(
+        //     'DHUKLAM Inside rejectCineFellowRequest model function : ',
+        //     userId,
+        //     requestorId
+        // );
         // First, retrieve the request to get from_id and to_id
         const { data: requestData, error: requestError } = await supabase
             .from('cinefellow_request')
@@ -412,7 +470,10 @@ const rejectCineFellowRequest = async ({ userId, requestorId }) => {
             .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
             .limit(1); // Limit to only the most recent one
 
-        console.log('Inside rejectCineFellowRequest model function, the fetched requestData: ', requestData[0]);
+        // console.log(
+        //     'Inside rejectCineFellowRequest model function, the fetched requestData: ',
+        //     requestData[0]
+        // );
 
         if (requestError) throw requestError;
         if (!requestData) throw new Error('Request not found.');
@@ -427,92 +488,149 @@ const rejectCineFellowRequest = async ({ userId, requestorId }) => {
         // console.log('Inside rejectCineFellowRequest model function, the updateError message : ', updateError);
 
         return true;
-
     } catch (error) {
         console.error('Error rejecting cinefellow request:', error.message);
         throw error;
     }
-}
+};
+
+const acceptCineFellowRequestByReqId = async ({ reqId }) => {
+    try {
+        // First, retrieve the request to get from_id and to_id
+        const { data: requestData, error: requestError } = await supabase
+            .from('cinefellow_request')
+            .select('*')
+            .eq('id', reqId)
+            .eq('status', 'pending');
+        if (requestError) throw requestError;
+        if (!requestData) throw new Error('Request not found.');
+        // Update request status to 'accepted'
+        const { error: updateError } = await supabase
+            .from('cinefellow_request')
+            .update({ status: 'accepted' })
+            .eq('id', reqId);
+        if (updateError) throw updateError;
+        // Add to the cinefellow table
+        const { error: cinefellowError } = await supabase
+            .from('cinefellow')
+            .insert([
+                {
+                    requestor_id: requestData[0].from_id,
+                    requestee_id: requestData[0].to_id,
+                },
+            ]);
+        if (cinefellowError) throw cinefellowError;
+
+        return true;
+    } catch (error) {
+        console.error('Error accepting cinefellow request:', error.message);
+        throw error;
+    }
+};
+
+const rejectCineFellowRequestByReqId = async ({ reqId }) => {
+    try {
+        // First, retrieve the request to get from_id and to_id
+        const { data: requestData, error: requestError } = await supabase
+            .from('cinefellow_request')
+            .select('*')
+            .eq('id', reqId)
+            .eq('status', 'pending');
+        if (requestError) throw requestError;
+        if (!requestData) throw new Error('Request not found.');
+        // Update request status to 'rejected'
+        const { error: updateError } = await supabase
+            .from('cinefellow_request')
+            .update({ status: 'rejected' })
+            .eq('id', reqId);
+        if (updateError) throw updateError;
+
+        return true;
+    } catch (error) {
+        console.error('Error rejecting cinefellow request:', error.message);
+        throw error;
+    }
+};
 
 // function to see if the user requested to follow the fellow, and the request is still pending
 async function checkIfIRequested({ userId, fellowId }) {
     const { data, error } = await supabase
-      .from('cinefellow_request')
-      .select('id, created_at') // Include 'created_at' in the selection
-      .match({ from_id: userId, to_id: fellowId, status: 'pending'})
-      .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
-      .limit(1); // Limit to only the most recent request
-  
+        .from('cinefellow_request')
+        .select('id, created_at') // Include 'created_at' in the selection
+        .match({ from_id: userId, to_id: fellowId, status: 'pending' })
+        .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
+        .limit(1); // Limit to only the most recent request
+
     if (error) {
-      console.error('Error checking cinefellow request:', error);
-      throw error; // Handle the error as needed
+        console.error('Error checking cinefellow request:', error);
+        throw error; // Handle the error as needed
     }
-  
+
     // Since we limit the result to 1, checking if the array has any elements directly indicates if a pending request exists.
-    return data.length > 0;  // True if a recent pending request exists, false otherwise
+    return data.length > 0; // True if a recent pending request exists, false otherwise
 }
 
-  // function to see if the fellow requested to follow the user, and the request is still pending
-  async function checkIfTheyRequested({ userId, fellowId }) {
+// function to see if the fellow requested to follow the user, and the request is still pending
+async function checkIfTheyRequested({ userId, fellowId }) {
     const { data, error } = await supabase
-      .from('cinefellow_request')
-      .select('id')
-      .match({ from_id: fellowId, to_id: userId, status: 'pending'})
-      .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
-      .limit(1); // Limit to only the most recent request
+        .from('cinefellow_request')
+        .select('id')
+        .match({ from_id: fellowId, to_id: userId, status: 'pending' })
+        .order('created_at', { ascending: false }) // Order by 'created_at' descending to get the most recent request first
+        .limit(1); // Limit to only the most recent request
     //   .single();
-  
-    if (error) {
-      console.error('Error checking if they requested:', error);
-      throw error; // or handle the error as you see fit
-    }
-  
-    return data.length > 0; 
-  }
-  
-  
 
-const getWatchedMovies = async ({ userId, limit, offset}) => {
+    if (error) {
+        console.error('Error checking if they requested:', error);
+        throw error; // or handle the error as you see fit
+    }
+
+    return data.length > 0;
+}
+
+const getWatchedMovies = async ({ userId, limit, offset }) => {
     try {
         const { data, error } = await supabase
             .from('watched_list')
-            .select(`
+            .select(
+                `
             movie_id,
             movie:movie_id (id, title, release_date, poster_url)
-            `)
+            `
+            )
             .eq('user_id', userId)
             .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
 
         if (error) throw error;
 
-        return data.map(item => item.movie);
-
+        return data.map((item) => item.movie);
     } catch (error) {
         console.error('Error fetching watched movies:', error.message);
         throw error;
     }
-}
+};
 
 const getWatchlist = async ({ userId, limit, offset }) => {
     try {
         const { data, error } = await supabase
-        .from('watch_list')
-        .select(`
+            .from('watch_list')
+            .select(
+                `
             movie_id,
             movie:movie_id (id, title, release_date, poster_url)
-        `)
-        .eq('user_id', userId)
-        .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
-    
+        `
+            )
+            .eq('user_id', userId)
+            .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
         if (error) throw error;
 
-        return data.map(item => item.movie);
-
+        return data.map((item) => item.movie);
     } catch (error) {
         console.error('Error fetching watchlist:', error.message);
         throw error;
     }
-}
+};
 
 const removeFromWatchlist = async ({ userId, movieId }) => {
     try {
@@ -525,14 +643,13 @@ const removeFromWatchlist = async ({ userId, movieId }) => {
         if (error) throw error;
 
         return true;
-
     } catch (error) {
         console.error('Error removing from watchlist:', error.message);
         throw error;
     }
-}
+};
 
-const searchProfilesByUsername = async ({ username , limit, offset}) => {
+const searchProfilesByUsername = async ({ username, limit, offset }) => {
     try {
         const { data, error } = await supabase
             .from('user_info')
@@ -551,7 +668,7 @@ const searchProfilesByUsername = async ({ username , limit, offset}) => {
 
 async function fetchJoinedForums(userId, limit, offset) {
     try {
-        console.log('Fetching joined forums:', userId, limit, offset);
+        // console.log('Fetching joined forums:', userId, limit, offset);
 
         const { data, error } = await supabase.rpc('get_joined_forums', {
             uid: userId,
@@ -572,8 +689,6 @@ async function fetchJoinedForums(userId, limit, offset) {
     }
 }
 
-
-
 const getProfileDetails = async ({ username }) => {
     try {
         const { data, error } = await supabase
@@ -581,19 +696,20 @@ const getProfileDetails = async ({ username }) => {
             .select('id, username, full_name, image_url, role')
             .eq('username', username);
 
-        console.log('In getProfileDetails', data);
+        // console.log('In getProfileDetails', data);
 
         if (error) throw error;
 
         return data[0];
-
     } catch (error) {
         console.error('Error fetching profile details:', error.message);
         throw error;
     }
-}
+};
 
 async function fetchUserById({ id }) {
+
+    // console.log('In fetchUserById', id);
     const { data, error } = await supabase
         .from('user_info')
         .select('id, username, role, image_url')
@@ -609,8 +725,156 @@ async function fetchUserById({ id }) {
     }
 
     return data[0];
-
 }
+
+async function fetchProductWishlist(userId, limit, offset) {
+    const { data, error } = await supabase
+        .from('user_wishes_product')
+        .select(
+            `
+                product_id,
+                product:product_id (
+                    name,
+                    price,
+                    thumbnail_url
+                )
+            `
+        )
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false }) // Sorting by created_at in descending order
+        .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+
+    // console.log('Returning from fetchProductWishlist:', data);
+    return data;
+}
+async function fetchUserPhotoById({ id }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, full_name, image_url')
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data.length !== 1) {
+        return null;
+    }
+    return data[0];
+};
+
+async function fetchUserProfileForUpdate({ username }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id, full_name, image_url, gender, date_of_birth, email')
+        .eq('username', username);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data.length !== 1) {
+        return null;
+    }
+    return data[0];
+};
+
+async function checkIfUsernameIsTaken({ newUsername }) {
+    const { data, error } = await supabase
+        .from('user_info')
+        .select('id')
+        .eq('username', newUsername);
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    if (data.length > 0) {
+        return true;
+    }
+
+    return false;
+};
+
+const updateByUsername = async (username, updateFields) => {
+    // console.log(
+    //     'Inside updateByUsername model function:',
+    //     username,
+    //     updateFields
+    // );
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .update(updateFields)
+            .select('id')
+            .eq('username', username);
+
+        if (error) {
+            throw error;
+        }
+        if (data && data.length > 0) {
+            // console.log(`User ${username} updated successfully.`);
+            return { success: true, data: data[0] };
+        } else {
+            // console.log(`User ${username} not found or no changes made.`);
+            return {
+                success: false,
+                message: 'User not found or no changes made.',
+            };
+        }
+    } catch (error) {
+        console.error(`Error updating user ${username}:`, error.message);
+        return { success: false, message: error.message };
+    }
+};
+
+const getHashedPasswordByUsername = async (username) => {
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .select('password')
+            .eq('username', username)
+            .single(); // Assuming username is unique and will return a single record
+
+        if (error) {
+            console.error('Error fetching user hashed password:', error);
+            return { error };
+        }
+
+        return { hashedPassword: data.password };
+    } catch (error) {
+        console.error('Error in getHashedPasswordByUsername:', error);
+        return { error };
+    }
+};
+
+const getJoinedForumsByUserId = async (userId) => {
+    try {
+        const { data, error } = await supabase
+            .from('watched_list')
+            .select(`
+                movie_id,
+                movie:movie_id (id, title, release_date, poster_url) 
+            `)
+            .eq('user_id', userId)
+            .eq('joined_forum', true);
+
+        if (error) throw error;
+
+        // Extract movie details from the joined data
+        const movies = data.map(entry => entry.movie);
+
+        return { success: true, movies };
+    } catch (error) {
+        console.error('Error fetching joined forums movies:', error);
+        return { success: false, error: 'Error fetching joined forums movies' };
+    }
+};
 
 module.exports = {
     createUser,
@@ -627,8 +891,12 @@ module.exports = {
     unfollowCinefellow,
     withdrawCineFellowRequest,
     getPendingRequests,
+    getPendingRequestsWithRequesters,
+    getPendingRequestCount,
     acceptCineFellowRequest,
     rejectCineFellowRequest,
+    acceptCineFellowRequestByReqId,
+    rejectCineFellowRequestByReqId,
     checkIfIRequested,
     checkIfTheyRequested,
     getWatchedMovies,
@@ -636,7 +904,13 @@ module.exports = {
     removeFromWatchlist,
     searchProfilesByUsername,
     fetchJoinedForums,
-
     getProfileDetails,
     fetchUserById,
+    fetchProductWishlist,
+    fetchUserPhotoById,
+    fetchUserProfileForUpdate,
+    checkIfUsernameIsTaken,
+    updateByUsername,
+    getHashedPasswordByUsername,
+    getJoinedForumsByUserId,
 };
