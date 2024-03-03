@@ -17,6 +17,7 @@ import {
   SendCinefellowRequestButton,
   RemoveCinefellowButton,
   WithdrawCinefellowRequestButton,
+  ChatButton,
 } from '@components/cinefellowProfileButtons'
 import Footer from '@components/footer'
 import Recommendations from '@components/recommendations'
