@@ -12,6 +12,7 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { set } from 'date-fns'
+import { de } from 'date-fns/locale'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from 'react'
@@ -48,28 +49,28 @@ const PostItem = ({
   const showToast = useCustomToast()
   const { onCopy, value, setValue, hasCopied } = useClipboard('')
 
-  const singlePostPage = !onSelectPost
+  const singlePostPage = onSelectPost
 
-  // useEffect(() => {
-  //   const getCommentCount = async (forumId, postId) => {
-  //     const response = await fetch(
-  //       `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
-  //       {
-  //         method: 'GET',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           // ...(cookie ? { Cookie: cookie } : {}),
-  //         },
-  //         credentials: 'include',
-  //       }
-  //     )
-  //     const data = await response.json() // Convert the response to JSON
+  useEffect(() => {
+    const getCommentCount = async (forumId, postId) => {
+      const response = await fetch(
+        `http://localhost:4000/v1/forum/${forumId}/post/${postId}/reactions`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(cookie ? { Cookie: cookie } : {}),
+          },
+          credentials: 'include',
+        }
+      )
+      const data = await response.json() // Convert the response to JSON
 
-  //     setCommentCount(data.total_comments)
-  //   }
+      setCommentCount(data.total_comments)
+    }
 
-  //   getCommentCount(forumId, post.postId)
-  // }, [forumId, post.postId])
+    getCommentCount(forumId, post.postId)
+  }, [forumId, post.postId])
 
   const handleDelete = async (event) => {
     event.stopPropagation()
@@ -97,9 +98,7 @@ const PostItem = ({
         status: 'success',
       })
 
-      if (singlePostPage) {
-        router.push(`/forum/${forumId}`)
-      }
+      router.push(`/forum/${forumId}`)
     } catch (error) {
       setError(error.message)
       showToast({
@@ -134,6 +133,12 @@ const PostItem = ({
       description: 'Currently, this functionality is not available',
       status: 'warning',
     })
+  }
+
+  const handleEdit = (event) => {
+    event.stopPropagation()
+
+    router.push(`/forum/${forumId}/post/${post.postId}/edit`)
   }
 
   return (
@@ -181,6 +186,7 @@ const PostItem = ({
         </Stack>
         <PostActions
           handleDelete={handleDelete}
+          handleEdit={handleEdit}
           loadingDelete={loadingDelete}
           userIsCreator={userIsCreator}
           handleShare={handleShare}
@@ -218,10 +224,6 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
       setDownvoteCount(data.downvotes)
     }
 
-    getVoteCount(forumId, post.postId)
-  }, [isVoted, forumId, post.postId])
-
-  useEffect(() => {
     const checkIfVoted = async (forumId, postId) => {
       const response = await fetch(
         `http://localhost:4000/v1/forum/${forumId}/post/${postId}/voted`,
@@ -236,11 +238,11 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
       )
       const data = await response.json() // Convert the response to JSON
 
-      // console.log('data', data)
       setIsVoted(data.voted)
       setVoteType(data.type)
     }
 
+    getVoteCount(forumId, post.postId)
     checkIfVoted(forumId, post.postId)
   }, [isVoted, forumId, post.postId])
 
@@ -249,23 +251,35 @@ const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
 
     onVote(event, post.postId, value, forumId, isVoted)
 
-    if (value === 1 && !isVoted) {
-      setVoteCount(voteCount + 1)
-      setIsVoted(true)
-      // console.log('voteCount', voteCount)
-    } else if (value === -1 && !isVoted) {
-      setDownvoteCount(downvoteCount + 1)
-      setIsVoted(true)
-      // console.log('downvoteCount', downvoteCount)
-    } else if (value === 1 && isVoted && voteCount > 0) {
-      setVoteCount(voteCount - 1)
-      setIsVoted(false)
-      // console.log('voteCount', voteCount)
-    } else if (value === -1 && isVoted && downvoteCount > 0) {
-      setDownvoteCount(downvoteCount - 1)
-      setIsVoted(false)
-      // console.log('downvoteCount', downvoteCount)
-    }
+    setIsVoted(!isVoted)
+
+    // let decreased = false
+
+    // if (value === 1 && !isVoted) {
+    //   setVoteCount(voteCount + 1)
+    //   // setIsVoted(true)
+    //   // console.log('voteCount', voteCount)
+    // } else if (value === -1 && !isVoted) {
+    //   setDownvoteCount(downvoteCount + 1)
+    //   // setIsVoted(true)
+    //   // console.log('downvoteCount', downvoteCount)
+    // } else if (value === 1 && isVoted && voteCount > 0) {
+    //   setVoteCount(voteCount - 1)
+    //   decreased = true
+    //   // console.log('voteCount', voteCount)
+    // } else if (value === -1 && isVoted && downvoteCount > 0) {
+    //   setDownvoteCount(downvoteCount - 1)
+    //   // setIsVoted(false)
+    //   decreased = true
+    //   // console.log('downvoteCount', downvoteCount)
+    // }
+
+    // if (decreased) {
+    //   setIsVoted(false)
+    // } else {
+    //   setIsVoted(true)
+    // }
+
   }
 
   return (
@@ -386,6 +400,7 @@ const PostActions = ({
   handleDelete,
   loadingDelete,
   userIsCreator,
+  handleEdit,
   handleShare,
   handleSave,
   commentCount,
@@ -402,17 +417,21 @@ const PostActions = ({
       width="100%" // Ensure the Flex container takes full width
     >
       <Flex direction="row">
-        <Button onClick={handleShare} className="mr-2">
+        {/* <Button onClick={handleShare} className="mr-2">
           <Icon as={FiShare2} mr={2} />
           Share
-        </Button>
-
-        <Button onClick={handleSave} className="mx-2">
-          <Icon as={BsBookmark} mr={2} />
-          Save
-        </Button>
+        </Button> */}
 
         {userIsCreator && (
+          <Button onClick={handleEdit} className="mx-2">
+          <Icon as={BsBookmark} mr={2} />
+          Edit
+        </Button>
+        )}
+    
+
+        {userIsCreator && (
+
           <Button
             onClick={handleDelete}
             isLoading={loadingDelete}
