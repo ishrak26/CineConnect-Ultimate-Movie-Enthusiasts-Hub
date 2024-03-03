@@ -253,7 +253,7 @@
 
 .chatButton {
   position: relative;
-  width: 175px;
+  width: 160px;
   height: 51px;
   background: #171616;
   border-radius: 15px;
@@ -268,8 +268,9 @@
   border: none;
   cursor: pointer;
   outline: none;
-  padding-left: 2rem; /* Adjust based on the size of your icon */
-  padding-right: 2rem; /* Adjust for padding */
+  padding-left: 3rem; /* Adjust based on the size of your icon */
+  padding-right: 3rem; /* Adjust for padding */
+  margin-left: 1rem; /* Adjust for margin */
   box-sizing: border-box;
   transition: background-color 0.3s;
 }
@@ -281,7 +282,7 @@
 
 .chatButtonIcon {
   position: absolute;
-  left: 1rem; /* Adjust based on your layout */
+  left: 2.2rem; /* Adjust based on your layout */
   
   top: 50%;
   transform: translateY(-50%);
