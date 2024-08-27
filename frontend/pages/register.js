@@ -3,14 +3,15 @@ import Layout from './layout'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import styles from '../styles/Form.module.css'
-import {
-  faCheck,
-  faTimes,
-  faInfoCircle,
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+// import {
+//   faCheck,
+//   faTimes,
+//   faInfoCircle,
+// } from '@fortawesome/free-solid-svg-icons'
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
+// import toast from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/
@@ -25,17 +26,17 @@ export default function Register() {
   const errRef = useRef()
 
   const [validName, setValidName] = useState(false)
-  const [userFocus, setUserFocus] = useState(false)
+  // const [userFocus, setUserFocus] = useState(false)
 
-  const [validPwd, setValidPwd] = useState(false)
-  const [pwdFocus, setPwdFocus] = useState(false)
+  // const [validPwd, setValidPwd] = useState(false)
+  // const [pwdFocus, setPwdFocus] = useState(false)
 
   const [matchPwd, setMatchPwd] = useState('')
   const [validMatch, setValidMatch] = useState(false)
-  const [matchFocus, setMatchFocus] = useState(false)
+  // const [matchFocus, setMatchFocus] = useState(false)
 
   const [errMsg, setErrMsg] = useState('')
-  const [success, setSuccess] = useState(false)
+  // const [success, setSuccess] = useState(false)
 
   const router = useRouter()
 
@@ -44,7 +45,7 @@ export default function Register() {
   }, [username])
 
   useEffect(() => {
-    setValidPwd(PWD_REGEX.test(password))
+    // setValidPwd(PWD_REGEX.test(password))
     setValidMatch(password === matchPwd)
   }, [password, matchPwd])
 
@@ -77,7 +78,7 @@ export default function Register() {
     )
 
     if (!response.ok) {
-      console.error('Error with request:', response.status, response.statusText)
+      // console.error('Error with request:', response.status, response.statusText)
     }
 
     await router.push('/login')

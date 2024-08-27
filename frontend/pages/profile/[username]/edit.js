@@ -80,7 +80,7 @@ const createSchema = (currentUsername) => {
             // )
             return data.message === 'Username is available'
           } catch (error) {
-            console.error('Error checking username availability:', error)
+            // console.error('Error checking username availability:', error)
             // Return false or throw a validation error if you cannot verify the username's uniqueness
             return false
           }
@@ -89,12 +89,12 @@ const createSchema = (currentUsername) => {
     .required()
 }
 
-const EditProfile = ({ username, oldProfileData, cookie }) => {
+const EditProfile = ({ username, oldProfileData }) => {
   const schema = createSchema(username)
   // console.log('Inside Edit Profile, client side, validation schema: ', schema)
   const [loading, setLoading] = useState(false)
   const [error, setErrorState] = useState('')
-  const [startDate, setStartDate] = useState(new Date())
+  // const [startDate, setStartDate] = useState(new Date())
 
   const [selectedFile, setSelectedFile] = useState(null)
 
@@ -165,12 +165,15 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
           // console.log('filePath:', filePath)
           // console.log('selectedFile:', selectedFile)
 
-          const { data: uploadData, error } = await supabase.storage
+          // const { data: uploadData, error } = await supabase.storage
+          //   .from('user_info')
+          //   .upload(uniqueFileName, selectedFile)
+          const { error } = await supabase.storage
             .from('user_info')
             .upload(uniqueFileName, selectedFile)
 
           if (error) {
-            console.error('Error uploading file:', error)
+            // console.error('Error uploading file:', error)
             throw error
           }
 
@@ -224,7 +227,7 @@ const EditProfile = ({ username, oldProfileData, cookie }) => {
         })
       }
     } catch (err) {
-      console.error('Error updating profile:', err)
+      // console.error('Error updating profile:', err)
       setErrorState('Failed to update profile.')
     } finally {
       setLoading(false)
@@ -419,7 +422,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.error('Error during data fetching:', error)
+    // console.error('Error during data fetching:', error)
     return {
       props: {
         error: error.message,

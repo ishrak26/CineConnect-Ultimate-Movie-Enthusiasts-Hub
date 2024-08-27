@@ -2,13 +2,13 @@ import React from 'react'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import Sidebar from '@components/Sidebar'
+// import Sidebar from '@components/Sidebar'
 import BaseLayout from '@components/BaseLayout'
 import Navbar from '@components/navbar'
-import Container from '@components/Container'
+// import Container from '@components/Container'
 import Row from '@components/Row'
 import ForumRow from '@components/ForumRow'
-import ReviewCard from '@components/ReviewCard'
+// import ReviewCard from '@components/ReviewCard'
 import CinefellowsRow from '@components/CinefellowsRow' // Adjust the import path as necessary
 import {
   EditButton,
@@ -19,7 +19,7 @@ import {
   WithdrawCinefellowRequestButton,
 } from '@components/cinefellowProfileButtons'
 import Footer from '@components/footer'
-import Recommendations from '@components/recommendations'
+// import Recommendations from '@components/recommendations'
 import { Box, Typography } from '@mui/material' // Import from MUI
 // import styles from '../styles/profile.module.css';
 // Adjust the path according to your file structure
@@ -30,14 +30,14 @@ import { Box, Typography } from '@mui/material' // Import from MUI
 export default function Profile({
   watchedMovies,
   watchlist,
-  reviews,
+  // reviews,
   forums,
   cineFellows,
   userType,
   profileInfo,
   cinefellowCount,
   user,
-  cookie,
+  // cookie,
 }) {
   // 1 - user's own profile, 2 - cinefellow, 3 - request sent by profileholder,
   // 4 - request received from profileholder, 5 - non-cinefellow, 6 - unauthenticated
@@ -58,24 +58,24 @@ export default function Profile({
     bio: 'Anime and movie enthusiast. Love to watch and discuss movies!',
     // Other user data can be included here
   }
-  const userReviews = [
-    {
-      movieImage: 'https://via.placeholder.com/150', // Replace with actual image source
-      movieName: 'Inception',
-      rating: 5,
-      timestamp: '2 days ago',
-      content:
-        'Inception is a great movie. I loved the plot and the acting. The visuals were stunning. Would recommend to anyone who loves a good thriller.',
-    },
-    {
-      movieImage: 'https://via.placeholder.com/150', // Replace with actual image source
-      movieName: 'The Dark Knight',
-      rating: 5,
-      timestamp: '5 days ago',
-      content:
-        "The Dark Knight is a masterpiece. Heath Ledger's performance as the Joker is iconic. The movie is a must-watch for any movie lover.Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-    },
-  ] // Assuming we have the user's reviews as static content
+  // const userReviews = [
+  //   {
+  //     movieImage: 'https://via.placeholder.com/150', // Replace with actual image source
+  //     movieName: 'Inception',
+  //     rating: 5,
+  //     timestamp: '2 days ago',
+  //     content:
+  //       'Inception is a great movie. I loved the plot and the acting. The visuals were stunning. Would recommend to anyone who loves a good thriller.',
+  //   },
+  //   {
+  //     movieImage: 'https://via.placeholder.com/150', // Replace with actual image source
+  //     movieName: 'The Dark Knight',
+  //     rating: 5,
+  //     timestamp: '5 days ago',
+  //     content:
+  //       "The Dark Knight is a masterpiece. Heath Ledger's performance as the Joker is iconic. The movie is a must-watch for any movie lover.Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
+  //   },
+  // ] // Assuming we have the user's reviews as static content
 
   // Function to create section headers with the same style as in Container component
   const SectionHeader = ({ title }) => (
@@ -109,11 +109,11 @@ export default function Profile({
   }
 
   const handleChat = (fellow) => {
-    router.push(`/chat/${fellow.username}`);
+    router.push(`/chat/${fellow.username}`)
   }
 
   const handleUnfollow = async (user, fellow) => {
-    console.log('Inside handleUnfollow, user:', user, 'fellow:', fellow)
+    // console.log('Inside handleUnfollow, user:', user, 'fellow:', fellow)
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${fellow.username}/cinefellows/unfollow`,
@@ -133,16 +133,16 @@ export default function Profile({
       if (!response.ok) {
         throw new Error('Failed to unfollow')
       }
-      console.log('Should have unfollowed')
-      console.log(data.message) // Handle success
+      // console.log('Should have unfollowed')
+      // console.log(data.message) // Handle success
       setProfileOwnerState(5) // Update state to reflect the new profile owner state
     } catch (err) {
-      console.error(err) // Handle errors
+      // console.error(err) // Handle errors
     }
   }
 
   const handleFollow = async (user, fellow) => {
-    console.log('Inside handleFollow, user:', user, 'fellow:', fellow)
+    // console.log('Inside handleFollow, user:', user, 'fellow:', fellow)
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${fellow.username}/cinefellows/follow`,
@@ -162,16 +162,16 @@ export default function Profile({
       if (!response.ok) {
         throw new Error('Failed to send follow request')
       }
-      console.log('Follow request should have been sent')
-      console.log(data.message) // Handle success
+      // console.log('Follow request should have been sent')
+      // console.log(data.message) // Handle success
       setProfileOwnerState(4) // Update state to reflect the new profile owner state
     } catch (err) {
-      console.error(err) // Handle errors
+      // console.error(err) // Handle errors
     }
   }
 
   const handleAcceptRequest = async (user, fellow) => {
-    console.log('Inside handleAcceptRequest, user:', user, 'fellow:', fellow)
+    // console.log('Inside handleAcceptRequest, user:', user, 'fellow:', fellow)
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${fellow.username}/cinefellows/accept`,
@@ -191,16 +191,16 @@ export default function Profile({
       if (!response.ok) {
         throw new Error('Failed to accept follow request')
       }
-      console.log('Follow request should have been accepted')
-      console.log(data.message) // Handle success
+      // console.log('Follow request should have been accepted')
+      // console.log(data.message) // Handle success
       setProfileOwnerState(2) // Update state to reflect the new profile owner state
     } catch (err) {
-      console.error(err) // Handle errors
+      // console.error(err) // Handle errors
     }
   }
 
   const handleRejectRequest = async (user, fellow) => {
-    console.log('Inside handleRejectRequest, user:', user, 'fellow:', fellow)
+    // console.log('Inside handleRejectRequest, user:', user, 'fellow:', fellow)
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${fellow.username}/cinefellows/reject`,
@@ -220,16 +220,16 @@ export default function Profile({
       if (!response.ok) {
         throw new Error('Failed to reject follow request')
       }
-      console.log('Follow request should have been rejected')
-      console.log(data.message) // Handle success
+      // console.log('Follow request should have been rejected')
+      // console.log(data.message) // Handle success
       setProfileOwnerState(5) // Update the profileOwnerState to reflect the change
     } catch (err) {
-      console.error(err) // Handle errors
+      // console.error(err) // Handle errors
     }
   }
 
   const handleWithdrawRequest = async (user, fellow) => {
-    console.log('Inside handleWithdrawRequest, user:', user, 'fellow:', fellow)
+    // console.log('Inside handleWithdrawRequest, user:', user, 'fellow:', fellow)
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/profile/${fellow.username}/cinefellows/withdraw-request`,
@@ -246,20 +246,20 @@ export default function Profile({
           }),
         }
       )
-      console.log('response: ', response)
+      // console.log('response: ', response)
       if (!response.ok) {
         throw new Error('Failed to withdraw the already sent follow request')
       }
       const data = await response.json()
-      console.log('Follow request should have been withdrawn')
-      console.log(data.message) // Handle success
+      // console.log('Follow request should have been withdrawn')
+      // console.log(data.message) // Handle success
       setProfileOwnerState(5) // or another appropriate state based on your app's logic
-      console.log(
-        'Inside handlerWithdraw function, state : ',
-        profileOwnerState
-      )
+      // console.log(
+      //   'Inside handlerWithdraw function, state : ',
+      //   profileOwnerState
+      // )
     } catch (err) {
-      console.error(err) // Handle errors
+      // console.error(err) // Handle errors
     }
   }
 
@@ -380,9 +380,9 @@ export default function Profile({
 
 export async function getServerSideProps(context) {
   const username = context.params.username
-  const { params } = context // Destructure params from context
+  // const { params } = context // Destructure params from context
   //   const { username } = params; // Now you can access username directly from params
-  const query = context.query // Get the query parameters
+  // const query = context.query // Get the query parameters
   const cookie = context.req.headers.cookie
   // console.log("Current sesisons user id: ", context.req)
 
@@ -490,7 +490,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.error('Error during data fetching:', error)
+    // console.error('Error during data fetching:', error)
     return {
       props: {
         error: error.message,

@@ -60,7 +60,7 @@ const Requests = ({
         setPendingReqCount(data.pendingRequestCount)
         setCurrentPage(page)
       } catch (error) {
-        console.error('Failed to fetch pending requests:', error)
+        // console.error('Failed to fetch pending requests:', error)
       }
     }
 
@@ -98,10 +98,10 @@ const Requests = ({
         ...prevStatuses,
         [requestId]: 'accepted',
       }))
-      console.log('Follow request should have been accepted')
-      console.log(data.message) // Handle success
+      // console.log('Follow request should have been accepted')
+      // console.log(data.message) // Handle success
     } catch (err) {
-      console.error(err) // Handle errors
+      // console.error(err) // Handle errors
     }
   }
 
@@ -128,10 +128,10 @@ const Requests = ({
         ...prevStatuses,
         [requestId]: 'rejected',
       }))
-      console.log('Follow request should have been rejected')
-      console.log(data.message) // Handle success
+      // console.log('Follow request should have been rejected')
+      // console.log(data.message) // Handle success
     } catch (err) {
-      console.error(err) // Handle errors
+      // console.error(err) // Handle errors
     }
   }
 
@@ -156,34 +156,30 @@ const Requests = ({
           <SectionHeader
             title={`Pending Cinefellow Requests (${pendingReqCount})`}
           />
-          {requests.map(
-            (request) => (
-              console.log('Request: ', request),
-              (
-                <CinefellowRequestCard
-                  key={request.id}
-                  requestorPhoto={request.requesterDetails.image_url}
-                  requestorUsername={request.requesterDetails.full_name}
-                  commonForumsCount={request.commonForumsCount}
-                  requestedAt={new Date(request.created_at).toLocaleString(
-                    'en-US',
-                    {
-                      month: 'long', // "January"
-                      day: '2-digit', // "01"
-                      year: 'numeric', // "2024"
-                      hour: '2-digit', // "12"
-                      minute: '2-digit', // "00"
-                      second: '2-digit', // "00"
-                      hour12: true, // AM/PM format
-                    }
-                  )}
-                  status={requestStatuses[request.id] || 'pending'}
-                  onAccept={() => handleAcceptRequest(request.id)}
-                  onReject={() => handleRejectRequest(request.id)}
-                />
-              )
-            )
-          )}
+          {requests.map((request) => (
+            // console.log('Request: ', request),
+            <CinefellowRequestCard
+              key={request.id}
+              requestorPhoto={request.requesterDetails.image_url}
+              requestorUsername={request.requesterDetails.full_name}
+              commonForumsCount={request.commonForumsCount}
+              requestedAt={new Date(request.created_at).toLocaleString(
+                'en-US',
+                {
+                  month: 'long', // "January"
+                  day: '2-digit', // "01"
+                  year: 'numeric', // "2024"
+                  hour: '2-digit', // "12"
+                  minute: '2-digit', // "00"
+                  second: '2-digit', // "00"
+                  hour12: true, // AM/PM format
+                }
+              )}
+              status={requestStatuses[request.id] || 'pending'}
+              onAccept={() => handleAcceptRequest(request.id)}
+              onReject={() => handleRejectRequest(request.id)}
+            />
+          ))}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -248,7 +244,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.error('Error during data fetching:', error)
+    // console.error('Error during data fetching:', error)
     return {
       props: {
         error: error.message,
