@@ -1,4 +1,4 @@
-const { parse } = require('dotenv');
+const { parse } = require('dotenv').config();
 const supabase = require('../config/supabaseConfig');
 
 async function createUser(user) {
@@ -708,7 +708,6 @@ const getProfileDetails = async ({ username }) => {
 };
 
 async function fetchUserById({ id }) {
-
     // console.log('In fetchUserById', id);
     const { data, error } = await supabase
         .from('user_info')
@@ -764,7 +763,7 @@ async function fetchUserPhotoById({ id }) {
         return null;
     }
     return data[0];
-};
+}
 
 async function fetchUserProfileForUpdate({ username }) {
     const { data, error } = await supabase
@@ -781,7 +780,7 @@ async function fetchUserProfileForUpdate({ username }) {
         return null;
     }
     return data[0];
-};
+}
 
 async function checkIfUsernameIsTaken({ newUsername }) {
     const { data, error } = await supabase
@@ -799,7 +798,7 @@ async function checkIfUsernameIsTaken({ newUsername }) {
     }
 
     return false;
-};
+}
 
 const updateByUsername = async (username, updateFields) => {
     // console.log(
@@ -857,17 +856,19 @@ const getJoinedForumsByUserId = async (userId) => {
     try {
         const { data, error } = await supabase
             .from('watched_list')
-            .select(`
+            .select(
+                `
                 movie_id,
                 movie:movie_id (id, title, release_date, poster_url) 
-            `)
+            `
+            )
             .eq('user_id', userId)
             .eq('joined_forum', true);
 
         if (error) throw error;
 
         // Extract movie details from the joined data
-        const movies = data.map(entry => entry.movie);
+        const movies = data.map((entry) => entry.movie);
 
         return { success: true, movies };
     } catch (error) {
