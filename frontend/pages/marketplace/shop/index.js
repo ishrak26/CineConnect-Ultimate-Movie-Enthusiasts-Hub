@@ -1,25 +1,26 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import CardSkeleton from '@/components/marketplace/cardskeleton'
+import React, { useState } from 'react'
+// import { useEffect } from 'react'
+// import { useSelector } from 'react-redux'
+// import CardSkeleton from '@/components/marketplace/cardskeleton'
 import Layout from '@/components/marketplace/layout'
 import MovieCard from '@/components/marketplace/moviecard'
 // import { recentCategory } from '../../slices/categorySlice'
 import Head from 'next/head'
 import useCustomToast from '@/hooks/useCustomToast'
 import Pagination from '@components/pagination'
-import { tr } from 'date-fns/locale'
+// import { tr } from 'date-fns/locale'
 
 function Category({
   data,
   dataItems,
   dataTypes,
   totalPages,
-  cookie,
+  // cookie,
   currentPage,
 }) {
   const [sort, setSort] = useState(0)
-  const showToast = useCustomToast()
-  const [tag, setTag] = useState('')
+  // const showToast = useCustomToast()
+  // const [tag, setTag] = useState('')
 
   const data_items = dataItems
     // .filter((item) => {

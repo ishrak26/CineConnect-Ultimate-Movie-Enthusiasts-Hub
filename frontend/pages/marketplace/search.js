@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import CardSkeleton from '@/components/marketplace/cardskeleton'
+// import { useSelector } from 'react-redux'
+// import CardSkeleton from '@/components/marketplace/cardskeleton'
 import Layout from '@/components/marketplace/layout'
 import ProductCard from '@/components/marketplace/productcard'
 // import { recentCategory } from '../../slices/categorySlice'
 import Head from 'next/head'
 import useCustomToast from '@/hooks/useCustomToast'
 import Pagination from '@components/pagination'
-import { set } from 'react-nprogress'
-import { da } from 'date-fns/locale'
+// import { set } from 'react-nprogress'
+// import { da } from 'date-fns/locale'
 
 function Category({
   data,
@@ -164,14 +164,14 @@ export async function getServerSideProps({ query }) {
 
   // Remove trailing comma
   tags = tags.slice(0, -1)
-  movies = movies.slice(0, -1)
+  // movies = movies.slice(0, -1)
 
   const dataItems = await fetchData(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/products?limit=${limit}&offset=${offset}&${tags}`
   )
 
   const totalItems = dataItems.length
-  console.log('Total Items ', totalItems)
+  // console.log('Total Items ', totalItems)
 
   const data = await fetchData(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/tags`

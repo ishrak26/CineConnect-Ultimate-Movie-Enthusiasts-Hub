@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+// import { useSelector } from 'react-redux'
 import Header from '@/components/marketplace/header'
 import WishProduct from '@/components/marketplace/wishproduct'
 // import { selectWishItems } from "../slices/wishlistSlice";
 import Head from 'next/head'
 
-function WishList({ username, cookie, offset }) {
+function WishList({ username, offset }) {
   // const data = useSelector(selectWishItems);
   const [items, setItems] = useState([])
 
@@ -35,7 +35,7 @@ function WishList({ username, cookie, offset }) {
     fetchWishlist()
   }, [])
 
-  const handleRemoveFromWishlist = (id) => {
+  const handleRemoveFromWishlist = () => {
     // removeFromWishlist(id).then(() => {
     fetchWishlist()
     // });
