@@ -19,7 +19,7 @@ const Messages = ({ user }) => {
 
   return (
     <div className="px-10 flex-1 overflow-auto">
-      {console.log(messages)}
+      {/* {console.log(messages)} */}
       {!loading &&
         messages.length > 0 &&
         messages.map((message) => (

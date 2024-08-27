@@ -1,12 +1,13 @@
 import { Box, Button, Flex, Icon, Image, Text } from '@chakra-ui/react'
-import React, { use, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+// import { use } from 'react'
 import { HiArrowCircleUp } from 'react-icons/hi'
 // import useForumData from "@/hooks/useForumData";
 import { useRouter } from 'next/router'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { FiSettings } from 'react-icons/fi'
 import IconItem from './Icon'
-import is from 'sharp/lib/is'
+// import is from 'sharp/lib/is'
 // import ForumSettingsModal from "../Modal/ForumSettings/ForumSettings";
 
 const ForumHeader = ({ ForumData }) => {
@@ -16,7 +17,7 @@ const ForumHeader = ({ ForumData }) => {
 
   // console.log('ForumData', ForumData)
   const [isJoined, setIsJoined] = useState(false)
-  const router = useRouter()
+  // const router = useRouter()
 
   useEffect(() => {
     const checkUserJoinedForum = async () => {
@@ -39,35 +40,48 @@ const ForumHeader = ({ ForumData }) => {
   }, [ForumData.forumId, isJoined])
 
   const onJoinOrLeaveForum = async (ForumData, isJoined) => {
-    if (isJoined) {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumData.forumId}/leave`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            // ...(cookie ? { Cookie: cookie } : {}),
-          },
-          credentials: 'include',
+    try {
+      if (isJoined) {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumData.forumId}/leave`,
+          {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              // ...(cookie ? { Cookie: cookie } : {}),
+            },
+            credentials: 'include',
+          }
+        )
+        if (!res.ok) {
+          throw new Error('Failed to leave forum')
         }
-      )
-      window.location.href = `/movie/${ForumData.forumId}`
-      // setIsJoined(false)
+        window.location.href = `/movie/${ForumData.forumId}`
+        // setIsJoined(false)
+      } else {
+        // else {
+        //   const res = await fetch(
+        //     `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumData.forumId}/join`,
+        //     {
+        //       method: 'POST',
+        //       headers: {
+        //         'Content-Type': 'application/json',
+        //         // ...(cookie ? { Cookie: cookie } : {}),
+        //       },
+        //       credentials: 'include',
+        //     }
+        //   )
+        //   setIsJoined(true)
+        // }
+      }
+    } catch (error) {
+      // console.error('Failed to join forum', error)
+      showToast({
+        title: 'Failed to join forum',
+        description: 'Please try again later',
+        status: 'error',
+      })
     }
-    // else {
-    //   const res = await fetch(
-    //     `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${ForumData.forumId}/join`,
-    //     {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //         // ...(cookie ? { Cookie: cookie } : {}),
-    //       },
-    //       credentials: 'include',
-    //     }
-    //   )
-    //   setIsJoined(true)
-    // }
   }
 
   return (
@@ -146,7 +160,7 @@ export const JoinOrLeaveButton = ({ isJoined, onClick }) => {
 }
 
 export const ForumSettings = ({ ForumData }) => {
-  const router = useRouter()
+  // const router = useRouter()
   const [user] = useAuthState(auth)
   const [isForumSettingsModalOpen, setForumSettingsModalOpen] = useState(false)
 

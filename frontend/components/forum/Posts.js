@@ -1,13 +1,13 @@
 // import usePosts from "@/hooks/usePosts";
 import { Stack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { useAuthState } from 'react-firebase-hooks/auth'
+import React, { useState } from 'react'
+// import { useAuthState } from 'react-firebase-hooks/auth'
 import PostItem from './PostItem'
 import PostLoader from './PostLoader'
 import useCustomToast from '../../hooks/useCustomToast'
 import usePosts from '../../hooks/usePosts'
 
-const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
+const Posts = ({ ForumData, user, ForumAbout }) => {
   // const [user] = useAuthState(auth);
 
   const [loading, setLoading] = useState(false)
@@ -19,7 +19,7 @@ const Posts = ({ ForumData, user, ForumAbout, cookie }) => {
     onDeletePost,
     onSelectPost,
   } = usePosts()
-  const showToast = useCustomToast()
+  // const showToast = useCustomToast()
 
   const postStateValue = {
     posts: ForumData,

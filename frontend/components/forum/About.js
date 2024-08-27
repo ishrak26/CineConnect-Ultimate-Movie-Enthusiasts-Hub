@@ -1,8 +1,8 @@
 import { Box, Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
-import moment from 'moment'
+// import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import { useAuthState } from 'react-firebase-hooks/auth'
+// import { useAuthState } from 'react-firebase-hooks/auth'
 import { HiOutlineDotsHorizontal } from 'react-icons/hi'
 // import ForumSettingsModal from "../Modal/ForumSettings/ForumSettings";
 
@@ -79,28 +79,28 @@ const AboutForum = ({ ForumData, members }) => (
   </Flex>
 )
 
-const AdminSectionAbout = ({ ForumData }) => {
-  const [isForumSettingsModalOpen, setForumSettingsModalOpen] = useState(false)
-  // const [user] = useAuthState(auth)
-  const user = []
-  return (
-    <>
-      {user?.uid === ForumData?.creatorId && (
-        <>
-          <ForumSettingsModal
-            open={isForumSettingsModalOpen}
-            handleClose={() => setForumSettingsModalOpen(false)}
-            ForumData={ForumData}
-          />
-          <Button
-            width="100%"
-            variant="outline"
-            onClick={() => setForumSettingsModalOpen(true)}
-          >
-            Forum Settings
-          </Button>
-        </>
-      )}
-    </>
-  )
-}
+// const AdminSectionAbout = ({ ForumData }) => {
+//   const [isForumSettingsModalOpen, setForumSettingsModalOpen] = useState(false)
+//   // const [user] = useAuthState(auth)
+//   const user = []
+//   return (
+//     <>
+//       {user?.uid === ForumData?.creatorId && (
+//         <>
+//           <ForumSettingsModal
+//             open={isForumSettingsModalOpen}
+//             handleClose={() => setForumSettingsModalOpen(false)}
+//             ForumData={ForumData}
+//           />
+//           <Button
+//             width="100%"
+//             variant="outline"
+//             onClick={() => setForumSettingsModalOpen(true)}
+//           >
+//             Forum Settings
+//           </Button>
+//         </>
+//       )}
+//     </>
+//   )
+// }

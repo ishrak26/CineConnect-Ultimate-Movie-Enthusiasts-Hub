@@ -1,7 +1,8 @@
 // import useGetConversations from "../../hooks/useGetConversations";
 import { getRandomEmoji } from '../../utils/emojis'
 import Conversation from './Conversation'
-import { use, useEffect, useState } from 'react'
+// import { use } from 'react'
+import { useEffect, useState } from 'react'
 
 const Conversations = ({ user }) => {
   //   const { loading, conversations } = useGetConversations()
@@ -22,10 +23,10 @@ const Conversations = ({ user }) => {
       )
 
       const data = await response.json()
-      console.log(data)
+      // console.log(data)
       setConversations(data)
     }
-    console.log('user', user)
+    // console.log('user', user)
     getConversions()
   }, [])
 

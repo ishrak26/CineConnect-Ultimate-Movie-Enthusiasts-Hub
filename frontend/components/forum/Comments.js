@@ -2,7 +2,7 @@
 import useCustomToast from '../../hooks/useCustomToast'
 import {
   Box,
-  Divider,
+  // Divider,
   Flex,
   SkeletonCircle,
   SkeletonText,
@@ -13,7 +13,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import CommentInput from './CommentInput'
 import CommentItem from './CommentItem'
-import router from 'next/router'
+// import router from 'next/router'
 
 const Comments = ({
   user,
@@ -46,7 +46,7 @@ const Comments = ({
       const data = await response.json()
       setComments(data)
     } catch (error) {
-      console.log('Error: fetchComments', error)
+      // console.log('Error: fetchComments', error)
       showToast({
         title: 'Comments not Fetched',
         description: 'There was an error fetching comments',
@@ -87,6 +87,9 @@ const Comments = ({
           body: JSON.stringify(newComment),
         }
       )
+      if (!response.ok) {
+        throw new Error('Error: onCreateComment')
+      }
 
       window.location.href = `/forum/${ForumId}/post/${selectedPost.postId}/comments`
 
@@ -110,7 +113,7 @@ const Comments = ({
         status: 'success',
       })
     } catch (error) {
-      console.log('Error: OnCreateComment', error)
+      // console.log('Error: OnCreateComment', error)
       showToast({
         title: 'Comment not Created',
         description: 'There was an error creating your comment',
@@ -152,7 +155,7 @@ const Comments = ({
         status: 'success',
       })
     } catch (error) {
-      console.log('Error: onDeleteComment', error)
+      // console.log('Error: onDeleteComment', error)
       showToast({
         title: 'Comment not Deleted',
         description: 'There was an error deleting your comment',
@@ -167,7 +170,7 @@ const Comments = ({
     try {
       setComments(Comments)
     } catch (error) {
-      console.log('Error: getPostComments', error)
+      // console.log('Error: getPostComments', error)
       showToast({
         title: 'Comments not Fetched',
         description: 'There was an error fetching comments',

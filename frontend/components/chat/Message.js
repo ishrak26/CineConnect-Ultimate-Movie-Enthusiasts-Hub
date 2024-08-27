@@ -6,11 +6,11 @@ const Message = ({ message, user }) => {
   const { selectedConversation } = useConversation()
   const fromMe = message.senderId === user.user.id
   const formattedTime = extractTime(message.createdAt)
-  const chatClassName = fromMe ? 'chat-end' : 'chat-start'
+  // const chatClassName = fromMe ? 'chat-end' : 'chat-start'
   const profilePic = fromMe
     ? user.user.image_url
     : selectedConversation?.imageUrl
-  const bubbleBgColor = fromMe ? 'bg-primary-600' : 'bg-gray-600'
+  // const bubbleBgColor = fromMe ? 'bg-primary-600' : 'bg-gray-600'
 
   const shakeClass = message.shouldShake ? 'shake' : ''
 

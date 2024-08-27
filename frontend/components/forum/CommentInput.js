@@ -1,7 +1,8 @@
 // import ProfileModal from "@/components/Modal/Profile/ProfileModal";
 // import AuthButtons from "@/components/Navbar/RightContent/AuthButtons";
 import { Flex, Textarea, Button, Text, Stack } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React from 'react'
+// import { useState } from 'react'
 
 const CommentInput = ({
   commentText,

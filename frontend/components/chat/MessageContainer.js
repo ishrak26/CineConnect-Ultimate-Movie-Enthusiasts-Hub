@@ -3,7 +3,7 @@ import useConversation from '../../zustand/useConversation'
 import MessageInput from './MessageInput'
 import Messages from './Messages'
 import { TiMessages } from 'react-icons/ti'
-import { set } from 'react-nprogress'
+// import { set } from 'react-nprogress'
 // import { useAuthContext } from "../../context/AuthContext";
 
 const MessageContainer = () => {

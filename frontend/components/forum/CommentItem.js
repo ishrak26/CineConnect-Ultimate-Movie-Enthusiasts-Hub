@@ -32,7 +32,7 @@ const CommentItem = ({ comment, onDeleteComment, loadingDelete, userId }) => {
             cursor="pointer"
             color="gray.500"
           >
-            {console.log('userId', userId)}
+            {/* {console.log('userId', userId)} */}
             {/* {console.log('comment.author.id', comment.author.id)} */}
             {userId.userId === comment.author?.id && (
               <>
