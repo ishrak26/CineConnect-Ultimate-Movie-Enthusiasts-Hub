@@ -3,8 +3,9 @@ import Layout from './layout'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import styles from '../styles/Form.module.css'
-import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
+// import Link from 'next/link'
+// import toast from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -12,9 +13,9 @@ const Login = () => {
   const router = useRouter()
 
   const userRef = useRef()
-  const errRef = useRef()
+  // const errRef = useRef()
 
-  const [errMsg, setErrMsg] = useState('') // error message
+  // const [errMsg, setErrMsg] = useState('') // error message
 
   useEffect(() => {
     userRef.current.focus()
@@ -36,7 +37,7 @@ const Login = () => {
       }
     ).then((response) => response.json())
 
-    console.log(response)
+    // console.log(response)
 
     await router.push('/')
   }

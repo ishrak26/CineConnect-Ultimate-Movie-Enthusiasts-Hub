@@ -1,5 +1,5 @@
 import ForumItem from '@/components/forum/ForumItem'
-import PersonalHome from '@/components/forum/PersonalHome'
+// import PersonalHome from '@/components/forum/PersonalHome'
 import PageContent from '@/components/forum/PageContent'
 import ForumLoader from '@/components/forum/ForumLoader'
 // import useForumData from "@/hooks/useForumData";
@@ -13,7 +13,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '@theme/theme'
 import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
-import ForumHeader from '@components/forum/ForumHeader'
+// import ForumHeader from '@components/forum/ForumHeader'
 
 // Displays the forums page with the top 5 communities.
 // Pressing the "See More" button will display the next 5 communities.
@@ -21,7 +21,7 @@ const Forums = ({ user, cookie }) => {
   // const { communityStateValue, onJoinOrLeaveCommunity } = useCommunityData();
   const [loading, setLoading] = useState(false)
   const [forums, setForums] = useState([])
-  const router = useRouter()
+  // const router = useRouter()
   const showToast = useCustomToast()
 
   // Gets the top 5 communities with the most members.
@@ -162,7 +162,7 @@ export async function getServerSideProps(context) {
 
   try {
     const limit = 9
-    const offset = (context.query.page - 1) * limit || 0
+    // const offset = (context.query.page - 1) * limit || 0
 
     // const response = await fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`)
     // const members = await fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/totalMembers`)
@@ -198,7 +198,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.log('Error: getServerSideProps', error)
+    // console.log('Error: getServerSideProps', error)
     return { props: {} }
   }
 }

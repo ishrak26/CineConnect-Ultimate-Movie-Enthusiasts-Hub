@@ -1,12 +1,12 @@
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import Header from "@/components/marketplace/header";
-import Head from "next/head";
+import { Carousel } from 'react-responsive-carousel'
+import 'react-responsive-carousel/lib/styles/carousel.min.css'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import Header from '@/components/marketplace/header'
+import Head from 'next/head'
 
 export default function Home() {
-  const line = "CineConnect";
+  const line = 'CineConnect'
 
   const sentence = {
     animate: {
@@ -14,7 +14,7 @@ export default function Home() {
         staggerChildren: 0.1,
       },
     },
-  };
+  }
 
   const letter = {
     initial: {
@@ -37,7 +37,7 @@ export default function Home() {
         duration: 1,
       },
     },
-  };
+  }
 
   return (
     <>
@@ -56,12 +56,12 @@ export default function Home() {
               className="text-4xl md:text-6xl font-semibold text-white  overflow-hidden"
             >
               <div className="flex overflow-hidden">
-                {line.split("").map((char, idx) => {
+                {line.split('').map((char, idx) => {
                   return (
-                    <motion.div key={char + "-" + idx} variants={letter}>
+                    <motion.div key={char + '-' + idx} variants={letter}>
                       {char}
                     </motion.div>
-                  );
+                  )
                 })}
               </div>
               <Link href="/marketplace/shop/">
@@ -113,6 +113,7 @@ export default function Home() {
                 className="h-screen object-cover w-full"
                 loading="lazy"
                 src="https://www.xtrafondos.com/wallpapers/john-wick-4-fanart-11681.jpg"
+                alt="John Wick fan art"
               />
             </div>
             <div>
@@ -120,6 +121,7 @@ export default function Home() {
                 className="h-screen object-cover w-full"
                 loading="lazy"
                 src="https://e0.pxfuel.com/wallpapers/984/484/desktop-wallpaper-spider-verse-miles-morale-movie-fan-art.jpg"
+                alt="Spiderman fan art"
               />
             </div>
             <div>
@@ -127,12 +129,12 @@ export default function Home() {
                 className="h-screen object-cover w-full"
                 loading="lazy"
                 src="https://images.ctfassets.net/usf1vwtuqyxm/3Tha0nbSjB8OCTHNR8yAe9/a80b2ce8b78995a24f76f64b85cd6021/hp-b1-pmp-crop.jpg?fm=jpg&q=70&w=2560"
-                
+                alt="Harry Potter fan art"
               />
             </div>
           </Carousel>
         </motion.div>
       </div>
     </>
-  );
+  )
 }
