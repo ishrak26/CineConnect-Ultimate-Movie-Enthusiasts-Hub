@@ -7,51 +7,26 @@ const port = process.env.PORT || 3000;
 
 // const movie = require('./models/Movie');
 // movie.fetchMoviesByTitle('godfather');
-let server
+let server;
 server = app.listen(port, () => {
     console.log(`Server listening on http://localhost:${port}`);
     // You can perform any additional startup logic here if needed
 });
 
 // Handling graceful shutdown
-process.once('SIGTERM', () => {
-    console.log('SIGTERM received. Shutting down gracefully.');
-    server.close(() => {
-        console.log('Server shut down.');
+process
+    .once('SIGTERM', () => {
+        console.log('SIGTERM received. Shutting down gracefully.');
+        server.close(() => {
+            console.log('Server shut down.');
+        });
+    })
+    .once('SIGINT', () => {
+        console.log('SIGINT received. Shutting down gracefully.');
+        server.close(() => {
+            console.log('Server shut down.');
+        });
     });
-}).once('SIGINT', () => {
-    console.log('SIGINT received. Shutting down gracefully.');
-    server.close(() => {
-        console.log('Server shut down.');
-    });
-});
-
-
-/*
-// configuring .env variables
-require('dotenv').config();
-
-const app = require('./app');
-const database = require('./database/database');
-
-// need to set this for oracledb connection pool
-process.env.UV_THREADPOOL_SIZE = 10;
-
-const port = process.env.PORT;
-app.listen(port, async () => {
-    try {
-        // create database connection pool, log startup message
-        await database.startup();
-        console.log(`listening on http://localhost:${port}`);
-    } catch (err) {
-        console.log('Error starting up database: ' + err);
-        process.exit(1);
-    }
-});
-
-process.once('SIGTERM', database.shutdown).once('SIGINT', database.shutdown);
-
-*/
 
 /*
 
