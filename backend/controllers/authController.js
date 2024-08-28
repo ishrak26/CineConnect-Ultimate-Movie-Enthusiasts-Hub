@@ -54,12 +54,12 @@ const authController = {
     login: async (req, res) => {
         try {
             const { username, password } = req.body;
-            console.log('login req.body', req.body);
+            // console.log('login req.body', req.body);
             console.log('username', username);
-            console.log('password', password);
+            // console.log('password', password);
 
             const user = await userModel.findOne({ username });
-            console.log('user', user);
+            // console.log('user', user);
 
             if (!user) {
                 console.error('user not found');
@@ -69,7 +69,7 @@ const authController = {
             }
 
             // console.log('hashedPassword', hashedPassword);
-            console.log('user.password', user.password);
+            // console.log('user.password', user.password);
             const isPasswordCorrect = await bcrypt.compare(
                 password,
                 user.password
@@ -86,7 +86,7 @@ const authController = {
             const token = jwt.sign({ id: user.id }, SECRET_KEY, {
                 expiresIn: '1d',
             });
-            console.log('token', token);
+            // console.log('token', token);
 
             const isProduction = process.env.NODE_ENV === 'production';
 
@@ -116,7 +116,7 @@ const authController = {
                 return res.status(200).json({ loggedIn: false });
             }
             const userInfo = await userModel.fetchUserById({ id: req.user.id });
-            console.log('userInfo', userInfo);
+            // console.log('userInfo', userInfo);
 
             if (!userInfo) {
                 return res.status(200).json({ loggedIn: false });

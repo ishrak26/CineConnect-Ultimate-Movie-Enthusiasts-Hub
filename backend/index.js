@@ -3,13 +3,15 @@ require('dotenv').config();
 const { supabase } = require('./config/supabaseConfig');
 const app = require('./app');
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 // const movie = require('./models/Movie');
 // movie.fetchMoviesByTitle('godfather');
 let server;
 server = app.listen(port, () => {
-    console.log(`Server listening on http://localhost:${port}`);
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`Server listening on http://localhost:${port}`);
+    }
     // You can perform any additional startup logic here if needed
 });
 
