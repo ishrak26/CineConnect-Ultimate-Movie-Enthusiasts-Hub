@@ -1,5 +1,5 @@
 // import { tmdb } from '@lib/service'
-import { useRouter } from 'next/router'
+// import { useRouter } from 'next/router'
 // import Card from '@components/card'
 import Navbar from '@components/navbar'
 // import Segmented from '@components/segmented'

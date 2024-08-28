@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/dist/client/router";
-import Search from "./search";
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/dist/client/router'
+import Search from './search'
 
 function TopCategory({ categories }) {
-  const { asPath } = useRouter();
+  const { asPath } = useRouter()
   useEffect(() => {
-    setIsActive(asPath);
-  }, [asPath]);
+    setIsActive(asPath)
+  }, [asPath])
 
-  const [isActive, setIsActive] = useState("/shop");
+  const [isActive, setIsActive] = useState('/shop')
   return (
     <div className="navbot bg-cusgray z-30 w-full px-1 md:px-0">
       <div className=" mx-auto md:flex place-items-center max-w-6xl">
@@ -25,7 +25,7 @@ function TopCategory({ categories }) {
               All items
             </button>
           </Link>
-          {categories.map((cat, idx) => (
+          {categories.map((cat) => (
             <Link key={cat.slug} href={`/shop/${cat.slug}`}>
               <button
                 className={`${
@@ -42,7 +42,7 @@ function TopCategory({ categories }) {
         <Search />
       </div>
     </div>
-  );
+  )
 }
 
-export default TopCategory;
+export default TopCategory

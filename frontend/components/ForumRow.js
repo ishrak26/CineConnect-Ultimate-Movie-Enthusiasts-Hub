@@ -5,7 +5,7 @@ import { BiChevronLeftCircle, BiChevronRightCircle } from 'react-icons/bi'
 import Container from './Container'
 // import Card from "./card";
 import ForumCard from './ForumCard'
-import dynamic from 'next/dynamic'
+// import dynamic from 'next/dynamic'
 
 // const Card = dynamic(() => import("./card"));
 

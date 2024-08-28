@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 // import { useAuthState } from 'react-firebase-hooks/auth'
 import PostItem from './PostItem'
 import PostLoader from './PostLoader'
-import useCustomToast from '../../hooks/useCustomToast'
+// import useCustomToast from '../../hooks/useCustomToast'
 import usePosts from '../../hooks/usePosts'
 
 const Posts = ({ ForumData, user, ForumAbout }) => {

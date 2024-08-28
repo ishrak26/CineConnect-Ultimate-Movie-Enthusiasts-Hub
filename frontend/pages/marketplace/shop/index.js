@@ -6,7 +6,7 @@ import Layout from '@/components/marketplace/layout'
 import MovieCard from '@/components/marketplace/moviecard'
 // import { recentCategory } from '../../slices/categorySlice'
 import Head from 'next/head'
-import useCustomToast from '@/hooks/useCustomToast'
+// import useCustomToast from '@/hooks/useCustomToast'
 import Pagination from '@components/pagination'
 // import { tr } from 'date-fns/locale'
 

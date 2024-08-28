@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import React from 'react'
-import NumberFormat from 'react-number-format'
+// import NumberFormat from 'react-number-format'
 // import { useDispatch } from "react-redux";
 // import { removeFromWishlist } from "../slices/wishlistSlice";
 import { motion } from 'framer-motion'
 
-function WishProduct({ item, idx, onRemove }) {
+function WishProduct({ item, onRemove }) {
   const removeFromWishlist = async (id) => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${id}/wishlist`,

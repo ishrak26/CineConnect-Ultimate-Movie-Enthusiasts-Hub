@@ -129,7 +129,7 @@ export default function Profile({
           }),
         }
       )
-      const data = await response.json()
+      // const data = await response.json()
       if (!response.ok) {
         throw new Error('Failed to unfollow')
       }
@@ -158,7 +158,7 @@ export default function Profile({
           }),
         }
       )
-      const data = await response.json()
+      // const data = await response.json()
       if (!response.ok) {
         throw new Error('Failed to send follow request')
       }
@@ -187,7 +187,7 @@ export default function Profile({
           }),
         }
       )
-      const data = await response.json()
+      // const data = await response.json()
       if (!response.ok) {
         throw new Error('Failed to accept follow request')
       }
@@ -216,7 +216,7 @@ export default function Profile({
           }),
         }
       )
-      const data = await response.json()
+      // const data = await response.json()
       if (!response.ok) {
         throw new Error('Failed to reject follow request')
       }
@@ -250,7 +250,7 @@ export default function Profile({
       if (!response.ok) {
         throw new Error('Failed to withdraw the already sent follow request')
       }
-      const data = await response.json()
+      // const data = await response.json()
       // console.log('Follow request should have been withdrawn')
       // console.log(data.message) // Handle success
       setProfileOwnerState(5) // or another appropriate state based on your app's logic

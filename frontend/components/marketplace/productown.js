@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import React from 'react'
-import NumberFormat from 'react-number-format'
+// import NumberFormat from 'react-number-format'
 import { motion } from 'framer-motion'
 
-function Product({ item, idx, onRemove }) {
+function Product({ item, onRemove }) {
   const removeFromProductlist = async (id) => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${id}`,

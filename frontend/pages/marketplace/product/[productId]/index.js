@@ -216,9 +216,9 @@ export default function Product({
     // console.log('userRated', userRated, 'userRating', userRating)
   }, [userRating, avgRating, reviewCount, isAdded])
 
-  const handleClick = () => {
+  const handleClick = async () => {
     try {
-      const response = fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/wishlist`,
         {
           method: isAdded ? 'DELETE' : 'POST',
@@ -228,10 +228,18 @@ export default function Product({
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
+      )
+      if (!response.ok) {
+        if (isAdded) {
+          throw new Error('Failed to remove from wishlist')
+        } else {
+          throw new Error('Failed to add to wishlist')
+        }
+      }
       setIsAdded(!isAdded)
     } catch (err) {
-      console.log(err)
+      // console.log(err)
+      showToast(err.message, 'error')
     }
   }
 

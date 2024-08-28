@@ -1,11 +1,11 @@
 import React from 'react'
-import Sidebar from '@components/Sidebar'
+// import Sidebar from '@components/Sidebar'
 import BaseLayout from '@components/BaseLayout'
 import Navbar from '@components/navbar'
 import Row from '@components/Row'
 // import Profiles from '@components/profiles';
 import Footer from '@components/footer'
-import Recommendations from '@components/recommendations'
+// import Recommendations from '@components/recommendations'
 // import styles from '../styles/profile.module.css';
 // Adjust the path according to your file structure
 
@@ -73,7 +73,7 @@ export default function Profile({
 // You will need to fetch the userData and other props for the component, potentially using getServerSideProps or getStaticProps
 
 export async function getServerSideProps(context) {
-  const query = context.query
+  // const query = context.query
   const cookie = context.req.headers.cookie
 
   // Helper function to fetch data
@@ -130,7 +130,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.error('Error during data fetching:', error)
+    // console.error('Error during data fetching:', error)
     return {
       props: {
         error: error.message,

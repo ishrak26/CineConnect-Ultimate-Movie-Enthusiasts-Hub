@@ -119,7 +119,7 @@ export default function Home({ data, type, casts }) {
         //   watchResponse.status,
         //   watchResponse.statusText
         // )
-        const responseBody = await watchResponse.text()
+        // const responseBody = await watchResponse.text()
         // console.log('Response Body:', responseBody)
       }
     }

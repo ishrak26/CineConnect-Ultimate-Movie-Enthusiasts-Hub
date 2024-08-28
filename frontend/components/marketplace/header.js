@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+// import { useSelector } from 'react-redux'
 // import { selectItems } from "./basketSlice";
 // import { selectWishItems } from "./wishlistSlice";
-import nookies from 'nookies'
+// import nookies from 'nookies'
 import { useRouter } from 'next/dist/client/router'
 import { destroyCookie } from 'nookies'
 import Logo from '../logo'
@@ -12,11 +12,11 @@ import Logo from '../logo'
 function Header() {
   const router = useRouter()
   //   const data = useSelector(selectItems);
-  const [items, setItems] = useState([])
+  // const [items, setItems] = useState([])
   //   const dataWish = useSelector(selectWishItems);
   const [wish, setWish] = useState([])
   const [open, setOpen] = useState(false)
-  const [cookie, setCookie] = useState({})
+  // const [cookie, setCookie] = useState({})
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
@@ -44,10 +44,10 @@ function Header() {
     checkIsLoggedIn()
   }, [])
 
-  const [isOpen, setIsOpen] = useState(false)
-  const handleOpen = () => {
-    setIsOpen(!isOpen)
-  }
+  // const [isOpen, setIsOpen] = useState(false)
+  // const handleOpen = () => {
+  //   setIsOpen(!isOpen)
+  // }
 
   const signOut = () => {
     destroyCookie(null, 'token')

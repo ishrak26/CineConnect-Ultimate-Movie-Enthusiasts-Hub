@@ -31,7 +31,7 @@ export default function Search({ forwardedRef }) {
       const data = await response.json()
       setFilteredData(data)
     } else {
-      console.error('Failed to fetch search results')
+      // console.error('Failed to fetch search results')
     }
   }
 

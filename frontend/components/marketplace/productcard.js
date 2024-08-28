@@ -1,19 +1,19 @@
 import useCustomToast from '@/hooks/useCustomToast'
 import React from 'react'
 import Image from 'next/image'
-import NumberFormat from 'react-number-format'
+// import NumberFormat from 'react-number-format'
 import { motion } from 'framer-motion'
-import Router from 'next/router'
-import { useDispatch } from 'react-redux'
+// import Router from 'next/router'
+// import { useDispatch } from 'react-redux'
 import Link from 'next/link'
 // import { addToWishlist } from "../slices/wishlistSlice";
 
 function ProductCard({ item }) {
   const showToast = useCustomToast()
 
-  const handleClick = () => {
+  const handleClick = async () => {
     try {
-      const response = fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${item.id}/wishlist`,
         {
           method: 'POST',
@@ -23,9 +23,12 @@ function ProductCard({ item }) {
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
+      )
+      if (!response.ok) {
+        throw new Error('Failed to add to wishlist')
+      }
     } catch (err) {
-      console.log(err)
+      // console.log(err)
 
       showToast({
         title: 'Error!',

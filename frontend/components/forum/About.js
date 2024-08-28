@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
 // import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React from 'react'
 // import { useAuthState } from 'react-firebase-hooks/auth'
 import { HiOutlineDotsHorizontal } from 'react-icons/hi'
 // import ForumSettingsModal from "../Modal/ForumSettings/ForumSettings";

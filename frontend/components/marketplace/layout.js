@@ -2,15 +2,15 @@ import React, { useState } from 'react'
 import Header from './header'
 import ShopCarousel from './shopcarousel'
 import SideCategory from './sidecategory'
-import TopCategory from './topcategory'
+// import TopCategory from './topcategory'
 import Search from './search'
 import BaseLayout from '@components/BaseLayout'
 import Breadcrumb from '@components/breadcrumb'
-import clsx from 'clsx'
+// import clsx from 'clsx'
 
 function Layout({
   children,
-  categories,
+  // categories,
   types,
   setSort,
   setTag,

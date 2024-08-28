@@ -6,7 +6,7 @@ import ForumLoader from '@/components/forum/ForumLoader'
 import useCustomToast from '@/hooks/useCustomToast'
 import { Button, Flex, Stack } from '@chakra-ui/react'
 // import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
-import { useRouter } from 'next/router'
+// import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
@@ -161,7 +161,7 @@ export async function getServerSideProps(context) {
   }
 
   try {
-    const limit = 9
+    // const limit = 9
     // const offset = (context.query.page - 1) * limit || 0
 
     // const response = await fetchData(`${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/posts?limit=${limit}&offset=${offset}`)

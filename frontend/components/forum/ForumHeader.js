@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 // import { use } from 'react'
 import { HiArrowCircleUp } from 'react-icons/hi'
 // import useForumData from "@/hooks/useForumData";
-import { useRouter } from 'next/router'
+// import { useRouter } from 'next/router'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { FiSettings } from 'react-icons/fi'
 import IconItem from './Icon'

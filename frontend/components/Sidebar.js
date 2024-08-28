@@ -1,66 +1,65 @@
-import Image from "next/image";
-import { AiOutlineHome } from "react-icons/ai";
-import { BsPeople } from "react-icons/bs";
-import { TiContacts } from "react-icons/ti";
-import { FiMail } from "react-icons/fi";
-import { RiCompassDiscoverLine } from "react-icons/ri";
-import { RiMovie2Line } from "react-icons/ri";
-import { MdOutlineForum } from "react-icons/md";
-import { BsChatDots } from "react-icons/bs";
-import { FiShoppingCart } from "react-icons/fi";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
-import Link from "next/link";
-import { useContext } from "react";
-import { useRouter } from "next/router";
-import { SidebarContext } from "../context/SidebarContext";
+// import Image from "next/image";
+import { AiOutlineHome } from 'react-icons/ai'
+import { BsPeople } from 'react-icons/bs'
+import { TiContacts } from 'react-icons/ti'
+// import { FiMail } from "react-icons/fi";
+import { RiCompassDiscoverLine } from 'react-icons/ri'
+import { RiMovie2Line } from 'react-icons/ri'
+import { MdOutlineForum } from 'react-icons/md'
+import { BsChatDots } from 'react-icons/bs'
+import { FiShoppingCart } from 'react-icons/fi'
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md'
+import Link from 'next/link'
+import { useContext } from 'react'
+import { useRouter } from 'next/router'
+import { SidebarContext } from '../context/SidebarContext'
 
 const sidebarItems = [
   {
-    name: "Home",
-    href: "/",
+    name: 'Home',
+    href: '/',
     icon: AiOutlineHome,
   },
   {
-    name: "Discover",
-    href: "/discover",
+    name: 'Discover',
+    href: '/discover',
     icon: RiCompassDiscoverLine,
   },
   {
-    name: "Movie",
-    href: "/movie",
+    name: 'Movie',
+    href: '/movie',
     icon: RiMovie2Line,
   },
   {
-    name: "Celebrity",
-    href: "/celebrity",
+    name: 'Celebrity',
+    href: '/celebrity',
     icon: BsPeople,
   },
   {
-    name: "Forum",
-    href: "/forum",
+    name: 'Forum',
+    href: '/forum',
     icon: MdOutlineForum,
   },
   {
-    name: "Chat",
-    href: "/chat",
+    name: 'Chat',
+    href: '/chat',
     icon: BsChatDots,
   },
   {
-    name: "Marketplace",
-    href: "/marketplace",
+    name: 'Marketplace',
+    href: '/marketplace',
     icon: FiShoppingCart,
   },
   {
-    name: "About",
-    href: "/about",
+    name: 'About',
+    href: '/about',
     icon: TiContacts,
   },
-
-];
+]
 
 const Sidebar = () => {
-  const router = useRouter();
-  const { isCollapsed, toggleSidebarcollapse } = useContext(SidebarContext);
+  const router = useRouter()
+  const { isCollapsed, toggleSidebarcollapse } = useContext(SidebarContext)
 
   return (
     <div className="sidebar__wrapper">
@@ -77,8 +76,9 @@ const Sidebar = () => {
             return (
               <li className="sidebar__item" key={name}>
                 <Link
-                  className={`sidebar__link ${router.pathname === href ? "sidebar__link--active" : ""
-                    }`}
+                  className={`sidebar__link ${
+                    router.pathname === href ? 'sidebar__link--active' : ''
+                  }`}
                   href={href}
                 >
                   <span className="sidebar__icon">
@@ -87,12 +87,12 @@ const Sidebar = () => {
                   <span className="sidebar__name">{name}</span>
                 </Link>
               </li>
-            );
+            )
           })}
         </ul>
       </aside>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

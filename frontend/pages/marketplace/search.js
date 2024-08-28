@@ -153,12 +153,12 @@ export async function getServerSideProps({ query }) {
 
   // Construct query parameters
   let tags = 'tags='
-  let movies = 'movies='
+  // let movies = 'movies='
 
   values.forEach((v) => {
     if (v.trim()) {
       tags += `${v.trim()},`
-      movies += `${v.trim()},`
+      // movies += `${v.trim()},`
     }
   })
 

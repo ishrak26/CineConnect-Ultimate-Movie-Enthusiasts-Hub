@@ -4,8 +4,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import styles from '../styles/Form.module.css'
 // import Link from 'next/link'
-// import toast from 'react-hot-toast'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -35,7 +34,13 @@ const Login = () => {
           password,
         }),
       }
-    ).then((response) => response.json())
+    )
+    if (!response.ok) {
+      // setErrMsg('Invalid username or password')
+      // console.log('Invalid username or password')
+      toast.error('Invalid username or password')
+      return
+    }
 
     // console.log(response)
 

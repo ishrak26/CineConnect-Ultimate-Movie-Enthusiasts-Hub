@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState } from 'react'
+// import { useDispatch, useSelector } from 'react-redux'
 // import { recentCategory, selectCategory } from "../slices/categorySlice";
 
 function SideCategory({ typesData, setTag }) {
   // const dispatch = useDispatch()
   //   const data = useSelector(recentCategory);
-  const data = []
+  // const data = []
   const [recent, setRecent] = useState()
 
   // useEffect(() => setRecent(data))
@@ -24,7 +24,7 @@ function SideCategory({ typesData, setTag }) {
             All products
           </button>
         </li>
-        {typesData.map((type, idx) => (
+        {typesData.map((type) => (
           <li key={type}>
             <button
               className={`${
