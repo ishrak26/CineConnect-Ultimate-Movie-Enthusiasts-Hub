@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react'
 import { HiArrowCircleUp } from 'react-icons/hi'
 // import useForumData from "@/hooks/useForumData";
 // import { useRouter } from 'next/router'
-import { useAuthState } from 'react-firebase-hooks/auth'
-import { FiSettings } from 'react-icons/fi'
-import IconItem from './Icon'
+// import { useAuthState } from 'react-firebase-hooks/auth'
+// import { FiSettings } from 'react-icons/fi'
+// import IconItem from './Icon'
 // import is from 'sharp/lib/is'
 // import ForumSettingsModal from "../Modal/ForumSettings/ForumSettings";
 
@@ -159,28 +159,28 @@ export const JoinOrLeaveButton = ({ isJoined, onClick }) => {
   )
 }
 
-export const ForumSettings = ({ ForumData }) => {
-  // const router = useRouter()
-  const [user] = useAuthState(auth)
-  const [isForumSettingsModalOpen, setForumSettingsModalOpen] = useState(false)
+// export const ForumSettings = ({ ForumData }) => {
+//   // const router = useRouter()
+//   const [user] = useAuthState(auth)
+//   const [isForumSettingsModalOpen, setForumSettingsModalOpen] = useState(false)
 
-  return (
-    <>
-      {user?.uid === ForumData.creatorId && (
-        <>
-          <ForumSettingsModal
-            open={isForumSettingsModalOpen}
-            handleClose={() => setForumSettingsModalOpen(false)}
-            ForumData={ForumData}
-          />
-          <IconItem
-            icon={FiSettings}
-            fontSize={20}
-            onClick={() => setForumSettingsModalOpen(true)}
-            iconColor="gray.500"
-          />
-        </>
-      )}
-    </>
-  )
-}
+//   return (
+//     <>
+//       {user?.uid === ForumData.creatorId && (
+//         <>
+//           <ForumSettingsModal
+//             open={isForumSettingsModalOpen}
+//             handleClose={() => setForumSettingsModalOpen(false)}
+//             ForumData={ForumData}
+//           />
+//           <IconItem
+//             icon={FiSettings}
+//             fontSize={20}
+//             onClick={() => setForumSettingsModalOpen(true)}
+//             iconColor="gray.500"
+//           />
+//         </>
+//       )}
+//     </>
+//   )
+// }

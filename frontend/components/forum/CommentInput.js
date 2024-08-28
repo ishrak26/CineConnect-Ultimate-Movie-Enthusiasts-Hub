@@ -84,7 +84,7 @@ const CommentInput = ({
           p={4}
         >
           <Text fontWeight={600}>Log in or sign up to comment</Text>
-          <AuthButtons />
+          {/* <AuthButtons /> */}
         </Flex>
       )}
     </Flex>
