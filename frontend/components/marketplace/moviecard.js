@@ -1,23 +1,23 @@
 import useCustomToast from '@/hooks/useCustomToast'
 import React from 'react'
 import Image from 'next/image'
-import NumberFormat from 'react-number-format'
+// import NumberFormat from 'react-number-format'
 import { motion } from 'framer-motion'
 import Router from 'next/router'
-import { useDispatch } from 'react-redux'
+// import { useDispatch } from 'react-redux'
 import Link from 'next/link'
 // import { addToWishlist } from "../slices/wishlistSlice";
 
 function MovieCard({ item }) {
   const showToast = useCustomToast()
 
-  console.log(item)
+  // console.log(item)
 
   const handleClick = () => {
     try {
       Router.push(`/marketplace/shop/${item.id}`)
     } catch (err) {
-      console.log(err)
+      // console.log(err)
 
       showToast({
         title: 'Error!',

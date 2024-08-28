@@ -7,8 +7,8 @@ import NewPostForm from '@/components/forum/NewPostForm'
 // import useForumData from "@/hooks/useForumData";
 import { Box, Stack, Text } from '@chakra-ui/react'
 import React from 'react'
-import { useAuthState } from 'react-firebase-hooks/auth'
-import { useSetRecoilState } from 'recoil'
+// import { useAuthState } from 'react-firebase-hooks/auth'
+// import { useSetRecoilState } from 'recoil'
 import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '@theme/theme'
@@ -143,7 +143,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.log('Error: getServerSideProps', error)
+    // console.log('Error: getServerSideProps', error)
     return { props: {} }
   }
 }

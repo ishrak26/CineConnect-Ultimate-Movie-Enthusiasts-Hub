@@ -1,4 +1,4 @@
-import { tmdb } from '@lib/service'
+// import { tmdb } from '@lib/service'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Navbar from '@components/navbar'

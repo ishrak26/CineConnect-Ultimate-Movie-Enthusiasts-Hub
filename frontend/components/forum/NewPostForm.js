@@ -19,7 +19,7 @@ import { MdOutlineArrowBackIos } from 'react-icons/md'
 import ImageUpload from './ImageUpload'
 import TextInputs from './TextInputs'
 import TabItem from './TabItem'
-import getFileExtensionFromDataURL from '../../utils/getFileExtensionFromDataURL'
+// import getFileExtensionFromDataURL from '../../utils/getFileExtensionFromDataURL'
 
 import supabase from '../../utils/supabaseClient'
 
@@ -34,7 +34,7 @@ const formTabs = [
   },
 ]
 
-const NewPostForm = ({ user, currentForum, cookie }) => {
+const NewPostForm = ({ currentForum }) => {
   const router = useRouter()
   const [selectedTab, setSelectedTab] = useState(formTabs[0].title)
   const [textInputs, setTextInputs] = useState({
@@ -72,12 +72,15 @@ const NewPostForm = ({ user, currentForum, cookie }) => {
         const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
         const filePath = `public/${forumId}/${uniquePrefix}-${originalImage.name}`
 
-        const { data: uploadData, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from('forum')
           .upload(filePath, originalImage)
+        // const { data: uploadData, error } = await supabase.storage
+        //   .from('forum')
+        //   .upload(filePath, originalImage)
 
         if (error) {
-          console.error('Error uploading file:', error)
+          // console.error('Error uploading file:', error)
           throw error
         }
 
@@ -108,7 +111,7 @@ const NewPostForm = ({ user, currentForum, cookie }) => {
         throw new Error(responseData.message)
       }
     } catch (error) {
-      console.error('Error creating post: ', error)
+      // console.error('Error creating post: ', error)
       showToast({
         title: 'Post not Created',
         description: 'There was an error creating your post',

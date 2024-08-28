@@ -3,7 +3,7 @@ import Layout from './layout'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import styles from '../styles/Form.module.css'
-import Link from 'next/link'
+// import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
 
 const Login = () => {
@@ -12,9 +12,9 @@ const Login = () => {
   const router = useRouter()
 
   const userRef = useRef()
-  const errRef = useRef()
+  // const errRef = useRef()
 
-  const [errMsg, setErrMsg] = useState('') // error message
+  // const [errMsg, setErrMsg] = useState('') // error message
 
   useEffect(() => {
     userRef.current.focus()
@@ -34,9 +34,15 @@ const Login = () => {
           password,
         }),
       }
-    ).then((response) => response.json())
+    )
+    if (!response.ok) {
+      // setErrMsg('Invalid username or password')
+      // console.log('Invalid username or password')
+      toast.error('Invalid username or password')
+      return
+    }
 
-    console.log(response)
+    // console.log(response)
 
     await router.push('/')
   }

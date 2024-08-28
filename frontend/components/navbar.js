@@ -2,41 +2,45 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Logo from './logo'
-import Modal from './modal'
+// import Modal from './modal'
 import Search from './search'
-import SearchIcon from './icons/search.svg'
+// import SearchIcon from './icons/search.svg'
 import clsx from 'clsx'
-import { FaUserFriends, FaSignOutAlt } from 'react-icons/fa';
+import { FaUserFriends, FaSignOutAlt } from 'react-icons/fa'
 
 export default function Navbar() {
   const ref = useRef(null)
   const router = useRouter()
+  // eslint-disable-next-line no-unused-vars
   const [searchOpen, setSearchOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
 
   const handleLogout = async () => {
     try {
-        const response = await fetch(`http://localhost:4000/v1/auth/logout`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            // Ensure you're passing necessary information if required by your backend API
-            // body: JSON.stringify({
-            // }),
-        });
-        if (!response.ok) {
-            throw new Error('Failed to logout');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/auth/logout`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          // Ensure you're passing necessary information if required by your backend API
+          // body: JSON.stringify({
+          // }),
         }
-        const data = await response.json();
-        console.log('logout successful :', data);
-        window.location.href = '/';
+      )
+      if (!response.ok) {
+        throw new Error('Failed to logout')
+      }
+      // const data = await response.json()
+      // console.log('logout successful :', data)
+      window.location.href = '/'
     } catch (err) {
-        console.error(err); // Handle errors
+      // console.error(err) // Handle errors
     }
-  };
+  }
 
   useEffect(() => {
     if (searchOpen) {
@@ -58,14 +62,19 @@ export default function Navbar() {
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
+      )
       // console.log('response', response)
-      if (!response.loggedIn) {
-        setLoggedIn(false)
-      } else {
-        setLoggedIn(true)
-        setUserInfo(response.user)
+      if (response.ok) {
+        const data = await response.json()
+        // console.log('data', data)
+        if (!data.loggedIn) {
+          setLoggedIn(false)
+        } else {
+          setLoggedIn(true)
+          setUserInfo(data.user)
+        }
       }
+      // console.log('response', response)
       // console.log('loggedIn', loggedIn)
       // console.log('userInfo', userInfo)
     }
@@ -110,15 +119,16 @@ export default function Navbar() {
           )}
           {loggedIn && <p>{userInfo.username}</p>}
           {loggedIn && (
-            // <Link href="/requests">
-            <a href="/requests" className="icon-button">
+            <Link href="/requests">
+              {/* TODO: test this link */}
+              {/* <a href="/requests" className="icon-button"> */}
               <FaUserFriends
                 style={{ color: 'black' }}
                 className="icon"
                 size={25}
               />
-            </a>
-            // </Link>
+              {/* </a> */}
+            </Link>
           )}
 
           {loggedIn && (
@@ -148,7 +158,11 @@ export default function Navbar() {
           )} */}
           {loggedIn && (
             <button className="icon-button" onClick={() => handleLogout()}>
-              <FaSignOutAlt style={{ color: 'black' }} className="icon" size={25} />
+              <FaSignOutAlt
+                style={{ color: 'black' }}
+                className="icon"
+                size={25}
+              />
             </button>
           )}
 

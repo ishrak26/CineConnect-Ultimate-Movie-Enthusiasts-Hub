@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import Header from '@components/marketplace/header'
-import NumberFormat from 'react-number-format'
+// import NumberFormat from 'react-number-format'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useDispatch } from 'react-redux'
+// import { useDispatch } from 'react-redux'
 // import { addToBasket } from "../../slices/basketSlice";
 // import NotFound from "../404";
 // import { addToWishlist } from "../../slices/wishlistSlice";
-import ProductCard from '@components/marketplace/productcard'
+// import ProductCard from '@components/marketplace/productcard'
 import Head from 'next/head'
 import useCustomToast from '@/hooks/useCustomToast'
-import is from 'sharp/lib/is'
+// import is from 'sharp/lib/is'
 import Rating from '@components/rating'
 import SetRating from '@components/marketplace/SetRating'
-import { set } from 'react-nprogress'
+// import { set } from 'react-nprogress'
 import BaseLayout from '@components/BaseLayout'
-import { data } from 'autoprefixer'
+// import { data } from 'autoprefixer'
 import Router from 'next/router'
 
 export default function Product({
@@ -216,9 +216,9 @@ export default function Product({
     // console.log('userRated', userRated, 'userRating', userRating)
   }, [userRating, avgRating, reviewCount, isAdded])
 
-  const handleClick = () => {
+  const handleClick = async () => {
     try {
-      const response = fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/wishlist`,
         {
           method: isAdded ? 'DELETE' : 'POST',
@@ -228,10 +228,18 @@ export default function Product({
           },
           credentials: 'include',
         }
-      ).then((res) => res.json())
+      )
+      if (!response.ok) {
+        if (isAdded) {
+          throw new Error('Failed to remove from wishlist')
+        } else {
+          throw new Error('Failed to add to wishlist')
+        }
+      }
       setIsAdded(!isAdded)
     } catch (err) {
-      console.log(err)
+      // console.log(err)
+      showToast(err.message, 'error')
     }
   }
 
@@ -239,11 +247,11 @@ export default function Product({
     Router.push(`/chat/${owner}`)
   }
 
-  const handleRating = (rate) => {
+  const handleRating = async (rate) => {
     // console.log(`Rated with: ${rate}`)
 
     try {
-      const response = fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/marketplace/product/${productId}/rating`,
         {
           method: userRated ? 'PUT' : 'POST',
@@ -256,10 +264,13 @@ export default function Product({
             rating: parseInt(rate),
           }),
         }
-      ).then((res) => res.json())
-      setUserRating(rate)
+      )
+      if (response.ok) {
+        showToast('Rating submitted successfully', 'success')
+        setUserRating(rate)
+      }
     } catch (err) {
-      console.log(err)
+      // console.log(err)
     }
   }
 

@@ -1,6 +1,6 @@
-import { Button, Flex, Image, Stack, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { useRecoilValue } from "recoil";
+import { Button, Flex, Image, Stack, Text } from '@chakra-ui/react'
+import React, { useState } from 'react'
+// import { useRecoilValue } from "recoil";
 // import CreateForumModal from "../Modal/CreateForum/CreateForumModal";
 // import { ForumState } from "@/atoms/ForumsAtom";
 
@@ -9,12 +9,13 @@ import { useRecoilValue } from "recoil";
  * @returns Card for creating a new Forum or post.
  */
 const PersonalHome = () => {
-  const [open, setOpen] = useState(false); // modal initially closed
-//   const mySnippets = useRecoilValue(ForumState).mySnippets;   // Updates automatically when mySnippets changes
-const mySnippets = [];
+  // eslint-disable-next-line no-unused-vars
+  const [open, setOpen] = useState(false) // modal initially closed
+  //   const mySnippets = useRecoilValue(ForumState).mySnippets;   // Updates automatically when mySnippets changes
+  // const mySnippets = [];
 
-//   const { onClick } = useCallCreatePost();
-const onClick = () => {};
+  //   const { onClick } = useCallCreatePost();
+  const onClick = () => {}
 
   return (
     <>
@@ -42,13 +43,10 @@ const onClick = () => {};
         ></Flex>
         <Flex direction="column" p="12px">
           <Flex align="center" mb={2}>
-            <Image
-              src="/LogoB.png"
-              height="50px"
-              alt="Website logo"
-              mr={2}
-            />
-            <Text fontWeight={600} className="mx-10">Home</Text>
+            <Image src="/LogoB.png" height="50px" alt="Website logo" mr={2} />
+            <Text fontWeight={600} className="mx-10">
+              Home
+            </Text>
           </Flex>
           <Stack spacing={3}>
             <Text fontSize="9pt">
@@ -68,7 +66,7 @@ const onClick = () => {};
         </Flex>
       </Flex>
     </>
-  );
-};
+  )
+}
 
-export default PersonalHome;
+export default PersonalHome

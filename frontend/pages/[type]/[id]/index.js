@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { tmdb } from '@lib/service'
+// import { tmdb } from '@lib/service'
 import { format, formatDuration, intervalToDuration } from 'date-fns'
 import ArrowIcon from '@components/icons/arrow.svg'
 import Navbar from '@components/navbar'
 import Rating from '@components/rating'
 import Head from 'next/head'
-import Part from '@components/part'
+// import Part from '@components/part'
 import Credits from '@components/credits'
 import Breadcrumb from '@components/breadcrumb'
 import Cast from '@components/cast'
 import Media from '@components/media'
 import Recommendations from '@components/recommendations'
-import Profiles from '@components/profiles'
+// import Profiles from '@components/profiles'
 import Footer from '@components/footer'
 import Card from '@components/card'
 import Link from 'next/link'
@@ -22,7 +22,7 @@ import {
   FaCheck,
   FaLock,
   FaArrowCircleRight,
-  FaExternalLinkAlt,
+  // FaExternalLinkAlt,
 } from 'react-icons/fa'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 import SetRating from '@components/SetRating'
@@ -72,11 +72,11 @@ export default function Home({ data, type, casts }) {
         setTotalRatingCount(ratingData.total_ratings)
       } else {
         // If the response is not successful, log or handle the error
-        console.error(
-          'Error with request:',
-          ratingResponse.status,
-          ratingResponse.statusText
-        )
+        // console.error(
+        //   'Error with request:',
+        //   ratingResponse.status,
+        //   ratingResponse.statusText
+        // )
         // Optionally, you can still read and log the response body
         // const responseBody = await ratingResponse.text()
         // console.log('Response Body:', responseBody)
@@ -114,13 +114,13 @@ export default function Home({ data, type, casts }) {
           setIsWatched(true)
         }
       } else {
-        console.error(
-          'Error with request:',
-          watchResponse.status,
-          watchResponse.statusText
-        )
-        const responseBody = await watchResponse.text()
-        console.log('Response Body:', responseBody)
+        // console.error(
+        //   'Error with request:',
+        //   watchResponse.status,
+        //   watchResponse.statusText
+        // )
+        // const responseBody = await watchResponse.text()
+        // console.log('Response Body:', responseBody)
       }
     }
 
@@ -145,11 +145,11 @@ export default function Home({ data, type, casts }) {
           setIsJoined(true)
         }
       } else {
-        console.error(
-          'Error with request:',
-          joinedResponse.status,
-          joinedResponse.statusText
-        )
+        // console.error(
+        //   'Error with request:',
+        //   joinedResponse.status,
+        //   joinedResponse.statusText
+        // )
       }
     }
 
@@ -169,11 +169,11 @@ export default function Home({ data, type, casts }) {
         // console.log('imageData', imageData)
         setMovieImages(imageData.images)
       } else {
-        console.error(
-          'Error with request:',
-          imageResponse.status,
-          imageResponse.statusText
-        )
+        // console.error(
+        //   'Error with request:',
+        //   imageResponse.status,
+        //   imageResponse.statusText
+        // )
       }
     }
 
@@ -204,14 +204,14 @@ export default function Home({ data, type, casts }) {
         }
         setIsWatchlisted(!isWatchlisted)
       } else {
-        console.error(
-          'Error with request:',
-          response.status,
-          response.statusText
-        )
+        // console.error(
+        //   'Error with request:',
+        //   response.status,
+        //   response.statusText
+        // )
       }
     } catch (err) {
-      console.error(err)
+      // console.error(err)
     }
   }
 
@@ -236,14 +236,14 @@ export default function Home({ data, type, casts }) {
         }
         setIsWatched(!isWatched)
       } else {
-        console.error(
-          'Error with request:',
-          response.status,
-          response.statusText
-        )
+        // console.error(
+        //   'Error with request:',
+        //   response.status,
+        //   response.statusText
+        // )
       }
     } catch (err) {
-      console.error(err)
+      // console.error(err)
     }
   }
 
@@ -277,14 +277,14 @@ export default function Home({ data, type, casts }) {
         }
         setUserRating(rate)
       } else {
-        console.error(
-          'Error with request:',
-          response.status,
-          response.statusText
-        )
+        // console.error(
+        //   'Error with request:',
+        //   response.status,
+        //   response.statusText
+        // )
       }
     } catch (err) {
-      console.error(err)
+      // console.error(err)
     }
   }
 
@@ -308,14 +308,14 @@ export default function Home({ data, type, casts }) {
         setTotalRatingCount(totalRatingCount - 1)
         setUserRating(0)
       } else {
-        console.error(
-          'Error with request for handleClickRemoveRating:',
-          response.status,
-          response.statusText
-        )
+        // console.error(
+        //   'Error with request for handleClickRemoveRating:',
+        //   response.status,
+        //   response.statusText
+        // )
       }
     } catch (err) {
-      console.error(err)
+      // console.error(err)
     }
   }
 
@@ -323,7 +323,7 @@ export default function Home({ data, type, casts }) {
     try {
       router.push(`/forum/${data.id}`)
     } catch (err) {
-      console.error(err)
+      // console.error(err)
     }
   }
 
@@ -344,14 +344,14 @@ export default function Home({ data, type, casts }) {
       if (response.ok) {
         setIsJoined(true)
       } else {
-        console.error(
-          'Error with request for handleClickJoinForum:',
-          response.status,
-          response.statusText
-        )
+        // console.error(
+        //   'Error with request for handleClickJoinForum:',
+        //   response.status,
+        //   response.statusText
+        // )
       }
     } catch (err) {
-      console.error(err)
+      // console.error(err)
     }
   }
 

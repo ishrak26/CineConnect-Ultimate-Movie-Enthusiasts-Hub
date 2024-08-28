@@ -5,19 +5,19 @@ import {
   Icon,
   Image,
   Link,
-  Skeleton,
+  // Skeleton,
   Stack,
   Text,
   useClipboard,
-  useToast,
+  // useToast,
 } from '@chakra-ui/react'
-import { set } from 'date-fns'
-import { de } from 'date-fns/locale'
+// import { set } from 'date-fns'
+// import { de } from 'date-fns/locale'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from 'react'
-import { BsBookmark } from 'react-icons/bs'
-import { FiShare2 } from 'react-icons/fi'
+// import { BsBookmark } from 'react-icons/bs'
+// import { FiShare2 } from 'react-icons/fi'
 import {
   IoArrowDownCircleOutline,
   IoArrowDownCircleSharp,
@@ -26,7 +26,7 @@ import {
   IoPeopleCircleOutline,
 } from 'react-icons/io5'
 import { MdOutlineDelete } from 'react-icons/md'
-import { number } from 'sharp/lib/is'
+// import { number } from 'sharp/lib/is'
 // import PostItemError from "../atoms/ErrorMessage";
 
 const PostItem = ({
@@ -35,18 +35,20 @@ const PostItem = ({
   userIsCreator,
   userVoteValue,
   onVote,
-  onDeletePost,
+  // onDeletePost,
   onSelectPost,
-  showForumImage,
+  // showForumImage,
   numberOfComments,
   // cookie,
 }) => {
   const [loadingImage, setLoadingImage] = useState(true)
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(false)
   const [loadingDelete, setLoadingDelete] = useState(false)
   const [commentCount, setCommentCount] = useState(numberOfComments)
   const router = useRouter()
   const showToast = useCustomToast()
+  // eslint-disable-next-line no-unused-vars
   const { onCopy, value, setValue, hasCopied } = useClipboard('')
 
   const singlePostPage = onSelectPost
@@ -199,7 +201,7 @@ const PostItem = ({
 }
 export default PostItem
 
-const VoteSection = ({ userVoteValue, onVote, post, forumId }) => {
+const VoteSection = ({ onVote, post, forumId }) => {
   let [voteCount, setVoteCount] = useState(0)
   let [downvoteCount, setDownvoteCount] = useState(0)
   const [isVoted, setIsVoted] = useState(false)
@@ -359,7 +361,7 @@ const PostDetails = ({ showForumImage, post }) => {
   )
 }
 
-const PostTitle = ({ post }) => {
+const PostTitle = () => {
   return (
     <Text fontSize="12pt" fontWeight={600} color="white">
       {/* {post.title} */}
@@ -399,9 +401,9 @@ const PostActions = ({
   handleDelete,
   loadingDelete,
   userIsCreator,
-  handleEdit,
-  handleShare,
-  handleSave,
+  // handleEdit,
+  // handleShare,
+  // handleSave,
   commentCount,
 }) => {
   return (

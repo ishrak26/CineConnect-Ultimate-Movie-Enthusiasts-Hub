@@ -30,15 +30,15 @@ function ProductUpload() {
 
   const [sizeInput, setSizeInput] = useState('')
 
-  const [movieId, setMovieId] = useState('')
+  // const [movieId, setMovieId] = useState('')
 
   const [thumbnailFile, setThumbnailFile] = useState(null)
 
   const handleMovieSelect = (movieId) => {
-    setMovieId(movieId)
+    // setMovieId(movieId)
     setProduct({ ...product, movieId })
 
-    console.log('movieId', movieId)
+    // console.log('movieId', movieId)
   }
 
   const handleChange = (e) => {
@@ -106,63 +106,70 @@ function ProductUpload() {
       }
     })
 
-    // Upload thumbnail image
-    if (thumbnailFile) {
-      const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
-      const filePath = `public/${product.movieId}/${uniquePrefix}-${thumbnailFile.name}`
-
-      // console.log('filePath:', filePath)
-      // console.log('selectedFile:', selectedFile)
-
-      const { data: uploadData, error } = await supabase.storage
-        .from('marketplace')
-        .upload(filePath, thumbnailFile)
-
-      if (error) {
-        console.error('Error uploading file:', error)
-        throw error
-      }
-
-      // console.log('uploadData', uploadData)
-
-      // Assuming you have the URL, update your DB or state as necessary
-      const { data: publicURL } = supabase.storage
-        .from('marketplace')
-        .getPublicUrl(filePath)
-      // console.log('File uploaded:', publicURL)
-      // Here you can proceed to update the user profile or perform other actions with the form data
-      product.thumbnailUrl = publicURL.publicUrl
-    }
-
-    const newImages = []
-
-    // Upload new images
-    if (product.images.length > 0) {
-      for (let file of product.images) {
+    try {
+      // Upload thumbnail image
+      if (thumbnailFile) {
         const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
-        const filePath = `public/${product.movieId}/${uniquePrefix}-${file.name}`
-        const { data: uploadData, error } = await supabase.storage
+        const filePath = `public/${product.movieId}/${uniquePrefix}-${thumbnailFile.name}`
+
+        // console.log('filePath:', filePath)
+        // console.log('selectedFile:', selectedFile)
+
+        // const { data: uploadData, error } = await supabase.storage
+        //   .from('marketplace')
+        //   .upload(filePath, thumbnailFile)
+        const { error } = await supabase.storage
           .from('marketplace')
-          .upload(filePath, file)
+          .upload(filePath, thumbnailFile)
 
         if (error) {
-          console.error('Error uploading file:', file.name, error)
-          throw error
+          // console.error('Error uploading file:', error)
+          throw new Error('Error uploading file')
         }
 
+        // console.log('uploadData', uploadData)
+
+        // Assuming you have the URL, update your DB or state as necessary
         const { data: publicURL } = supabase.storage
           .from('marketplace')
           .getPublicUrl(filePath)
-
-        newImages.push({
-          imageUrl: publicURL.publicUrl,
-          caption: '',
-        })
+        // console.log('File uploaded:', publicURL)
+        // Here you can proceed to update the user profile or perform other actions with the form data
+        product.thumbnailUrl = publicURL.publicUrl
       }
-      product.images = newImages
-    }
 
-    try {
+      const newImages = []
+
+      // Upload new images
+      if (product.images.length > 0) {
+        for (let file of product.images) {
+          const uniquePrefix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9)
+          const filePath = `public/${product.movieId}/${uniquePrefix}-${file.name}`
+          // const { data: uploadData, error } = await supabase.storage
+          //   .from('marketplace')
+          //   .upload(filePath, file)
+          const { error } = await supabase.storage
+            .from('marketplace')
+            .upload(filePath, file)
+
+          if (error) {
+            // console.error('Error uploading file:', file.name, error)
+            throw new Error('Error uploading file')
+          }
+
+          const { data: publicURL } = supabase.storage
+            .from('marketplace')
+            .getPublicUrl(filePath)
+
+          newImages.push({
+            imageUrl: publicURL.publicUrl,
+            caption: '',
+          })
+        }
+        product.images = newImages
+      }
+
       // console.log('product', product)
 
       const response = await fetch(
@@ -181,10 +188,12 @@ function ProductUpload() {
         const { productId } = await response.json()
         router.push(`/marketplace/product/${productId}`)
       } else {
-        console.error('Failed to upload product')
+        // console.error('Failed to upload product')
+        throw new Error('Failed to upload product')
       }
     } catch (error) {
-      console.error('Error uploading product:', error)
+      // console.error('Error uploading product:', error)
+      alert('Error uploading product')
     }
   }
 

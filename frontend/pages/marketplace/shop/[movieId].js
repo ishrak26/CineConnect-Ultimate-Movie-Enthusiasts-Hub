@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import CardSkeleton from '@/components/marketplace/cardskeleton'
+// import { useSelector } from 'react-redux'
+// import CardSkeleton from '@/components/marketplace/cardskeleton'
 import Layout from '@/components/marketplace/layout'
 import ProductCard from '@/components/marketplace/productcard'
 // import { recentCategory } from '../../slices/categorySlice'
 import Head from 'next/head'
 import useCustomToast from '@/hooks/useCustomToast'
 import Pagination from '@components/pagination'
-import { set } from 'react-nprogress'
-import { da } from 'date-fns/locale'
+// import { set } from 'react-nprogress'
+// import { da } from 'date-fns/locale'
 
 function Category({
   movieId,
@@ -27,7 +27,7 @@ function Category({
   const [filteredDataItems, setFilteredDataItems] = useState(dataItems)
 
   useEffect(() => {
-    console.log('Tag ', tag)
+    // console.log('Tag ', tag)
     const fetchMovie = async () => {
       try {
         const response = await fetch(
@@ -72,7 +72,7 @@ function Category({
         }
 
         const data = await response.json()
-        console.log('Data ', data)
+        // console.log('Data ', data)
         setFilteredDataItems(data)
       } catch (error) {
         showToast('Failed to fetch products by tag', 'error')

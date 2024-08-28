@@ -91,7 +91,7 @@ export default function Search({ forwardedRef }) {
 
   const fetchResults = async () => {
     if (!value) return setFilteredData([])
-    const limit = 10
+    // const limit = 10
 
     const values = value
       .split(',')
@@ -101,22 +101,22 @@ export default function Search({ forwardedRef }) {
     // Construct query parameters
     let queryParams = 'limit=10&offset=0&'
     let tags = 'tags='
-    let movies = 'movies='
+    // let movies = 'movies='
 
     values.forEach((v) => {
       if (v.trim()) {
         tags += `${v.trim()},`
-        movies += `${v.trim()},`
+        // movies += `${v.trim()},`
       }
     })
 
     // Remove trailing comma
     tags = tags.slice(0, -1)
-    movies = movies.slice(0, -1)
+    // movies = movies.slice(0, -1)
 
     queryParams = tags
 
-    console.log(queryParams.toString())
+    // console.log(queryParams.toString())
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_SERVER_URL
@@ -126,7 +126,7 @@ export default function Search({ forwardedRef }) {
       const data = await response.json()
       setFilteredData(data)
     } else {
-      console.error('Failed to fetch search results')
+      // console.error('Failed to fetch search results')
     }
   }
 

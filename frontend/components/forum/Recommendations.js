@@ -1,11 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { Flex, Icon, Link, Skeleton, SkeletonCircle, Stack, Image, Text, Box, Button } from "@chakra-ui/react";
+import React, { useEffect, useState } from 'react'
+import {
+  Flex,
+  Icon,
+  Link,
+  Skeleton,
+  SkeletonCircle,
+  Stack,
+  Image,
+  Text,
+  Box,
+  Button,
+} from '@chakra-ui/react'
 // import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
-import { useRouter } from "next/router";
-import { IoPeopleCircleOutline } from "react-icons/io5";
-// import { firestore } from "./firebase/clientApp"; 
-// import useForumData from "./useForumData"; 
-import useCustomToast from "../../hooks/useCustomToast";
+import { useRouter } from 'next/router'
+import { IoPeopleCircleOutline } from 'react-icons/io5'
+// import { firestore } from "./firebase/clientApp";
+// import useForumData from "./useForumData";
+// import useCustomToast from '../../hooks/useCustomToast'
 
 const Recommendations = () => {
   return (
@@ -23,8 +34,8 @@ const Recommendations = () => {
         <SuggestedForumsList />
       </Flex>
     </Flex>
-  );
-};
+  )
+}
 
 const SuggestionsHeader = () => {
   return (
@@ -41,34 +52,35 @@ const SuggestionsHeader = () => {
     >
       Top Forums
     </Flex>
-  );
-};
+  )
+}
 
 const SuggestedForumsList = () => {
-//   const { ForumStateValue, onJoinOrLeaveForum } = useForumData();
-    const { ForumStateValue, onJoinOrLeaveForum } = [];
-  const [loading, setLoading] = useState(false);
-  const [Forums, setForums] = useState([]);
-  const router = useRouter();
-  const showToast = useCustomToast();
+  //   const { ForumStateValue, onJoinOrLeaveForum } = useForumData();
+  const { ForumStateValue, onJoinOrLeaveForum } = []
+  const [loading, setLoading] = useState(false)
+  // eslint-disable-next-line no-unused-vars
+  const [Forums, setForums] = useState([])
+  const router = useRouter()
+  // const showToast = useCustomToast();
 
   const getForumRecommendations = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-    //   const ForumQuery = query(collection(firestore, "Forums"), orderBy("numberOfMembers", "desc"), limit(5));
-    //   const ForumDocs = await getDocs(ForumQuery);
-    //   const Forums = ForumDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    //   setForums(Forums);
+      //   const ForumQuery = query(collection(firestore, "Forums"), orderBy("numberOfMembers", "desc"), limit(5));
+      //   const ForumDocs = await getDocs(ForumQuery);
+      //   const Forums = ForumDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      //   setForums(Forums);
     } catch (error) {
-      console.log("Error: getForumRecommendations", error);
+      // console.log("Error: getForumRecommendations", error);
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    getForumRecommendations();
-  }, []);
+    getForumRecommendations()
+  }, [])
 
   return (
     <Flex direction="column" mb={0}>
@@ -88,7 +100,7 @@ const SuggestedForumsList = () => {
           {Forums.map((item, index) => {
             const isJoined = !!ForumStateValue.mySnippets.find(
               (snippet) => snippet.ForumId === item.id
-            );
+            )
             return (
               <Link key={item.id} href={`/Forum/${item.id}`}>
                 <Flex
@@ -123,9 +135,9 @@ const SuggestedForumsList = () => {
                       {/* show dots when Forum name doesnt fit */}
                       <span
                         style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                         }}
                       >
                         {`${item.id}`}
@@ -137,18 +149,18 @@ const SuggestedForumsList = () => {
                       height="24px"
                       width="100px"
                       fontSize="8pt"
-                      variant={isJoined ? "outline" : "solid"}
+                      variant={isJoined ? 'outline' : 'solid'}
                       onClick={(event) => {
-                        event.preventDefault();
-                        onJoinOrLeaveForum(item, isJoined);
+                        event.preventDefault()
+                        onJoinOrLeaveForum(item, isJoined)
                       }}
                     >
-                      {isJoined ? "Unsubscribe" : "Subscribe"}
+                      {isJoined ? 'Unsubscribe' : 'Subscribe'}
                     </Button>
                   </Box>
                 </Flex>
               </Link>
-            );
+            )
           })}
         </>
       )}
@@ -157,14 +169,14 @@ const SuggestedForumsList = () => {
           height="30px"
           width="100%"
           onClick={() => {
-            router.push(`/Forums`);
+            router.push(`/Forums`)
           }}
         >
           View All
         </Button>
       </Box>
     </Flex>
-  );
-};
+  )
+}
 
-export default Recommendations;
+export default Recommendations

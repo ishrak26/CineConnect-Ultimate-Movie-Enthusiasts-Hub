@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { BsFillPeopleFill } from 'react-icons/bs'
 import { IoPeopleCircleOutline } from 'react-icons/io5'
 import { useState, useEffect } from 'react'
-import { set } from 'react-nprogress'
+// import { set } from 'react-nprogress'
 
 const ForumItem = ({ Forum }) => {
   const router = useRouter()
@@ -34,7 +34,7 @@ const ForumItem = ({ Forum }) => {
     checkIfUserJoinedForum()
   }, [Forum.movie_id, isJoined])
 
-  const onJoinOrLeaveForum = async (Forum, isJoined) => {
+  const onJoinOrLeaveForum = async (Forum) => {
     router.push(`/forum/${Forum.id ? Forum.id : Forum.movie_id}`)
   }
 
@@ -127,7 +127,7 @@ const ForumItemButtonMembersSection = ({
         variant={isJoined ? 'outline' : 'solid'}
         onClick={() => onJoinOrLeaveForum(Forum, isJoined)}
       >
-        {console.log(isJoined)}
+        {/* {console.log(isJoined)} */}
         {isJoined ? 'Go to Forum' : 'Join Forum'}
       </Button>
     </Stack>

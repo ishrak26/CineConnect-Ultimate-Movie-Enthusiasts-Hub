@@ -2,7 +2,7 @@ import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import Navbar from '@components/navbar'
+// import Navbar from '@components/navbar'
 
 const Layout = (props) => {
   const router = useRouter()
@@ -35,6 +35,7 @@ const Layout = (props) => {
       </ul>
     )
   } else {
+    // eslint-disable-next-line no-unused-vars
     menu = (
       <ul className="navbar-nav me-auto mb-2 mb-md-0">
         <li className="nav-item">

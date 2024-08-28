@@ -1,16 +1,16 @@
-import { tmdb } from '@lib/service'
-import { useRouter } from 'next/router'
-import Card from '@components/card'
+// import { tmdb } from '@lib/service'
+// import { useRouter } from 'next/router'
+// import Card from '@components/card'
 import Navbar from '@components/navbar'
-import Segmented from '@components/segmented'
+// import Segmented from '@components/segmented'
 import Head from 'next/head'
 import Footer from '@components/footer'
-import Search from '@components/search'
-import Pagination from '@components/pagination'
+// import Search from '@components/search'
+// import Pagination from '@components/pagination'
 import BaseLayout from '@components/BaseLayout'
-import Profile from '@components/profiles'
+// import Profile from '@components/profiles'
 // import Row from '@components/Row'
-import Layout from './layout'
+// import Layout from './layout'
 import dynamic from 'next/dynamic'
 
 const Row = dynamic(() => import('@components/Row'))
@@ -19,9 +19,9 @@ export default function Home({
   topRated,
   netflixOriginals,
   actionMovies,
-  query,
+  // query,
 }) {
-  const router = useRouter()
+  // const router = useRouter()
 
   return (
     <div>
@@ -136,7 +136,7 @@ export default function Home({
 }
 
 export async function getServerSideProps(context) {
-  const query = context.query
+  // const query = context.query
   const cookie = context.req.headers.cookie
 
   // Helper function to fetch data
@@ -193,7 +193,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.error('Error during data fetching:', error)
+    // console.error('Error during data fetching:', error)
     return {
       props: {
         error: error.message,

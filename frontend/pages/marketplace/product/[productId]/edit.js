@@ -5,7 +5,7 @@ import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
 import Head from 'next/head'
 import Search from '@components/marketplace/movieSearch'
-import { set } from 'react-nprogress'
+// import { set } from 'react-nprogress'
 
 import supabase from '../../../../utils/supabaseClient'
 
@@ -15,7 +15,7 @@ function ProductEdit({
   dataImages,
   dataFeatures,
   dataTags,
-  cookie,
+  // cookie,
 }) {
   const [product, setProduct] = useState({
     name: dataItem.productName || '',
@@ -37,7 +37,7 @@ function ProductEdit({
   const [tagInput, setTagInput] = useState('')
   const [sizeInput, setSizeInput] = useState('')
 
-  const [movieId, setMovieId] = useState('')
+  // const [movieId, setMovieId] = useState('')
 
   //   const [newImages, setNewImages] = useState([])
   const [existingImages, setExistingImages] = useState(dataImages)
@@ -68,7 +68,7 @@ function ProductEdit({
   }
 
   const handleMovieSelect = (movieId) => {
-    setMovieId(movieId)
+    // setMovieId(movieId)
     setProduct({ ...product, movieId })
 
     // console.log('movieId', movieId)
@@ -137,12 +137,15 @@ function ProductEdit({
       // console.log('filePath:', filePath)
       // console.log('selectedFile:', selectedFile)
 
-      const { data: uploadData, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('marketplace')
         .upload(filePath, thumbnailFile)
+      // const { data: uploadData, error } = await supabase.storage
+      //   .from('marketplace')
+      //   .upload(filePath, thumbnailFile)
 
       if (error) {
-        console.error('Error uploading file:', error)
+        // console.error('Error uploading file:', error)
         throw error
       }
 
@@ -164,12 +167,15 @@ function ProductEdit({
       for (let file of files) {
         const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
         const filePath = `public/${product.movieId}/${uniquePrefix}-${file.name}`
-        const { data: uploadData, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from('marketplace')
           .upload(filePath, file)
+        // const { data: uploadData, error } = await supabase.storage
+        //   .from('marketplace')
+        //   .upload(filePath, file)
 
         if (error) {
-          console.error('Error uploading file:', file.name, error)
+          // console.error('Error uploading file:', file.name, error)
           throw error
         }
 
@@ -229,10 +235,10 @@ function ProductEdit({
         if (response.ok) {
           router.push(`/marketplace/product/${productId}`)
         } else {
-          console.error('Failed to upload product')
+          // console.error('Failed to upload product')
         }
       } catch (error) {
-        console.error('Error uploading product:', error)
+        // console.error('Error uploading product:', error)
       }
 
       setShouldCallAPI(false)

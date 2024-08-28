@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+// import { useSelector } from 'react-redux'
 import Header from '@/components/marketplace/header'
 import Product from '@/components/marketplace/productown'
 import Head from 'next/head'
 import Pagination from '@components/pagination'
 
-function ProductList({ username, cookie, offset, totalProducts, currentPage }) {
+function ProductList({ username, offset, totalProducts, currentPage }) {
   // const data = useSelector(selectWishItems);
   const [items, setItems] = useState([])
   const limit = 9
@@ -36,7 +36,7 @@ function ProductList({ username, cookie, offset, totalProducts, currentPage }) {
     fetchProductlist()
   }, [])
 
-  const handleRemoveFromProductlist = (id) => {
+  const handleRemoveFromProductlist = () => {
     // removeFromWishlist(id).then(() => {
     fetchProductlist()
     // });

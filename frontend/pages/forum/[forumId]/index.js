@@ -1,12 +1,13 @@
 import About from '@/components/forum/About'
-import CreatePostLink from '@/components/forum/CreatePostLink'
+// import CreatePostLink from '@/components/forum/CreatePostLink'
 // import Header from "@/components/forum/Header";
 // import NotFound from "@/components/forum/NotFound";
 import PageContent from '@/components/forum/PageContent'
 import Posts from '@/components/forum/Posts'
-import React, { useEffect } from 'react'
-import { useSetRecoilState } from 'recoil'
-import safeJsonStringify from 'safe-json-stringify'
+import React from 'react'
+// import { useEffect } from 'react'
+// import { useSetRecoilState } from 'recoil'
+// import safeJsonStringify from 'safe-json-stringify'
 import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '@theme/theme'
@@ -16,7 +17,7 @@ import ForumHeader from '@components/forum/ForumHeader'
 
 const ForumPage = ({ ForumData, user, members, ForumAbout, cookie }) => {
   //   const setForumStateValue = useSetRecoilState(ForumState);
-  const setForumStateValue = []
+  // const setForumStateValue = []
 
   // useEffect(() => {
   //   if (ForumData) {
@@ -142,7 +143,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.log('Error: getServerSideProps', error)
+    // console.log('Error: getServerSideProps', error)
     return { props: {} }
   }
 }

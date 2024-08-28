@@ -44,13 +44,13 @@ function ProductUpload() {
     }
   }
 
-  const handleTagSubmit = (e) => {
-    e.preventDefault() // Prevent form submission
-    if (tagInput && !product.tags.includes(tagInput)) {
-      setProduct({ ...product, tags: [...product.tags, tagInput] })
-      setTagInput('') // Reset input
-    }
-  }
+  // const handleTagSubmit = (e) => {
+  //   e.preventDefault() // Prevent form submission
+  //   if (tagInput && !product.tags.includes(tagInput)) {
+  //     setProduct({ ...product, tags: [...product.tags, tagInput] })
+  //     setTagInput('') // Reset input
+  //   }
+  // }
 
   const handleSizeSubmit = (e) => {
     e.preventDefault() // Prevent form submission
@@ -85,10 +85,10 @@ function ProductUpload() {
         const { productId } = await response.json()
         router.push(`/marketplace/product/${productId}`)
       } else {
-        console.error('Failed to upload product')
+        // console.error('Failed to upload product')
       }
     } catch (error) {
-      console.error('Error uploading product:', error)
+      // console.error('Error uploading product:', error)
     }
   }
 
@@ -230,7 +230,7 @@ function ProductUpload() {
               </div>
             </label>
 
-{/* Displaying added colors as buttons */}
+            {/* Displaying added colors as buttons */}
             <div className="flex flex-wrap gap-2">
               {product.colors.map((size, index) => (
                 <span

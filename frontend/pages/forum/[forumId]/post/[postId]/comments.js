@@ -5,19 +5,20 @@ import Comments from '@/components/forum/Comments'
 import PostItem from '@/components/forum/PostItem'
 // import { auth, firestore } from "@/firebase/clientApp";
 // import useForumData from "@/hooks/useForumData";
-import useCustomToast from '@/hooks/useCustomToast'
+// import useCustomToast from '@/hooks/useCustomToast'
 import usePosts from '@/hooks/usePosts'
 import { Stack } from '@chakra-ui/react'
 // import { doc, getDoc } from "firebase/firestore";
-import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import { useAuthState } from 'react-firebase-hooks/auth'
+// import { useRouter } from 'next/router'
+import React, { useState } from 'react'
+// import { useEffect } from 'react'
+// import { useAuthState } from 'react-firebase-hooks/auth'
 import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '@theme/theme'
 import Navbar from '@components/navbar'
 import BaseLayout from '@components/BaseLayout'
-import { number } from 'sharp/lib/is'
+// import { number } from 'sharp/lib/is'
 
 const PostPage = ({
   postData,
@@ -37,10 +38,11 @@ const PostPage = ({
 
   //   const { ForumStateValue } = useForumData();
   //   const [user] = useAuthState(auth);
-  const router = useRouter()
-  const showToast = useCustomToast()
-  const [hasFetched, setHasFetched] = useState(false)
-  const [postExists, setPostExists] = useState(true)
+  // const router = useRouter()
+  // const showToast = useCustomToast()
+  // const [hasFetched, setHasFetched] = useState(false)
+  // const [postExists, setPostExists] = useState(true)
+  // eslint-disable-next-line no-unused-vars
   const [postLoading, setPostLoading] = useState(false)
   const [numberOfComments, setCommentCount] = useState(postComments.length)
 
@@ -133,8 +135,8 @@ export async function getServerSideProps(context) {
   }
 
   try {
-    const limit = 9
-    const offset = (context.query.page - 1) * limit || 0
+    // const limit = 9
+    // const offset = (context.query.page - 1) * limit || 0
 
     const forumId = context.params.forumId
 
@@ -169,10 +171,10 @@ export async function getServerSideProps(context) {
       `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/forum/${forumId}/totalMembers`
     )
 
-    console.log('postData', postData)
-    console.log('comments', postComments)
-    console.log('votes', votes)
-    console.log('ForumAbout', ForumAbout)
+    // console.log('postData', postData)
+    // console.log('comments', postComments)
+    // console.log('votes', votes)
+    // console.log('ForumAbout', ForumAbout)
 
     // if (response.status === 404) {
     //   return {
@@ -204,7 +206,7 @@ export async function getServerSideProps(context) {
       },
     }
   } catch (error) {
-    console.log('Error: getServerSideProps', error)
+    // console.log('Error: getServerSideProps', error)
     return { props: {} }
   }
 }

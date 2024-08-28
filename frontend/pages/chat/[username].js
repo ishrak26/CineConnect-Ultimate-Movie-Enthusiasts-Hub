@@ -75,7 +75,7 @@ export async function getServerSideProps(context) {
     imageUrl: userDetails.image_url,
   }
 
-  console.log('user', user)
+  // console.log('user', user)
 
   return {
     props: {

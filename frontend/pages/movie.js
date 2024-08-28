@@ -1,4 +1,4 @@
-import { tmdb } from '@lib/service'
+// import { tmdb } from '@lib/service'
 import Head from 'next/head'
 import Navbar from '@components/navbar'
 import Footer from '@components/footer'
@@ -15,9 +15,9 @@ export default function MoviePage({ data, query, genres, totalMovies }) {
   const totalPages = Math.ceil(totalMovies / limit)
 
   // Handle page change
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage)
-  }
+  // const handlePageChange = (newPage) => {
+  //   setCurrentPage(newPage)
+  // }
 
   return (
     <div>
