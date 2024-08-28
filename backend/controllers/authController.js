@@ -88,11 +88,13 @@ const authController = {
             });
             console.log('token', token);
 
+            const isProduction = process.env.NODE_ENV === 'production';
+
             // Set token in an HTTP-only cookie
             res.cookie('token', token, {
-                httpOnly: true,
-                secure: false, // no Send only over HTTPS
-                // sameSite: 'Lax', // no Strict SameSite policy
+                httpOnly: true, // This makes the cookie inaccessible to client-side scripts, enhancing security
+                secure: isProduction, // true in production, false in development
+                sameSite: isProduction ? 'None' : 'Lax', // None for production, Lax for development
                 maxAge: 3600000 * 24, // Cookie expiry set to match token expiry // 1d
                 path: '/', // Set the path to root
             });
@@ -170,9 +172,10 @@ const authController = {
         try {
             res.cookie('token', '', {
                 httpOnly: true, // This makes the cookie inaccessible to client-side scripts, enhancing security
-                secure: false, // Ensures the cookie is sent over HTTPS --> no
+                secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
                 expires: new Date(0), // Setting the cookie's expiry date to Unix Epoch (January 1, 1970) ensures it's in the past
-                // sameSite: 'strict' // This setting controls whether the cookie is sent in cross-site requests
+                sameSite:
+                    process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // None for cross-site, Lax for same-site requests
                 path: '/', // Set the path to root
             });
             return res.status(200).json({ success: true });
