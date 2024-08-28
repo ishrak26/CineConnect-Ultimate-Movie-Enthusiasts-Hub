@@ -59,6 +59,7 @@ const SuggestedForumsList = () => {
   //   const { ForumStateValue, onJoinOrLeaveForum } = useForumData();
   const { ForumStateValue, onJoinOrLeaveForum } = []
   const [loading, setLoading] = useState(false)
+  // eslint-disable-next-line no-unused-vars
   const [Forums, setForums] = useState([])
   const router = useRouter()
   // const showToast = useCustomToast();

@@ -31,7 +31,9 @@ export default function Register() {
   // const [validPwd, setValidPwd] = useState(false)
   // const [pwdFocus, setPwdFocus] = useState(false)
 
+  // eslint-disable-next-line no-unused-vars
   const [matchPwd, setMatchPwd] = useState('')
+  // eslint-disable-next-line no-unused-vars
   const [validMatch, setValidMatch] = useState(false)
   // const [matchFocus, setMatchFocus] = useState(false)
 

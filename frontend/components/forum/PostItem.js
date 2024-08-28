@@ -42,11 +42,13 @@ const PostItem = ({
   // cookie,
 }) => {
   const [loadingImage, setLoadingImage] = useState(true)
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(false)
   const [loadingDelete, setLoadingDelete] = useState(false)
   const [commentCount, setCommentCount] = useState(numberOfComments)
   const router = useRouter()
   const showToast = useCustomToast()
+  // eslint-disable-next-line no-unused-vars
   const { onCopy, value, setValue, hasCopied } = useClipboard('')
 
   const singlePostPage = onSelectPost

@@ -11,6 +11,7 @@ import { FaUserFriends, FaSignOutAlt } from 'react-icons/fa'
 export default function Navbar() {
   const ref = useRef(null)
   const router = useRouter()
+  // eslint-disable-next-line no-unused-vars
   const [searchOpen, setSearchOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [userInfo, setUserInfo] = useState(null)

@@ -9,6 +9,7 @@ import React, { useState } from 'react'
  * @returns Card for creating a new Forum or post.
  */
 const PersonalHome = () => {
+  // eslint-disable-next-line no-unused-vars
   const [open, setOpen] = useState(false) // modal initially closed
   //   const mySnippets = useRecoilValue(ForumState).mySnippets;   // Updates automatically when mySnippets changes
   // const mySnippets = [];

@@ -5,7 +5,7 @@ import Comments from '@/components/forum/Comments'
 import PostItem from '@/components/forum/PostItem'
 // import { auth, firestore } from "@/firebase/clientApp";
 // import useForumData from "@/hooks/useForumData";
-import useCustomToast from '@/hooks/useCustomToast'
+// import useCustomToast from '@/hooks/useCustomToast'
 import usePosts from '@/hooks/usePosts'
 import { Stack } from '@chakra-ui/react'
 // import { doc, getDoc } from "firebase/firestore";
@@ -42,6 +42,7 @@ const PostPage = ({
   // const showToast = useCustomToast()
   // const [hasFetched, setHasFetched] = useState(false)
   // const [postExists, setPostExists] = useState(true)
+  // eslint-disable-next-line no-unused-vars
   const [postLoading, setPostLoading] = useState(false)
   const [numberOfComments, setCommentCount] = useState(postComments.length)
 

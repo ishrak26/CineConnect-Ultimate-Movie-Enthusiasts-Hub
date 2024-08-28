@@ -14,6 +14,7 @@ function Header() {
   //   const data = useSelector(selectItems);
   // const [items, setItems] = useState([])
   //   const dataWish = useSelector(selectWishItems);
+  // eslint-disable-next-line no-unused-vars
   const [wish, setWish] = useState([])
   const [open, setOpen] = useState(false)
   // const [cookie, setCookie] = useState({})

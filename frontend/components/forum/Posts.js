@@ -9,7 +9,7 @@ import usePosts from '../../hooks/usePosts'
 
 const Posts = ({ ForumData, user, ForumAbout }) => {
   // const [user] = useAuthState(auth);
-
+  // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false)
 
   const {
