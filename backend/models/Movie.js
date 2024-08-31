@@ -678,6 +678,32 @@ async function fetchTopRatedMovies(offset, limit) {
     return data;
 }
 
+async function fetchLatestMovies(offset, limit) {
+    const { data, error } = await supabase
+        .from('movie')
+        .select('id, title, release_date, poster_url, avg_rating')
+        .range(offset, offset + limit - 1)
+        .order('release_date', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching latest movies:', error);
+        throw error;
+    }
+
+    if (data) {
+        // Map the data to rename avg_rating to rating
+        const modifiedData = data.map((movie) => {
+            const { avg_rating, ...rest } = movie;
+            return { ...rest, rating: avg_rating };
+        });
+        // console.log('Returning from fetchLatestMovies:', modifiedData);
+        return modifiedData;
+    }
+
+    // console.log('Returning from fetchLatestMovies:', data);
+    return data;
+}
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -701,4 +727,5 @@ module.exports = {
     getMovieRatingInfo,
     fetchMovieWatchDetails,
     fetchTopRatedMovies,
+    fetchLatestMovies,
 };

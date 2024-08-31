@@ -85,4 +85,7 @@ router.get('/v1/search', movieController.searchAllTypes);
 // Router to get top rated movies
 router.get('/v1/movies/topRated', movieController.getTopRatedMovies);
 
+// Router to get latest movies
+router.get('/v1/movies/latest', movieController.getLatestMovies);
+
 module.exports = router;

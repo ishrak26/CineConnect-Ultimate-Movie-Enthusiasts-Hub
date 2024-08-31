@@ -147,12 +147,12 @@ export async function getServerSideProps(context) {
   // Use Promise.all to fetch data for different categories concurrently
   try {
     const limit = 10
-    const [topRated, netflixOriginals, actionMovies] = await Promise.all([
+    const [topRated, latestReleases, actionMovies] = await Promise.all([
       fetchData(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies/topRated?limit=${limit}`
       ),
       fetchData(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies/latest?limit=${limit}`
       ),
       fetchData(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
@@ -160,11 +160,7 @@ export async function getServerSideProps(context) {
     ])
 
     // Check if any of the responses indicate 'not found'
-    if (
-      topRated.notFound ||
-      netflixOriginals.notFound ||
-      actionMovies.notFound
-    ) {
+    if (topRated.notFound || latestReleases.notFound || actionMovies.notFound) {
       return { notFound: true }
     }
 
@@ -175,9 +171,9 @@ export async function getServerSideProps(context) {
         movies: topRated,
       },
       {
-        title: 'Netflix Originals',
+        title: 'Latest Releases',
         isMain: true,
-        movies: netflixOriginals,
+        movies: latestReleases,
       },
       {
         title: 'Action Movies',
