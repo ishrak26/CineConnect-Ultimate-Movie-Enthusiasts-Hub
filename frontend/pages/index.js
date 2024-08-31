@@ -16,9 +16,7 @@ import dynamic from 'next/dynamic'
 const Row = dynamic(() => import('@components/Row'))
 
 export default function Home({
-  topRated,
-  netflixOriginals,
-  actionMovies,
+  movies,
   // query,
 }) {
   // const router = useRouter()
@@ -59,29 +57,15 @@ export default function Home({
             </div>
           </div>
           <section className="md:space-y-24 pt-5">
-            <div className="pb-4 my-5">
-              <Row
-                // movies={trending.results}
-                movies={topRated}
-                title="Top Rated"
-                isMain={true}
-              />
-            </div>
-            <div className="pb-4 my-5">
-              <Row
-                movies={netflixOriginals}
-                title="Netflix Originals"
-                isMain={true}
-              />
-            </div>
-
-            <div className="pb-4 my-5">
-              <Row
-                movies={actionMovies}
-                title="Action Thrillers"
-                isMain={true}
-              />
-            </div>
+            {movies.map((row, index) => (
+              <div className="pb-4 my-5" key={index}>
+                <Row
+                  movies={row.movies}
+                  title={row.title}
+                  isMain={row.isMain}
+                />
+              </div>
+            ))}
           </section>
 
           {/* <Segmented
@@ -184,11 +168,27 @@ export async function getServerSideProps(context) {
       return { notFound: true }
     }
 
+    const movies = [
+      {
+        title: 'Top Rated',
+        isMain: true,
+        movies: topRated,
+      },
+      {
+        title: 'Netflix Originals',
+        isMain: true,
+        movies: netflixOriginals,
+      },
+      {
+        title: 'Action Movies',
+        isMain: true,
+        movies: actionMovies,
+      },
+    ]
+
     return {
       props: {
-        topRated,
-        netflixOriginals,
-        actionMovies,
+        movies,
         // Add other props as needed
       },
     }
