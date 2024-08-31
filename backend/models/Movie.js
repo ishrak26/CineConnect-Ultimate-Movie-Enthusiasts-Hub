@@ -230,7 +230,7 @@ async function fetchMoviesByTitle(title, offset, limit) {
     title = '%' + title + '%';
     const { data, error } = await supabase
         .from('movie')
-        .select('id, title, release_date, poster_url')
+        .select('id, title, release_date, poster_url, avg_rating')
         .ilike('title', title) // ilike is case-insensitive. like is case-sensitive.
         .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1)
         .order('title', { ascending: true });
@@ -239,24 +239,38 @@ async function fetchMoviesByTitle(title, offset, limit) {
         console.error('Error fetching movies by title', error);
         return null;
     }
-    if (data) {
-        for (let movie of data) {
-            // const genres = await fetchGenresByMovieId(movie.id);
-            // if (genres) {
-            //     movie.genres = genres;
-            //     // console.log('movie.genres', movie.genres);
-            // }
 
-            const rating = await fetchMovieRatingById(movie.id);
-            if (rating) {
-                movie.rating = rating;
-            }
-            // console.log('movie', movie);
-        }
-        // console.log('Returning from fetchMoviesByTitle:', data);
-        // console.log(data[0].genres);
-        return data;
+    if (data) {
+        // Map the data to rename avg_rating to rating
+        const modifiedData = data.map((movie) => {
+            const { avg_rating, ...rest } = movie;
+            return { ...rest, rating: avg_rating };
+        });
+        // console.log('Returning from fetchMoviesByTitle:', modifiedData);
+        return modifiedData;
     }
+
+    // if (data) {
+    //     for (let movie of data) {
+    //         // const genres = await fetchGenresByMovieId(movie.id);
+    //         // if (genres) {
+    //         //     movie.genres = genres;
+    //         //     // console.log('movie.genres', movie.genres);
+    //         // }
+
+    //         const rating = await fetchMovieRatingById(movie.id);
+    //         if (rating) {
+    //             movie.rating = rating;
+    //         }
+    //         // console.log('movie', movie);
+    //     }
+    //     // console.log('Returning from fetchMoviesByTitle:', data);
+    //     // console.log(data[0].genres);
+    //     return data;
+    // }
+
+    // console.log('Returning from fetchMoviesByTitle:', data);
+    return data;
 }
 
 /*
@@ -649,8 +663,18 @@ async function fetchTopRatedMovies(offset, limit) {
         console.error('Error fetching top rated movies:', error);
         throw error;
     }
-    // console.log('Returning from fetchTopRatedMovies:', data);
 
+    if (data) {
+        // Map the data to rename avg_rating to rating
+        const modifiedData = data.map((movie) => {
+            const { avg_rating, ...rest } = movie;
+            return { ...rest, rating: avg_rating };
+        });
+        // console.log('Returning from fetchTopRatedMovies:', modifiedData);
+        return modifiedData;
+    }
+
+    // console.log('Returning from fetchTopRatedMovies:', data);
     return data;
 }
 

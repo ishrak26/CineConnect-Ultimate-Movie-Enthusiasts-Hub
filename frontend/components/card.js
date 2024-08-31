@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import Link from 'next/link'
 import Poster from './poster'
@@ -21,15 +21,17 @@ export default function Card({
       href={`/${type}/${id}`}
       className={clsx('card', className)}
       {...props}
-    > 
-
+    >
       <Poster path={image} alt={title} />
 
       {rating >= 0 && (
         <Rating average={rating} className="absolute top-4 left-4" />
       )}
       {title && <div className="card-title">{title}</div>}
-      {release_date && <div className="card-date">{release_date}</div>}
+      {/* {release_date && <div className="card-date">{release_date}</div>} */}
+      {release_date && (
+        <div className="card-date">{new Date(release_date).getFullYear()}</div>
+      )}
       {children}
     </Link>
   )
