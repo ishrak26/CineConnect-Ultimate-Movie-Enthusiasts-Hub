@@ -165,7 +165,7 @@ export async function getServerSideProps(context) {
     const limit = 10
     const [topRated, netflixOriginals, actionMovies] = await Promise.all([
       fetchData(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies/topRated?limit=${limit}`
       ),
       fetchData(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/movies?limit=${limit}`

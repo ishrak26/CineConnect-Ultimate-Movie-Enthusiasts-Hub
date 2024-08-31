@@ -82,4 +82,7 @@ router.get('/v1/movie/:movieId/images', movieController.getMovieImages);
 // Router to get search results for movies, moviePersons, users
 router.get('/v1/search', movieController.searchAllTypes);
 
+// Router to get top rated movies
+router.get('/v1/movies/topRated', movieController.getTopRatedMovies);
+
 module.exports = router;

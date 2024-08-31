@@ -15,7 +15,7 @@ const moviesController = {
                 limit
             );
 
-            res.json(movies || []);
+            res.status(200).json(movies || []);
         } catch (error) {
             console.error('in catch: ', error.message);
             res.status(500).json({ message: error.message });
@@ -568,6 +568,21 @@ const moviesController = {
         } catch (error) {
             console.error('Error in getMovieRating:', error);
             res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getTopRatedMovies: async (req, res) => {
+        const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not specified
+        const offset = parseInt(req.query.offset) || 0; // Default offset to 0 if not specified
+
+        try {
+            const movies = await db_movie.fetchTopRatedMovies(offset, limit);
+            // console.log('movies:', movies);
+
+            res.status(200).json(movies);
+        } catch (error) {
+            console.error('in catch of getTopRatedMovies: ', error.message);
+            res.status(500).json({ message: error.message });
         }
     },
 

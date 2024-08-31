@@ -638,6 +638,22 @@ async function getMovieRatingInfo(movieId, userId = null) {
     return data[0];
 }
 
+async function fetchTopRatedMovies(offset, limit) {
+    const { data, error } = await supabase
+        .from('movie')
+        .select('id, title, release_date, poster_url, avg_rating')
+        .range(offset, offset + limit - 1)
+        .order('avg_rating', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching top rated movies:', error);
+        throw error;
+    }
+    // console.log('Returning from fetchTopRatedMovies:', data);
+
+    return data;
+}
+
 module.exports = {
     fetchMoviesById,
     fetchMoviesByTitle,
@@ -660,4 +676,5 @@ module.exports = {
     fetchMovieImages,
     getMovieRatingInfo,
     fetchMovieWatchDetails,
+    fetchTopRatedMovies,
 };
